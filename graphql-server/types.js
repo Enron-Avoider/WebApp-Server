@@ -1,6 +1,9 @@
 const { gql } = require("apollo-server");
+const GraphQLJSON = require('graphql-type-json');
 
 const typeDefs = gql`
+    scalar JSON
+
     type SimfinStock {
         simId: String,
         ticker: String,
@@ -9,13 +12,16 @@ const typeDefs = gql`
         employees: String,
         sectorName: String,
         sectorCode: String,
-        industryCompanies: [SimfinStock]
-        # financials: []
+        industryCompanies: [SimfinStock],
+        yearlyFinancials: YearlyFinancials
     }
 
-    # type Financials {
-    #     years: Int[]
-    # }
+    type YearlyFinancials {
+        years: [Int],
+        pl: [JSON],
+        bs: [JSON],
+        cf: [JSON]
+    }
 
     type Query {
         findSimfinStockByName(name: String): [SimfinStock],
@@ -24,6 +30,7 @@ const typeDefs = gql`
 `;
 
 const resolvers = {
+  JSON: GraphQLJSON,
   Query: {
     findSimfinStockByName: async (_source, params, { dataSources, redisClient }) =>
         [
@@ -39,9 +46,8 @@ const resolvers = {
             .map(async (company) =>
                 await dataSources.messyFinanceDataAPI.getSimfinCompanyById({ id: company.simId }, redisClient)
             ),
-    // financials: async (_source, params, { dataSources, redisClient }) =>
-    //     dataSources.messyFinanceDataAPI.getStockFinancials(_source, redisClient)
-    
+    yearlyFinancials: async (_source, params, { dataSources, redisClient }) =>
+        dataSources.messyFinanceDataAPI.yearlyFinancials(_source, redisClient)
   }
 };
 
