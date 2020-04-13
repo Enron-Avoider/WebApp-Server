@@ -94,31 +94,88 @@ module.exports = {
     };
 
     yearlyFinancials = async (id, redisClient) => {
-      const years = ((yearFrom = 1990) =>
+      const years = ((yearFrom = 2005) =>
         Array.from(
           { length: new Date().getFullYear() - yearFrom + 1 },
           (v, k) => yearFrom + k
         ))();
 
-      const statements = await ["pl", "bs", "cf"].reduce( async (accUnresolved, statement) => {
-        const accResolved = await accUnresolved;
-        return {
-          ...accResolved,
-          [statement]: await years.map(
-            async (year) =>
-              await this.cached(
-                redisClient,
-                `https://simfin.com/api/v1/companies/id/111052/statements/standardised
+      const transformToPerField = (statements) => {
+        // gets all fields uniquely
+        const fields = statements
+          .reduce((acc, curr) => {
+            const newFields = curr
+              ? curr.reduce(
+                  (acc2, curr2) =>
+                    !curr2 ||
+                    (curr2.standardisedName &&
+                      acc.find(
+                        (el) => el.standardisedName === curr2.standardisedName
+                      ))
+                      ? acc2
+                      : [...acc2, curr2],
+                  []
+                )
+              : [];
+            return [...acc, ...newFields];
+          }, [])
+          .sort((a, b) => a.tid - b.tid || a.uid - b.uid);
+
+        const perField = fields.map((field) => {
+          const valuesOverArray = (key) =>
+            statements
+              .reduce(
+                (acc, curr) =>
+                  curr
+                    ? [
+                        ...acc,
+                        curr.find(
+                          (f) => f.standardisedName === field.standardisedName
+                        )[key],
+                      ]
+                    : [...acc, 0],
+                []
+              )
+              .map((v) => (!isNaN(+v) ? parseInt(v) : v));
+
+          return {
+            ...field,
+            valueChosen: valuesOverArray("valueChosen"),
+            valueAssigned: valuesOverArray("valueAssigned"),
+            valueCalculated: valuesOverArray("valueCalculated"),
+            checkPossible: valuesOverArray("checkPossible"),
+          };
+        });
+
+        return perField;
+      };
+
+      const statements = await ["pl", "bs", "cf"].reduce(
+        async (accUnresolved, statement) => {
+          const accResolved = await accUnresolved;
+          return {
+            ...accResolved,
+            [statement]: transformToPerField(
+              await Promise.all(
+                years.map(
+                  async (year) =>
+                    await this.cached(
+                      redisClient,
+                      `https://simfin.com/api/v1/companies/id/111052/statements/standardised
                       ?api-key=${this.keys.simfin}
                       &ptype=${"FY"}
                       &fyear=${year}
                       &stype=${statement}
                 `.replace(/\s/g, ""),
-                "get"
-              ).then((r, e) => r && r.values)
-          ),
-        };
-      }, {});
+                      "get"
+                    ).then((r, e) => r && r.values)
+                )
+              )
+            ),
+          };
+        },
+        {}
+      );
 
       return {
         years,
