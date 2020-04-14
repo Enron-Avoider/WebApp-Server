@@ -13,7 +13,20 @@ const typeDefs = gql`
         sectorName: String,
         sectorCode: String,
         industryCompanies: [SimfinStock],
-        yearlyFinancials: YearlyFinancials
+        aggregatedShares: [JSON],
+        shareClasses: [ShareClasses],
+        years: [Int],
+        yearlyFinancials: YearlyFinancials,
+        # yearlyPrices: [JSON] 
+    }
+
+    type ShareClasses {
+        simId: String,
+        shareClassId: String,
+        shareClassName: String,
+        shareClassType: String,
+        years: [Int],
+        yearlyPrices: JSON
     }
 
     type YearlyFinancials {
@@ -37,17 +50,42 @@ const resolvers = {
             ... await dataSources.messyFinanceDataAPI.findSimfinStockByName(params, redisClient),
             ... await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(params, redisClient)
         ],
-    getSimfinCompanyById: async (_source, params, { dataSources, redisClient }) =>
-        dataSources.messyFinanceDataAPI.getSimfinCompanyById(params, redisClient)
+    getSimfinCompanyById: async (_source, params, { dataSources, redisClient }) => ({
+        ... await dataSources.messyFinanceDataAPI.getSimfinCompanyById(params, redisClient),
+        years: ((yearFrom = 2010) =>
+            Array.from(
+                { length: new Date().getFullYear() - yearFrom + 1 },
+                (v, k) => yearFrom + k
+            ))()
+    })
   },
   SimfinStock: {
+
+    aggregatedShares: async (_source, params, { dataSources, redisClient }) =>
+        dataSources.messyFinanceDataAPI.aggregatedShares(_source, redisClient),
+
+    shareClasses: async (_source, params, { dataSources, redisClient }) =>
+        dataSources.messyFinanceDataAPI.shareClasses(_source, redisClient),
+
     industryCompanies: async (_source, params, { dataSources, redisClient }) =>
         (await dataSources.messyFinanceDataAPI.getSimfinIndustryCompanies(_source.sectorCode, redisClient))
             .map(async (company) =>
-                await dataSources.messyFinanceDataAPI.getSimfinCompanyById({ id: company.simId }, redisClient)
+                 ({
+                    years: _source.years,
+                    ...await dataSources.messyFinanceDataAPI.getSimfinCompanyById({ id: company.simId }, redisClient)
+                })
             ),
+
     yearlyFinancials: async (_source, params, { dataSources, redisClient }) =>
-        dataSources.messyFinanceDataAPI.yearlyFinancials(_source, redisClient)
+        dataSources.messyFinanceDataAPI.yearlyFinancials(_source, redisClient),
+
+    // yearlyPrices: async (_source, params, { dataSources, redisClient }) =>
+    //     dataSources.messyFinanceDataAPI.yearlyPrices(_source, redisClient),
+  },
+
+  ShareClasses: {
+    yearlyPrices: async (_source, params, { dataSources, redisClient }) =>
+        dataSources.messyFinanceDataAPI.pricesForShareClasses(_source, redisClient)
   }
 };
 

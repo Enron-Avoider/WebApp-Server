@@ -7,6 +7,7 @@ module.exports = {
 
       this.keys = {
         simfin: "QPUY3ma4Lj69NsEYCb3HNGfiQstUAhpJ",
+        iex: "pk_f98f7cd7f79646248c4ff291c23f1440",
       };
     }
 
@@ -93,13 +94,7 @@ module.exports = {
       }
     };
 
-    yearlyFinancials = async (id, redisClient) => {
-      const years = ((yearFrom = 2005) =>
-        Array.from(
-          { length: new Date().getFullYear() - yearFrom + 1 },
-          (v, k) => yearFrom + k
-        ))();
-
+    yearlyFinancials = async ({ years }, redisClient) => {
       const transformToPerField = (statements) => {
         // gets all fields uniquely
         const fields = statements
@@ -140,17 +135,18 @@ module.exports = {
 
           return {
             ...field,
-            valueChosen: valuesOverArray("valueChosen"),
-            valueAssigned: valuesOverArray("valueAssigned"),
-            valueCalculated: valuesOverArray("valueCalculated"),
-            checkPossible: valuesOverArray("checkPossible"),
+            value: valuesOverArray("valueChosen"),
+            // valueChosen: valuesOverArray("valueChosen"),
+            // valueAssigned: valuesOverArray("valueAssigned"),
+            // valueCalculated: valuesOverArray("valueCalculated"),
+            // checkPossible: valuesOverArray("checkPossible"),
           };
         });
 
         return perField;
       };
 
-      const statements = await ["pl", "bs", "cf"].reduce(
+      return await ["pl", "bs", "cf"].reduce(
         async (accUnresolved, statement) => {
           const accResolved = await accUnresolved;
           return {
@@ -176,11 +172,61 @@ module.exports = {
         },
         {}
       );
-
-      return {
-        years,
-        ...statements,
-      };
     };
+
+    // yearlyPrices = async ({ years, ticker }, redisClient) => {
+    //   return await Promise.all(
+    //     years.map(
+    //       async (y) =>
+    //         await this.cached(
+    //           redisClient,
+    //           // quite disappointing data
+    //           `https://cloud.iexapis.com/stable/stock/${ticker}/chart/date/${y}0930?chartByDay=true&token=${this.keys.iex}`,
+    //           "get"
+    //         )
+    //     )
+    //   );
+    // };
+
+    aggregatedShares = async ({ simId }, redisClient) =>
+      (
+        await this.cached(
+          redisClient,
+          `https://simfin.com/api/v1/companies/id/${simId}/shares/aggregated?api-key=${this.keys.simfin}`,
+          "get"
+        )
+      ).sort((a, b) => a.date - b.date);
+
+    shareClasses = async ({ simId, years }, redisClient) =>
+      (
+        await this.cached(
+          redisClient,
+          `https://simfin.com/api/v1/companies/id/${simId}/shares/classes/list?api-key=${this.keys.simfin}`,
+          "get"
+        )
+      ).map((c) => ({
+        simId,
+        years,
+        ...c,
+      }));
+
+    pricesForShareClasses = async (
+      { simId, shareClassId, years },
+      redisClient
+    ) =>
+      this.cached(
+        redisClient,
+        `https://simfin.com/api/v1/companies/id/${simId}/shares/classes/${shareClassId}/prices?api-key=${this.keys.simfin}`,
+        "get"
+      ).then((r) => ({
+        ...r,
+        priceData: years.map(
+          (y) =>
+            r &&
+            r.priceData
+              .sort((a, b) => a.date - b.date)
+              .find((p) => p.date.includes(`${y}-09-2`))
+        ),
+      }));
   },
 };
