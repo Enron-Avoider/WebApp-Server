@@ -14,9 +14,9 @@ module.exports = {
     cached = async (redisClient, url, httpCall, body, differentiator) =>
       await new Promise((res, rej) => {
         const cacheHash = url + differentiator + JSON.stringify(body);
-        //  console.log({ cacheHash });
+        // console.log({ cacheHash });
         return redisClient.get(cacheHash, async (err, reply) => {
-          //   console.log({ err, reply });
+        //   console.log({ err, reply });
           if (reply) {
             res(JSON.parse(reply));
           } else {
@@ -45,12 +45,18 @@ module.exports = {
         "get"
       );
 
-    getSimfinCompanyById = async ({ id }, redisClient) =>
-      this.cached(
+    getSimfinCompanyById = async ({ id }, redisClient) => ({
+      ...(await this.cached(
         redisClient,
         `https://simfin.com/api/v1/companies/id/${id}?api-key=${this.keys.simfin}`,
         "get"
-      );
+      )),
+      years: ((yearFrom = 2010) =>
+        Array.from(
+          { length: new Date().getFullYear() - yearFrom + 1 },
+          (v, k) => yearFrom + k
+        ))(),
+    });
 
     getSimfinIndustryCompanies = async (id, redisClient) => {
       const firstRequest = await this.cached(

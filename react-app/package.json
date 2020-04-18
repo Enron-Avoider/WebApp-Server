@@ -1,0 +1,49 @@
+{
+  "scripts": {
+    "check-types": "tsc",
+    "start": "npm run serve:dev",
+    "build": "cross-env NODE_ENV=production webpack --color --progress",
+    "serve:dist": "serve dist",
+    "serve:dev": "cross-env NODE_ENV=development webpack-dev-server --color --progress",
+    "serve:staging": "cross-env NODE_ENV=staging webpack-dev-server --color --progress",
+    "serve:production": "cross-env NODE_ENV=production webpack-dev-server --color --progress"
+  },
+  "dependencies": {
+    "@apollo/react-hooks": "^3.1.5",
+    "@loadable/component": "^5.12.0",
+    "apollo-boost": "^0.4.7",
+    "bootstrap": "^4.4.1",
+    "graphql": "^15.0.0",
+    "react": "^16.12.0",
+    "react-apollo": "^3.1.5",
+    "react-dom": "^16.12.0",
+    "react-router-dom": "^5.1.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/preset-env": "^7.7.7",
+    "@babel/preset-react": "^7.7.4",
+    "@babel/preset-typescript": "^7.7.7",
+    "@types/loadable__component": "^5.10.0",
+    "@types/node": "^12.12.5",
+    "@types/react": "^16.9.11",
+    "@types/react-dom": "^16.9.3",
+    "@types/react-router-dom": "^5.1.3",
+    "awesome-typescript-loader": "^5.2.1",
+    "babel-loader": "^8.0.6",
+    "cross-env": "^6.0.3",
+    "css-loader": "^3.4.2",
+    "html-webpack-plugin": "^3.2.0",
+    "hygen": "^5.0.3",
+    "node-sass": "^4.13.1",
+    "resolve-ts-aliases": "^1.0.0",
+    "sass-loader": "^8.0.2",
+    "serve": "^11.3.0",
+    "style-loader": "^1.1.3",
+    "terser-webpack-plugin": "^2.3.2",
+    "typescript": "^3.7.4",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1"
+  }
+}

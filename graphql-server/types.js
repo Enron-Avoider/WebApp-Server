@@ -38,7 +38,8 @@ const typeDefs = gql`
 
     type Query {
         findSimfinStockByName(name: String): [SimfinStock],
-        getSimfinCompanyById(id: String): SimfinStock
+        getSimfinCompanyById(id: String): SimfinStock,
+        getSimfinCompanyByTicker(name: String): SimfinStock
     }
 `;
 
@@ -50,14 +51,18 @@ const resolvers = {
             ... await dataSources.messyFinanceDataAPI.findSimfinStockByName(params, redisClient),
             ... await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(params, redisClient)
         ],
-    getSimfinCompanyById: async (_source, params, { dataSources, redisClient }) => ({
-        ... await dataSources.messyFinanceDataAPI.getSimfinCompanyById(params, redisClient),
-        years: ((yearFrom = 2010) =>
-            Array.from(
-                { length: new Date().getFullYear() - yearFrom + 1 },
-                (v, k) => yearFrom + k
-            ))()
-    })
+
+    getSimfinCompanyById: async (_source, params, { dataSources, redisClient }) => 
+        dataSources.messyFinanceDataAPI.getSimfinCompanyById(params, redisClient),
+
+    getSimfinCompanyByTicker: async (_source, params, { dataSources, redisClient }) => {
+        const stocks = [
+            ... await dataSources.messyFinanceDataAPI.findSimfinStockByName(params, redisClient),
+            ... await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(params, redisClient)
+        ]
+
+        return  dataSources.messyFinanceDataAPI.getSimfinCompanyById({id: stocks[0].simId}, redisClient)
+    }
   },
   SimfinStock: {
 
