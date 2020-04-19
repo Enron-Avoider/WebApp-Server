@@ -15,7 +15,7 @@ export default function App() {
                 <Header />
 
                 <Switch>
-                    <Route path="/stock/:ticker" component={loadable(() => import('./components/Routes/Page1'))} />
+                    <Route path="/stock/:ticker" component={loadable(() => import('./components/routes/StockPage'))} />
                 </Switch>
             </Router>
         </>

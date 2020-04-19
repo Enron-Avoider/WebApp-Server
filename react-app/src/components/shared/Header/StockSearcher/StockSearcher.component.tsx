@@ -30,15 +30,28 @@ export default function StockSearcher() {
     }, [name])
 
     return (
-        <>
-            <input onChange={handleInputChange} value={name} />
+        <div className="StockSearcher_container">
+            <input
+                className="form-control"
+                type="search"
+                placeholder="Search Stonks"
+                aria-label="Search"
+                onChange={handleInputChange}
+                value={name}
+            />
 
-            {loading && 'loading'}
-
-            {name.length > 2 && (
-                <ul>
+            {(name.length > 2 || loading) && (
+                <ul className="list-group mt-1 list-group-flush StockSearcher_SearchResults">
+                    {loading && (
+                        <li className="list-group-item">
+                            loading
+                        </li>
+                    )}
                     {data && data.findSimfinStockByName.map((d: any) => (
-                        <li key={d.ticker}>
+                        <li
+                            className="list-group-item"
+                            key={d.ticker}
+                        >
                             <Link to={`/stock/${d.ticker}`}>
                                 {d.name}
                             </Link>
@@ -46,7 +59,6 @@ export default function StockSearcher() {
                     ))}
                 </ul>
             )}
-
-        </>
+        </div>
     );
 }

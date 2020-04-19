@@ -16,7 +16,7 @@ module.exports = {
         const cacheHash = url + differentiator + JSON.stringify(body);
         // console.log({ cacheHash });
         return redisClient.get(cacheHash, async (err, reply) => {
-        //   console.log({ err, reply });
+            console.log({ err, reply });
           if (reply) {
             res(JSON.parse(reply));
           } else {

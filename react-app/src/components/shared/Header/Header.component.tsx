@@ -2,14 +2,16 @@ import React from 'react';
 
 import './style.sass';
 
-import StockSearcher from '@components/shared/StockSearcher';
+import StockSearcher from './StockSearcher';
 
 export default function Header() {
     return (
-        <>
-            <p>Header</p>
-            <StockSearcher />
-        </>
+        <nav className="navbar navbar-dark bg-dark">
+            <a className="navbar-brand">Enron.Monster</a>
+            <form className="form-inline">
+                <StockSearcher />
+            </form>
+        </nav>
     );
 }
 
