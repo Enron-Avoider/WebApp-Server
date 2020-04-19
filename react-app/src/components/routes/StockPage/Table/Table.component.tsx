@@ -1,6 +1,5 @@
 import React from "react";
 import { useTable, useBlockLayout, Column } from "react-table";
-import { FixedSizeList } from "react-window";
 import { useSticky } from 'react-table-sticky';
 
 import "./style.sass";
@@ -22,13 +21,14 @@ export default function Table({ columns, data }: { columns: Column<{}>[], data: 
         useSticky,
     );
 
+
     return (
         <div className={'TableContainer'}>
-            <div {...getTableProps()} className="table sticky" style={{ width: 1000, height: 500 }}>
+            <div {...getTableProps()} className="table sticky">
                 <div className="header">
-                    {headerGroups.map((headerGroup) => (
+                    {headerGroups.map((headerGroup: any) => (
                         <div {...headerGroup.getHeaderGroupProps()} className="tr">
-                            {headerGroup.headers.map((column) => (
+                            {headerGroup.headers.map((column: any) => (
                                 <div {...column.getHeaderProps()} className="th">
                                     {column.render('Header')}
                                 </div>
@@ -37,11 +37,11 @@ export default function Table({ columns, data }: { columns: Column<{}>[], data: 
                     ))}
                 </div>
                 <div {...getTableBodyProps()} className="body">
-                    {rows.map((row) => {
+                    {rows.map((row: any) => {
                         prepareRow(row);
                         return (
                             <div {...row.getRowProps()} className="tr">
-                                {row.cells.map((cell) => (
+                                {row.cells.map((cell: any) => (
                                     <div {...cell.getCellProps()} className="td">
                                         {cell.render('Cell')}
                                     </div>
