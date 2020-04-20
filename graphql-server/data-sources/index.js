@@ -16,7 +16,7 @@ module.exports = {
         const cacheHash = url + differentiator + JSON.stringify(body);
         // console.log({ cacheHash });
         return redisClient.get(cacheHash, async (err, reply) => {
-            console.log({ err, reply });
+            // console.log({ err, reply });
           if (reply) {
             res(JSON.parse(reply));
           } else {
@@ -100,7 +100,7 @@ module.exports = {
       }
     };
 
-    yearlyFinancials = async ({ years }, redisClient) => {
+    yearlyFinancials = async ({ years, simId }, redisClient) => {
       const transformToPerField = (statements) => {
         // gets all fields uniquely
         const fields = statements
@@ -163,7 +163,7 @@ module.exports = {
                   async (year) =>
                     await this.cached(
                       redisClient,
-                      `https://simfin.com/api/v1/companies/id/111052/statements/standardised
+                      `https://simfin.com/api/v1/companies/id/${simId}/statements/standardised
                       ?api-key=${this.keys.simfin}
                       &ptype=${"FY"}
                       &fyear=${year}

@@ -1,5 +1,7 @@
 .TableContainer
-    padding: 1rem
+    // padding: 1rem
+    font-family: dm, Menlo, Monaco, "Courier New", monospace
+    font-size: 14px
 
     .table 
         border: 1px solid #ddd
@@ -12,13 +14,25 @@
             
         .th, .td 
             padding: 5px
-            border-bottom: 1px solid #ddd
-            border-right: 1px solid #ddd
+            // border-bottom: 1px solid #ddd
             background-color: #fff
             overflow: hidden
+            text-align: right
 
             &:last-child 
                 border-right: 0
+
+            &:first-child
+                text-align: left
+                background-color: black
+                color: white
+                // white-space: nowrap
+                // overflow: hidden
+                // text-overflow: ellipsis
+
+                &:hover
+                    white-space: inherit
+                    
         
         &.sticky 
             overflow: scroll
@@ -26,15 +40,16 @@
             .header, .footer 
                 position: sticky
                 z-index: 1
-                width: fit-content
+                background: black
+                color: white
+                // width: fit-content
         
             .header 
                 top: 0
-                box-shadow: 0px 3px 3px #ccc
-        
-            .footer 
-                bottom: 0
-                box-shadow: 0px -3px 3px #ccc
+                // box-shadow: 0px 2px 2px #ccc
+                
+                .th
+                    background-color: black
         
             .body 
                 position: relative
@@ -43,11 +58,11 @@
             [data-sticky-td] 
                 position: sticky
         
-            [data-sticky-last-left-td] 
-                box-shadow: 2px 0px 3px #ccc
+            // [data-sticky-last-left-td] 
+            //     box-shadow: 2px 0px 2px #ccc
         
-            [data-sticky-first-right-td] 
-                box-shadow: -2px 0px 3px #ccc
+            // [data-sticky-first-right-td] 
+            //     box-shadow: -2px 0px 2px #ccc
       
     
   
