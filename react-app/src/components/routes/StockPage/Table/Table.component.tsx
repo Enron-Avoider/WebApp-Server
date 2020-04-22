@@ -1,5 +1,5 @@
 import React from "react";
-import { useTable, useBlockLayout, Column } from "react-table";
+import { useTable, useBlockLayout, useExpanded, Column } from "react-table";
 import { useSticky } from 'react-table-sticky';
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
 
@@ -13,14 +13,18 @@ export default function Table({ columns, data }: { columns: Column<{}>[], data: 
         headerGroups,
         rows,
         prepareRow,
+        // state: { expanded },
     } = useTable(
         {
             columns,
             data,
         },
         useBlockLayout,
+        useExpanded,
         useSticky,
     );
+
+    console.log({ rows });
 
     return (
         <div className={'TableContainer'}>

@@ -3,4 +3,7 @@ declare module "*.svg" {
     export default content;
 }
 
-declare module "react-scroll-sync"
+declare module "react-scroll-sync" {
+    const value: any;
+    export default value;
+}

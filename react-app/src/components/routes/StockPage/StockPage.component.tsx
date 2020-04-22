@@ -63,7 +63,26 @@ export default function StockPage() {
 
     const columns = stock && [
         {
-            Header: '',
+            id: 'expander',
+            Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }: any) => (
+                <span {...getToggleAllRowsExpandedProps()}>
+                    {isAllRowsExpanded ? '👇' : '👉'}
+                </span>
+            ),
+            Cell: ({ row, cell }: any) =>
+                <span
+                    {...row.getToggleRowExpandedProps({
+                        style: {
+                            // We can even use the row.depth property
+                            // and paddingLeft to indicate the depth
+                            // of the row
+                            paddingLeft: `${row.depth * 2}rem`,
+                        },
+                    })}
+                >
+                    {cell.value}
+                    {row.canExpand ? (row.isExpanded ? '👇' : '👉') : null}
+                </span>,
             accessor: 'title',
             sticky: 'left',
             width: 150
@@ -82,17 +101,46 @@ export default function StockPage() {
 
     const financialTableData = stock && Object.getOwnPropertyNames(stock.yearlyFinancials)
         .filter((k: string) => k !== '__typename') // graphql spam
-        .reduce((acc: any, curr: any, i: number) =>
+        .reduce((acc: any, key: any, i: number) =>
             ({
                 ...acc,
-                [curr]: stock.yearlyFinancials[curr]
-                    .filter((y: any) => y.displayLevel === '0') // hack, figure out remaining data or replace please    
-                    .map((y: any) =>
-                        y.value.reduce((acc: any, curr: any, i: number) => ({
-                            ...acc,
-                            [`${stock.years[i]}`]: numeral(curr).format('(0.00a)')
-                        }), { title: y.standardisedName })
-                    )
+                [key]: stock.yearlyFinancials[key]
+                    // .filter((y: any) => y.displayLevel === '0') // hack, figure out remaining data or replace please    
+                    // .map((y: any) =>
+                    .reduce((acc: any, dataPoint: any, i: number) => {
+                        // console.log({ dataPoint, acc });
+                        if (dataPoint.displayLevel === '0') {
+                            return [
+                                ...acc,
+                                dataPoint.value.reduce((acc: any, value: any, i: number) => ({
+                                    ...acc,
+                                    [`${stock.years[i]}`]: numeral(value).format('(0.00a)')
+                                }), { title: dataPoint.standardisedName, subRows: [] })
+                            ];
+                        } else if (dataPoint.displayLevel === '1') {
+                            return [
+                                ...acc.map((tableRow: any, i: number) => {
+                                    if (i === acc.length - 1) {
+                                        return {
+                                            ...tableRow,
+                                            subRows: [
+                                                ...tableRow.subRows,
+                                                dataPoint.value.reduce((acc: any, value: any, i: number) => ({
+                                                    ...acc,
+                                                    [`${stock.years[i]}`]: numeral(value).format('(0.00a)')
+                                                }), { title: dataPoint.standardisedName, subRows: [] })
+                                            ]
+                                        };
+                                    } else {
+                                        return tableRow;
+                                    }
+                                }),
+                            ]
+                        } else {
+                            // console.log(dataPoint.displayLevel)
+                            return acc;
+                        }
+                    }, [])
             })
             , {})
 

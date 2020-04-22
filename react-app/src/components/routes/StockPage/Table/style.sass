@@ -26,12 +26,21 @@
                 text-align: left
                 background-color: black
                 color: white
-                // white-space: nowrap
-                // overflow: hidden
+                position: relative
                 // text-overflow: ellipsis
+                // overflow: visible
 
                 &:hover
-                    white-space: inherit
+                    overflow: visible
+
+                span
+                    position: absolute
+                    overflow: hidden
+                    white-space: nowrap
+                    background-color: black
+
+                    // width: 250px !important
+                    // white-space: inherit
                     
         
         &.sticky 
