@@ -4,7 +4,7 @@
     font-size: 14px
 
     .table 
-        border: 1px solid #ddd
+        // border: 1px solid #ddd
         width: 100%
         max-height: 500px
 
@@ -15,7 +15,7 @@
         .th, .td 
             padding: 5px
             // border-bottom: 1px solid #ddd
-            background-color: #fff
+            // background-color: #fff
             overflow: hidden
             text-align: right
 
@@ -24,8 +24,8 @@
 
             &:first-child
                 text-align: left
-                background-color: black
-                color: white
+                // background-color: black
+                // color: white
                 position: relative
                 // text-overflow: ellipsis
                 // overflow: visible
@@ -33,11 +33,14 @@
                 &:hover
                     overflow: visible
 
+                    span
+                        background-color: black
+
                 span
                     position: absolute
                     overflow: hidden
                     white-space: nowrap
-                    background-color: black
+                    // background-color: black
 
                     // width: 250px !important
                     // white-space: inherit
@@ -49,7 +52,7 @@
             .header, .footer 
                 position: sticky
                 z-index: 1
-                background: black
+                // background: black
                 color: white
                 // width: fit-content
         
@@ -58,7 +61,7 @@
                 // box-shadow: 0px 2px 2px #ccc
                 
                 .th
-                    background-color: black
+                    // background-color: black
         
             .body 
                 position: relative

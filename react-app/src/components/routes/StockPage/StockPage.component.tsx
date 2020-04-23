@@ -4,6 +4,7 @@ import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import numeral from 'numeral';
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
+import { Paper, Grid, Box } from '@material-ui/core';
 
 import Table from './Table';
 
@@ -147,72 +148,77 @@ export default function StockPage() {
     console.log({ stock, columns, priceTableData, financialTableData });
 
     return data ? (
-        <div className="container">
-            <h2>{stock.name} <small>({ticker})</small></h2>
-            <p>Employees: {stock.employees}</p>
-            <p>Sector Name: {stock.sectorName}</p>
+        <div>
 
-            <p>Share Classes: {
-                stock.shareClasses.map((s: any, i: Number) =>
-                    s.shareClassName + (stock.shareClasses.length > i ? ', ' : '.')
-                )}
-            </p>
+            <Paper>
+                <Box p={2} mt={2}>
+                    <h2>{stock.name} <small>({ticker})</small></h2>
+                    <p>Employees: {stock.employees}</p>
+                    <p>Sector Name: {stock.sectorName}</p>
+
+                    <p>Share Classes: {
+                        stock.shareClasses.map((s: any, i: Number) =>
+                            s.shareClassName + (stock.shareClasses.length > i ? ', ' : '.')
+                        )}
+                    </p>
+                </Box>
+            </Paper>
 
             {/* <p>Employees: {stock.employees}</p>
             <p>Employees: {stock.employees}</p> */}
 
-            <br />
-            <br />
-
             <ScrollSync><>
 
-                <div className="row no-gutters">
-                    <div className="col-12">
+                <Paper>
+                    <Box p={2} mt={2}>
                         <h2>Price</h2>
 
                         <Table
                             columns={columns}
                             data={priceTableData}
                         />
-                    </div>
-                </div>
+                    </Box>
+                </Paper>
 
+                <Grid container spacing={3}>
+                    <Grid item xs={4}>
+                        <Paper>
+                            <Box p={2} mt={2}>
+                                <h2>Income Statement</h2>
 
-                <div className="row no-gutters">
+                                <Table
+                                    columns={columns}
+                                    data={financialTableData.pl}
+                                />
+                            </Box>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Paper>
+                            <Box p={2} mt={2}>
+                                <h2>Balance Sheet</h2>
 
-                    <div className="col-4">
-                        <h2>Income Statement</h2>
+                                <Table
+                                    columns={columns}
+                                    data={financialTableData.bs}
+                                />
 
-                        <Table
-                            columns={columns}
-                            data={financialTableData.pl}
-                        />
-                    </div>
+                            </Box>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Paper>
+                            <Box p={2} mt={2}>
+                                <h2>Cash Flow</h2>
 
-
-                    <div className="col-4">
-
-                        <h2>Balance Sheet</h2>
-
-                        <Table
-                            columns={columns}
-                            data={financialTableData.bs}
-                        />
-
-                    </div>
-
-                    <div className="col-4">
-
-                        <h2>Cash Flow</h2>
-
-                        <Table
-                            columns={columns}
-                            data={financialTableData.cf}
-                        />
-
-                    </div>
-
-                </div>
+                                <Table
+                                    columns={columns}
+                                    data={financialTableData.cf}
+                                />
+                            </Box>
+                        </Paper>
+                    </Grid>
+                </Grid>
             </></ScrollSync>
 
 

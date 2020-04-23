@@ -5,6 +5,7 @@ import {
     Route
 } from 'react-router-dom';
 import loadable from '@loadable/component';
+import {Container} from '@material-ui/core';
 
 import Header from '@components/shared/Header';
 
@@ -14,9 +15,11 @@ export default function App() {
             <Router>
                 <Header />
 
-                <Switch>
-                    <Route path="/stock/:ticker" component={loadable(() => import('./components/routes/StockPage'))} />
-                </Switch>
+                <Container>
+                    <Switch>
+                        <Route path="/stock/:ticker" component={loadable(() => import('./components/routes/StockPage'))} />
+                    </Switch>
+                </Container>
             </Router>
         </>
     );

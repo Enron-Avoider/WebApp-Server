@@ -1,3 +1,3 @@
-import StockSearcher from './StockSearcher.component';
+import Component from './component';
 
-export default StockSearcher;
+export default Component;
