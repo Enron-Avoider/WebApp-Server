@@ -1,4 +1,4 @@
-const webpack = require('webpack');
+const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserWebpackPlugin = require("terser-webpack-plugin");
 const { resolveTsAliases } = require("resolve-ts-aliases");
@@ -10,43 +10,48 @@ console.log({ e: process.env.NODE_ENV, __dirname });
 const config = {
   mode: isProd ? "production" : "development",
   entry: {
-    index: "./src/index.tsx"
+    index: "./src/index.tsx",
   },
   output: {
     path: `${__dirname}/dist`,
-    publicPath: '/',
-    filename: "[name].js"
+    publicPath: "/",
+    filename: "[name].js",
   },
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
-    alias: resolveTsAliases(__dirname + "/tsconfig.json")
+    alias: resolveTsAliases(__dirname + "/tsconfig.json"),
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
         use: "babel-loader",
-        exclude: /node_modules/
+        exclude: /node_modules/,
       },
       {
         test: /\.s[ac]ss$/i,
-        use: ["style-loader", "css-loader", "sass-loader"]
-      }
-    ]
+        use: ["style-loader", "css-loader", "sass-loader"],
+      },
+      {
+        test: /\.(png|svg|jpg|gif|ico)$/,
+        use: ["file-loader"],
+      },
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "src/index.html"
+      template: "src/index.html",
+      favicon: "src/assets/favicon.ico",
     }),
     new webpack.DefinePlugin({
-      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV)
-    })
-  ]
+      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+    }),
+  ],
 };
 
 if (isProd) {
   config.optimization = {
-    minimizer: [new TerserWebpackPlugin()]
+    minimizer: [new TerserWebpackPlugin()],
   };
 } else {
   config.devServer = {
@@ -56,7 +61,7 @@ if (isProd) {
     compress: true,
     stats: "errors-only",
     overlay: true,
-    historyApiFallback: true
+    historyApiFallback: true,
   };
 }
 

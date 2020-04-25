@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
-import numeral from 'numeral';
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
 import { Paper, Grid, Box } from '@material-ui/core';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import { ArrowDropDown, ArrowDropUp } from '@material-ui/icons';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { priceTableMap, financialTableMap } from './dataMaps';
 
 import Table from './Table';
 
@@ -56,6 +60,12 @@ export default function StockPage() {
 
     const { ticker } = useParams();
 
+    const [visibleFinancials, setVisibleFinancials] = useState(() => ['pl', 'bs', 'cf']);
+
+    const handleVisibleFinancials = (event: React.MouseEvent<HTMLElement>, newFormats: string[]) => {
+        setVisibleFinancials(newFormats);
+    };
+
     const { loading, error, data } = useQuery(TICKER_QUERY, {
         variables: { ticker },
     });
@@ -67,7 +77,7 @@ export default function StockPage() {
             id: 'expander',
             Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }: any) => (
                 <span {...getToggleAllRowsExpandedProps()}>
-                    {isAllRowsExpanded ? '👇' : '👉'}
+                    {isAllRowsExpanded ? <ArrowDropUp /> : <ArrowDropDown />}
                 </span>
             ),
             Cell: ({ row, cell }: any) =>
@@ -77,12 +87,13 @@ export default function StockPage() {
                             // We can even use the row.depth property
                             // and paddingLeft to indicate the depth
                             // of the row
-                            paddingLeft: `${row.depth * 2}rem`,
+                            paddingLeft: `${row.depth * 1}rem`,
                         },
                     })}
+                    // className={row.original.checkPossible ? 'relevant' : ''}
                 >
                     {cell.value}
-                    {row.canExpand ? (row.isExpanded ? '👇' : '👉') : null}
+                    {row.canExpand ? (row.isExpanded ? <ArrowDropUp /> : <ArrowDropDown />) : null}
                 </span>,
             accessor: 'title',
             sticky: 'left',
@@ -95,55 +106,9 @@ export default function StockPage() {
         }))
     ];
 
-    const priceTableData = stock && [stock.shareClasses[0].yearlyPrices.priceData.reduce((acc: any, curr: any, i: number) => ({
-        ...acc,
-        [`${stock.years[i]}`]: numeral(curr ? curr.closeAdj : '0').format('(0.00a)')
-    }), { title: stock.shareClasses[0].shareClassName })];
+    const priceTableData = stock && priceTableMap(stock);
 
-    const financialTableData = stock && Object.getOwnPropertyNames(stock.yearlyFinancials)
-        .filter((k: string) => k !== '__typename') // graphql spam
-        .reduce((acc: any, key: any, i: number) =>
-            ({
-                ...acc,
-                [key]: stock.yearlyFinancials[key]
-                    // .filter((y: any) => y.displayLevel === '0') // hack, figure out remaining data or replace please    
-                    // .map((y: any) =>
-                    .reduce((acc: any, dataPoint: any, i: number) => {
-                        // console.log({ dataPoint, acc });
-                        if (dataPoint.displayLevel === '0') {
-                            return [
-                                ...acc,
-                                dataPoint.value.reduce((acc: any, value: any, i: number) => ({
-                                    ...acc,
-                                    [`${stock.years[i]}`]: numeral(value).format('(0.00a)')
-                                }), { title: dataPoint.standardisedName, subRows: [] })
-                            ];
-                        } else if (dataPoint.displayLevel === '1') {
-                            return [
-                                ...acc.map((tableRow: any, i: number) => {
-                                    if (i === acc.length - 1) {
-                                        return {
-                                            ...tableRow,
-                                            subRows: [
-                                                ...tableRow.subRows,
-                                                dataPoint.value.reduce((acc: any, value: any, i: number) => ({
-                                                    ...acc,
-                                                    [`${stock.years[i]}`]: numeral(value).format('(0.00a)')
-                                                }), { title: dataPoint.standardisedName, subRows: [] })
-                                            ]
-                                        };
-                                    } else {
-                                        return tableRow;
-                                    }
-                                }),
-                            ]
-                        } else {
-                            // console.log(dataPoint.displayLevel)
-                            return acc;
-                        }
-                    }, [])
-            })
-            , {})
+    const financialTableData = stock && financialTableMap(stock);
 
     console.log({ stock, columns, priceTableData, financialTableData });
 
@@ -180,45 +145,70 @@ export default function StockPage() {
                     </Box>
                 </Paper>
 
-                <Grid container spacing={3}>
-                    <Grid item xs={4}>
-                        <Paper>
-                            <Box p={2} mt={2}>
-                                <h2>Income Statement</h2>
+                <Paper>
+                    <Box p={2} mt={2}>
 
-                                <Table
-                                    columns={columns}
-                                    data={financialTableData.pl}
-                                />
-                            </Box>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Paper>
-                            <Box p={2} mt={2}>
-                                <h2>Balance Sheet</h2>
+                        <Box
+                            display="flex"
+                            // width={500} height={80} 
+                            // bgcolor="lightgreen"
+                            alignItems="center"
+                            justifyContent="center"
+                        >
+                            <ToggleButtonGroup value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
+                                <ToggleButton value="pl">Income Statement</ToggleButton>
+                                <ToggleButton value="bs">Balance Sheet</ToggleButton>
+                                <ToggleButton value="cf">Cash Flow</ToggleButton>
+                            </ToggleButtonGroup>
+                        </Box>
 
-                                <Table
-                                    columns={columns}
-                                    data={financialTableData.bs}
-                                />
+                        <Grid container spacing={3}>
+                            {visibleFinancials.includes('pl') && (
+                                <Grid item xs={(12/visibleFinancials.length) as any}>
+                                    <Paper elevation={5}>
+                                        <Box p={2} mt={2}>
+                                            <h2>Income Statement</h2>
 
-                            </Box>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Paper>
-                            <Box p={2} mt={2}>
-                                <h2>Cash Flow</h2>
+                                            <Table
+                                                columns={columns}
+                                                data={financialTableData.pl}
+                                            />
+                                        </Box>
+                                    </Paper>
+                                </Grid>
+                            )}
+                            {visibleFinancials.includes('bs') && (
+                                <Grid item xs={(12/visibleFinancials.length) as any}>
+                                    <Paper elevation={5}>
+                                        <Box p={2} mt={2}>
+                                            <h2>Balance Sheet</h2>
 
-                                <Table
-                                    columns={columns}
-                                    data={financialTableData.cf}
-                                />
-                            </Box>
-                        </Paper>
-                    </Grid>
-                </Grid>
+                                            <Table
+                                                columns={columns}
+                                                data={financialTableData.bs}
+                                            />
+
+                                        </Box>
+                                    </Paper>
+                                </Grid>
+                            )}
+                            {visibleFinancials.includes('cf') && (
+                                <Grid item xs={(12/visibleFinancials.length) as any}>
+                                    <Paper elevation={5}>
+                                        <Box p={2} mt={2}>
+                                            <h2>Cash Flow</h2>
+
+                                            <Table
+                                                columns={columns}
+                                                data={financialTableData.cf}
+                                            />
+                                        </Box>
+                                    </Paper>
+                                </Grid>
+                            )}
+                        </Grid>
+                    </Box>
+                </Paper>
             </></ScrollSync>
 
 
@@ -226,5 +216,5 @@ export default function StockPage() {
             {/* <hr />
             <pre>{JSON.stringify(stock, null, 2)} </pre> */}
         </div>
-    ) : null;
+    ) : <CircularProgress />;
 }

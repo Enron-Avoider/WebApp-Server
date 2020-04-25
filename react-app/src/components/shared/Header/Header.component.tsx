@@ -1,7 +1,8 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, IconButton } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import { Grid, makeStyles } from '@material-ui/core';
+import { Grid, makeStyles, Box } from '@material-ui/core';
+import logoImg from '@assets/e-transparent.png';
 
 import './style.sass';
 const useStyles = makeStyles((theme) => ({
@@ -14,6 +15,10 @@ const useStyles = makeStyles((theme) => ({
     title: {
         flexGrow: 1,
     },
+    logo: {
+        'max-height': '50px',
+        'padding-top': '3px'
+    }
 }));
 
 import StockSearcher from './StockSearcher';
@@ -22,21 +27,26 @@ export default function Header() {
     const classes = useStyles();
 
     return (
-        <AppBar position="static">
+        <AppBar position="sticky">
             <Toolbar>
-                <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+                {/* <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
                     <MenuIcon />
-                </IconButton>
+                </IconButton> */}
+                <Box mr={2}>
+                    <img className={classes.logo} src={logoImg} />
+                </Box>
                 <Grid container direction="column">
                     <Grid item >
                         <Typography variant="h6">
-                            Enron Monster
+                            Enron Avoider
                         </Typography>
                     </Grid>
-                    <Grid item >
-                        <Typography variant="subtitle1">
-                            (best name ever, shut up, it is)
-                        </Typography>
+                    <Grid item>
+                        <Box mt={-1}>
+                            <Typography variant="subtitle1">
+                                ask why.
+                            </Typography>
+                        </Box>
                     </Grid>
                 </Grid>
                 <StockSearcher />

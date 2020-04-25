@@ -45,7 +45,7 @@ export default function StockSearcher() {
                 <InputBase
                     onChange={handleInputChange}
                     value={name}
-                    placeholder="Search…"
+                    placeholder="Stonks"
                     classes={{
                         root: classes.inputRoot,
                         input: classes.inputInput,

@@ -19,6 +19,10 @@ const darkTheme = createMuiTheme({
         type: 'dark',
         primary: purple,
         secondary: purple,
+        background: {
+            default: '#212121',
+            paper: '#333'
+        }
     },
 });
 
