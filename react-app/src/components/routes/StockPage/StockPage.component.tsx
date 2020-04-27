@@ -3,12 +3,13 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
-import { Paper, Grid, Box } from '@material-ui/core';
+import { Paper, Grid, Box, Typography } from '@material-ui/core';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { ArrowDropDown, ArrowDropUp } from '@material-ui/icons';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { priceTableMap, financialTableMap } from './dataMaps';
+import { priceTableMap, outstandingSharesTableMap, mergeCalculationsWithTable } from './dataMaps';
+import { doCalculations, calculations } from './calculations'
 
 import Table from './Table';
 
@@ -22,7 +23,7 @@ const TICKER_QUERY = gql`
             employees
             sectorName
             sectorCode
-            # aggregatedShares
+            aggregatedShares
             shareClasses {
                 shareClassId
                 shareClassName
@@ -72,32 +73,35 @@ export default function StockPage() {
 
     const stock = data && data.getSimfinCompanyByTicker;
 
+    const calc = stock && doCalculations('yearlyFinancials.pl', calculations, stock.years, stock);
+
+    // const priceTableData = stock && priceTableMap(stock.years, stock.shareClasses);
+
+    // const outstandingSharesTableData = stock && outstandingSharesTableMap(stock.years, stock.aggregatedShares);
+
     const columns = stock && [
         {
             id: 'expander',
             Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }: any) => (
                 <span {...getToggleAllRowsExpandedProps()}>
-                    {isAllRowsExpanded ? <ArrowDropUp /> : <ArrowDropDown />}
+                    {isAllRowsExpanded ? 'expand none' : 'expand all'}
                 </span>
             ),
             Cell: ({ row, cell }: any) =>
                 <span
                     {...row.getToggleRowExpandedProps({
                         style: {
-                            // We can even use the row.depth property
-                            // and paddingLeft to indicate the depth
-                            // of the row
                             paddingLeft: `${row.depth * 1}rem`,
                         },
                     })}
-                    // className={row.original.checkPossible ? 'relevant' : ''}
+                // className={row.original.checkPossible ? 'relevant' : ''}
                 >
                     {cell.value}
-                    {row.canExpand ? (row.isExpanded ? <ArrowDropUp /> : <ArrowDropDown />) : null}
+                    {/* {row.canExpand ? (row.isExpanded ? <ArrowDropUp /> : <ArrowDropDown />) : null} */}
                 </span>,
             accessor: 'title',
             sticky: 'left',
-            width: 150
+            width: 170
         },
         ...stock.years.map((y: number) => ({
             Header: y,
@@ -106,43 +110,48 @@ export default function StockPage() {
         }))
     ];
 
-    const priceTableData = stock && priceTableMap(stock);
-
-    const financialTableData = stock && financialTableMap(stock);
-
-    console.log({ stock, columns, priceTableData, financialTableData });
+    console.log({ stock, columns, calc });
 
     return data ? (
-        <div>
-
+        <Box pb={2}>
             <Paper>
                 <Box p={2} mt={2}>
-                    <h2>{stock.name} <small>({ticker})</small></h2>
-                    <p>Employees: {stock.employees}</p>
-                    <p>Sector Name: {stock.sectorName}</p>
+                    <Box display="flex" alignItems="center">
+                        <Typography variant="h5">
+                            {stock.name}
+                        </Typography>
+                        <Box ml={1}>
+                            <Typography variant="h5">
+                                <b>({ticker})</b>
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <div>
+                        {/* <p>Employees: {stock.employees}</p> */}
+                        <Typography variant="body1">Sector Name: {stock.sectorName}</Typography>
 
-                    <p>Share Classes: {
-                        stock.shareClasses.map((s: any, i: Number) =>
-                            s.shareClassName + (stock.shareClasses.length > i ? ', ' : '.')
-                        )}
-                    </p>
+                        <Typography variant="body1">Share Classes: {
+                            stock.shareClasses.map((s: any, i: Number) =>
+                                s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
+                            )}
+                        </Typography>
+                    </div>
                 </Box>
             </Paper>
-
-            {/* <p>Employees: {stock.employees}</p>
-            <p>Employees: {stock.employees}</p> */}
 
             <ScrollSync><>
 
                 <Paper>
-                    <Box p={2} mt={2}>
-                        <h2>Price</h2>
-
-                        <Table
-                            columns={columns}
-                            data={priceTableData}
-                        />
-                    </Box>
+                    <Table
+                        title={'Shares'}
+                        columns={columns}
+                        data={
+                            [
+                                stock.shareClasses[0].yearlyPrices,
+                                stock.aggregatedShares
+                            ]
+                        }
+                    />
                 </Paper>
 
                 <Paper>
@@ -150,11 +159,13 @@ export default function StockPage() {
 
                         <Box
                             display="flex"
-                            // width={500} height={80} 
-                            // bgcolor="lightgreen"
                             alignItems="center"
-                            justifyContent="center"
+                            justifyContent="space-between"
                         >
+                            <Typography variant="h5" gutterBottom>
+                                Financial Statements
+                            </Typography>
+
                             <ToggleButtonGroup value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
                                 <ToggleButton value="pl">Income Statement</ToggleButton>
                                 <ToggleButton value="bs">Balance Sheet</ToggleButton>
@@ -164,45 +175,35 @@ export default function StockPage() {
 
                         <Grid container spacing={3}>
                             {visibleFinancials.includes('pl') && (
-                                <Grid item xs={(12/visibleFinancials.length) as any}>
+                                <Grid item xs={(12 / visibleFinancials.length) as any}>
                                     <Paper elevation={5}>
-                                        <Box p={2} mt={2}>
-                                            <h2>Income Statement</h2>
-
-                                            <Table
-                                                columns={columns}
-                                                data={financialTableData.pl}
-                                            />
-                                        </Box>
+                                        <Table
+                                            title={'Income Statement'}
+                                            columns={columns}
+                                            data={mergeCalculationsWithTable(stock.years, stock.yearlyFinancials.pl)}
+                                        />
                                     </Paper>
                                 </Grid>
                             )}
                             {visibleFinancials.includes('bs') && (
-                                <Grid item xs={(12/visibleFinancials.length) as any}>
+                                <Grid item xs={(12 / visibleFinancials.length) as any}>
                                     <Paper elevation={5}>
-                                        <Box p={2} mt={2}>
-                                            <h2>Balance Sheet</h2>
-
-                                            <Table
-                                                columns={columns}
-                                                data={financialTableData.bs}
-                                            />
-
-                                        </Box>
+                                        <Table
+                                            title={'Balance Sheet'}
+                                            columns={columns}
+                                            data={stock.yearlyFinancials.bs}
+                                        />
                                     </Paper>
                                 </Grid>
                             )}
                             {visibleFinancials.includes('cf') && (
-                                <Grid item xs={(12/visibleFinancials.length) as any}>
+                                <Grid item xs={(12 / visibleFinancials.length) as any}>
                                     <Paper elevation={5}>
-                                        <Box p={2} mt={2}>
-                                            <h2>Cash Flow</h2>
-
-                                            <Table
-                                                columns={columns}
-                                                data={financialTableData.cf}
-                                            />
-                                        </Box>
+                                        <Table
+                                            title={'Cash Flow'}
+                                            columns={columns}
+                                            data={stock.yearlyFinancials.cf}
+                                        />
                                     </Paper>
                                 </Grid>
                             )}
@@ -210,11 +211,10 @@ export default function StockPage() {
                     </Box>
                 </Paper>
             </></ScrollSync>
-
-
-
-            {/* <hr />
-            <pre>{JSON.stringify(stock, null, 2)} </pre> */}
-        </div>
-    ) : <CircularProgress />;
+        </Box>
+    ) : (
+        <Box p={5} m={5} height="100vh" display="flex" alignItems="center" justifyContent="center">
+            <CircularProgress size={100} />
+        </Box>
+    );
 }

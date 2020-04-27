@@ -1,6 +1,8 @@
 const { gql } = require("apollo-server");
 const GraphQLJSON = require('graphql-type-json');
 
+const { financialTableMap, outstandingSharesTableMap, priceTableMap } = require('./dataMaps');
+
 const typeDefs = gql`
     scalar JSON
 
@@ -13,7 +15,7 @@ const typeDefs = gql`
         sectorName: String,
         sectorCode: String,
         industryCompanies: [SimfinStock],
-        aggregatedShares: [JSON],
+        aggregatedShares: JSON,
         shareClasses: [ShareClasses],
         years: [Int],
         yearlyFinancials: YearlyFinancials,
@@ -67,10 +69,13 @@ const resolvers = {
   SimfinStock: {
 
     aggregatedShares: async (_source, params, { dataSources, redisClient }) =>
-        dataSources.messyFinanceDataAPI.aggregatedShares(_source, redisClient),
+        outstandingSharesTableMap(
+            _source.years,
+            await dataSources.messyFinanceDataAPI.aggregatedShares(_source, redisClient),
+        ),
 
     shareClasses: async (_source, params, { dataSources, redisClient }) =>
-        dataSources.messyFinanceDataAPI.shareClasses(_source, redisClient),
+        (await dataSources.messyFinanceDataAPI.shareClasses(_source, redisClient)),
 
     industryCompanies: async (_source, params, { dataSources, redisClient }) =>
         (await dataSources.messyFinanceDataAPI.getSimfinIndustryCompanies(_source.sectorCode, redisClient))
@@ -82,7 +87,10 @@ const resolvers = {
             ),
 
     yearlyFinancials: async (_source, params, { dataSources, redisClient }) =>
-        dataSources.messyFinanceDataAPI.yearlyFinancials(_source, redisClient),
+        financialTableMap(
+            _source.years,
+            await dataSources.messyFinanceDataAPI.yearlyFinancials(_source, redisClient),
+        )
 
     // yearlyPrices: async (_source, params, { dataSources, redisClient }) =>
     //     dataSources.messyFinanceDataAPI.yearlyPrices(_source, redisClient),
@@ -90,7 +98,7 @@ const resolvers = {
 
   ShareClasses: {
     yearlyPrices: async (_source, params, { dataSources, redisClient }) =>
-        dataSources.messyFinanceDataAPI.pricesForShareClasses(_source, redisClient)
+        priceTableMap(_source.years, _source.shareClassName, await dataSources.messyFinanceDataAPI.pricesForShareClasses(_source, redisClient))
   }
 };
 

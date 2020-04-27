@@ -103,23 +103,22 @@ module.exports = {
     yearlyFinancials = async ({ years, simId }, redisClient) => {
       const transformToPerField = (statements) => {
         // gets all fields uniquely
-        const fields = statements
-          .reduce((acc, curr) => {
-            const newFields = curr
-              ? curr.reduce(
-                  (acc2, curr2) =>
-                    !curr2 ||
-                    (curr2.standardisedName &&
-                      acc.find(
-                        (el) => el.standardisedName === curr2.standardisedName
-                      ))
-                      ? acc2
-                      : [...acc2, curr2],
-                  []
-                )
-              : [];
-            return [...acc, ...newFields];
-          }, [])
+        const fields = statements.reduce((acc, curr) => {
+          const newFields = curr
+            ? curr.reduce(
+                (acc2, curr2) =>
+                  !curr2 ||
+                  (curr2.standardisedName &&
+                    acc.find(
+                      (el) => el.standardisedName === curr2.standardisedName
+                    ))
+                    ? acc2
+                    : [...acc2, curr2],
+                []
+              )
+            : [];
+          return [...acc, ...newFields];
+        }, []);
         //   .sort((a, b) => a.tid - b.tid || a.uid - b.uid);
 
         const perField = fields.map((field) => {
@@ -195,14 +194,32 @@ module.exports = {
     //   );
     // };
 
-    aggregatedShares = async ({ simId }, redisClient) =>
-      (
-        await this.cached(
-          redisClient,
-          `https://simfin.com/api/v1/companies/id/${simId}/shares/aggregated?api-key=${this.keys.simfin}`,
-          "get"
-        )
-      ).sort((a, b) => a.date - b.date);
+    aggregatedShares = async ({ simId, years }, redisClient) =>
+      await this.cached(
+        redisClient,
+        `https://simfin.com/api/v1/companies/id/${simId}/shares/aggregated?api-key=${this.keys.simfin}`,
+        "get"
+      ).then((r) => {
+          
+        // return r.sort((a, b) => a.date - b.date)
+        
+        return years.map((y) =>
+              r
+                .sort((a, b) => a.date - b.date)
+                .find((p) =>
+                    p.date.includes(`${y}`) //&&
+                    // p.measure === "point-in-time"
+                    // p.date.includes(`${y}`)
+                )
+            )
+      })
+    //   .then((r) => ({
+    //     ...years.map((y) =>
+    //       r
+    //         .sort((a, b) => a.date - b.date)
+    //         .find((p) => p.date.includes(`${y}-09-2`))
+    //     ),
+    //   }));
 
     shareClasses = async ({ simId, years }, redisClient) =>
       (
