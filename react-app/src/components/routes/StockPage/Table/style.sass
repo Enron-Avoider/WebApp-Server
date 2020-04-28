@@ -22,9 +22,14 @@
             font-weight: 500
             background-color: #515151
 
-        .td:first-child.relevant
-            color: #d500f9
-            font-weight: 900
+        .td:first-child
+            &.relevant
+                color: #d500f9
+                font-weight: 900
+
+            &.calc
+                color: orange
+                font-weight: 900
 
         .th, .td 
             padding: 8px 12px

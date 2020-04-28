@@ -4,3 +4,4 @@ declare module "*.svg" {
 }
 
 declare module 'react-scroll-sync';
+declare module 'deep-find';

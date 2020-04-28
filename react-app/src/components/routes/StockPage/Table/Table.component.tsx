@@ -14,6 +14,7 @@ import {
     Button
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
+import EditIcon from '@material-ui/icons/Edit';
 import Fab from '@material-ui/core/Fab';
 
 import { useBackgrounds } from '@components/shared/styles';
@@ -21,9 +22,14 @@ import { useBackgrounds } from '@components/shared/styles';
 import "./style.sass";
 
 export default function Table(
-    { columns, data, title='' }:
-    { columns: Column<{}>[], data: {}[], title: string }
+    { columns, data, title='', calculations=[] }:
+    { columns: Column<{}>[], data: {}[], title: string, calculations?: any }
 ) {
+
+    console.log({
+        data,
+        calculations
+    })
 
     const { bg1 } = useBackgrounds();
 
@@ -47,7 +53,7 @@ export default function Table(
     } = useTable(
         {
             columns,
-            data,
+            data: data,
         },
         useBlockLayout,
         useExpanded,
@@ -85,9 +91,14 @@ export default function Table(
                                                 {row.cells.map((cell: any) => (
                                                     <div
                                                         {...cell.getCellProps()}
-                                                        className={`td ${row.subRows.length ? 'relevant' : ''}`}
+                                                        className={`
+                                                            td
+                                                            ${row.subRows.length ? 'relevant' : ''}
+                                                            ${row.original.type === 'calc' ? 'calc' : ''}
+                                                        `}
                                                     >
                                                         {cell.render('Cell')}
+                                                        {/* {row.original.type === 'calc' ? 'edit' : ''} */}
                                                     </div>
                                                 ))}
                                             </div>

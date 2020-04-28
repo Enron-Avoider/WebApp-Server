@@ -73,7 +73,7 @@ export default function StockPage() {
 
     const stock = data && data.getSimfinCompanyByTicker;
 
-    const calc = stock && doCalculations('yearlyFinancials.pl', calculations, stock.years, stock);
+    const calc = stock && doCalculations(calculations, stock.years, stock);
 
     // const priceTableData = stock && priceTableMap(stock.years, stock.shareClasses);
 
@@ -180,7 +180,11 @@ export default function StockPage() {
                                         <Table
                                             title={'Income Statement'}
                                             columns={columns}
-                                            data={mergeCalculationsWithTable(stock.years, stock.yearlyFinancials.pl)}
+                                            data={[
+                                                ...stock.yearlyFinancials.pl,
+                                                ...calc.filter((c: any) => c.onTable === 'Income Statement')
+                                            ]}
+                                            calculations={calc.filter((c: any) => c.onTable === 'Income Statement')}
                                         />
                                     </Paper>
                                 </Grid>
