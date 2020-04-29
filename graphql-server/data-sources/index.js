@@ -198,28 +198,12 @@ module.exports = {
       await this.cached(
         redisClient,
         `https://simfin.com/api/v1/companies/id/${simId}/shares/aggregated?api-key=${this.keys.simfin}`,
-        "get"
+        "get",
       ).then((r) => {
           
         // return r.sort((a, b) => a.date - b.date)
-        
-        return years.map((y) =>
-              r
-                .sort((a, b) => a.date - b.date)
-                .find((p) =>
-                    p.date.includes(`${y}`) //&&
-                    // p.measure === "point-in-time"
-                    // p.date.includes(`${y}`)
-                )
-            )
+        return r;
       })
-    //   .then((r) => ({
-    //     ...years.map((y) =>
-    //       r
-    //         .sort((a, b) => a.date - b.date)
-    //         .find((p) => p.date.includes(`${y}-09-2`))
-    //     ),
-    //   }));
 
     shareClasses = async ({ simId, years }, redisClient) =>
       (

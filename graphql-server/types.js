@@ -1,7 +1,7 @@
 const { gql } = require("apollo-server");
 const GraphQLJSON = require('graphql-type-json');
 
-const { financialTableMap, outstandingSharesTableMap, priceTableMap } = require('./dataMaps');
+const { financialTableMap, outstandingSharesTableMap, priceTableMap, isolateShares } = require('./dataMaps');
 
 const typeDefs = gql`
     scalar JSON

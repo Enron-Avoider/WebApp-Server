@@ -11,14 +11,50 @@ const priceTableMap = (years, shareClassName, yearlyPrices) =>
     { title: shareClassName }
   );
 
-const outstandingSharesTableMap = (years, aggregatedShares) =>
-  aggregatedShares.reduce(
-    (acc, curr, i) => ({
-      ...acc,
-      [`${years[i]}`]: numeral(curr ? curr.value : "0").format("(0.00a)"),
-    }),
-    { title: "Outstanding Shares" }
-  );
+const outstandingSharesTableMap = (years, aggregatedShares) => {
+
+    const filterByFigureAndPeriod = (figure, period, aggregatedShares) => 
+        aggregatedShares
+            .filter(s => s.figure === figure)
+            .filter(s => s.period === period)
+            .sort((a, b) => a.date - b.date)
+            .reduce(
+                    (acc, curr, i) => ({
+                      ...acc,
+                      ...years[i] ? {
+                          [`${years[i]}`]: numeral(curr ? curr.value : "0").format("(0.00a)")
+                      }: {},
+                    }),
+                    { title: figure }
+                  );
+
+    return [    
+        filterByFigureAndPeriod('common-outstanding-basic', 'FY', aggregatedShares),
+        filterByFigureAndPeriod('common-outstanding-diluted', 'FY', aggregatedShares)
+    ]
+};
+
+const isolateShares = (years, aggregatedShares) => {
+  const explore = (name, aggregatedShares) =>
+    aggregatedShares.reduce(
+      (acc, curr, i) => [
+        ...acc,
+        ...(curr[name] && !acc.find((s) => s === curr[name])
+          ? [curr[name]]
+          : []),
+      ],
+      []
+    ).map(n => ({
+        [n]: aggregatedShares.filter(s => s[name] === n).length
+    }));
+
+  return {
+    figures: explore('figure', aggregatedShares),
+    types: explore('type', aggregatedShares),
+    periods: explore('period', aggregatedShares),
+    measures: explore('measure', aggregatedShares),
+  };
+};
 
 const financialTableMap = (years, yearlyFinancials) =>
   Object.getOwnPropertyNames(yearlyFinancials)
@@ -95,4 +131,5 @@ module.exports = {
   priceTableMap,
   financialTableMap,
   outstandingSharesTableMap,
+  isolateShares,
 };

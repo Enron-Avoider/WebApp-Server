@@ -8,7 +8,7 @@ export const calculations = [
         onTable: 'Income Statement',
         title: 'Income per Share',
         scope: {
-            a: 'aggregatedShares',
+            a: 'aggregatedShares[common-outstanding-basic]',
             b: 'yearlyFinancials.pl[Net Income Available to Common Shareholders]'
         },
         calc: 'b/a'

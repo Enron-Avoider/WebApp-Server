@@ -148,7 +148,7 @@ export default function StockPage() {
                         data={
                             [
                                 stock.shareClasses[0].yearlyPrices,
-                                stock.aggregatedShares
+                                ...stock.aggregatedShares
                             ]
                         }
                     />
