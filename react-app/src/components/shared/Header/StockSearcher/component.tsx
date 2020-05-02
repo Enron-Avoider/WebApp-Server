@@ -31,7 +31,7 @@ export default function StockSearcher() {
         setName(e ? e.target.value : '');
 
     useEffect(() => {
-        name.length > 2 && getStocks({ variables: { name } })
+        name.length > 1 && getStocks({ variables: { name } })
     }, [name])
 
     // Typography
@@ -54,7 +54,7 @@ export default function StockSearcher() {
                 />
             </div>
 
-            {(name.length > 2 || loading) && (
+            {(name.length > 1 || loading) && (
                 <Paper
                     className="StockSearcher_SearchResults"
                     elevation={3}

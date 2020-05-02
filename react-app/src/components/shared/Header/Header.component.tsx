@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, IconButton } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import { Grid, makeStyles, Box } from '@material-ui/core';
+import { Grid, makeStyles, Box, Button } from '@material-ui/core';
 import logoImg from '@assets/e-transparent.png';
 
 import './style.sass';
@@ -48,7 +49,66 @@ export default function Header() {
                             </Typography>
                         </Box>
                     </Grid>
+                    <Grid>
+                    </Grid>
                 </Grid>
+                <Box display="flex" flexDirection="row">
+                    <Box m={1}>
+                        <Button
+                            startIcon={`🏦`}
+                            variant="contained"
+                            color="secondary"
+                            component={Link}
+                            to="/stock/BRKA"
+                        >
+                            Berkshire
+                        </Button>
+                    </Box>
+                    <Box m={1}>
+                        <Button
+                            startIcon={`👍`}
+                            variant="contained"
+                            color="secondary"
+                            component={Link}
+                            to="/stock/FB"
+                        >
+                            Facebook
+                        </Button>
+                    </Box>
+                    <Box m={1}>
+                        <Button
+                            startIcon={`🛰`}
+                            variant="contained"
+                            color="secondary"
+                            component={Link}
+                            to="/stock/GOOG"
+                        >
+                            Google
+                        </Button>
+                    </Box>
+                    <Box m={1}>
+                        <Button
+                            startIcon={`🚛`}
+                            variant="contained"
+                            color="secondary"
+                            component={Link}
+                            to="/stock/AMZN"
+                        >
+                            Amazon
+                        </Button>
+                    </Box>
+                    <Box m={1}>
+                        <Button
+                            startIcon={`🚘`}
+                            variant="contained"
+                            color="secondary"
+                            component={Link}
+                            to="/stock/TSLA"
+                        >
+                            Tesla
+                        </Button>
+                    </Box>
+                </Box>
                 <StockSearcher />
             </Toolbar>
         </AppBar>

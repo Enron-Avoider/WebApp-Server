@@ -19,8 +19,9 @@ const server = new ApolloServer({
   context: async ({ req }) => ({
     redisClient,
   }),
+  playground: true,
 });
 
-server.listen().then(({ url }) => {
+server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`);
 });

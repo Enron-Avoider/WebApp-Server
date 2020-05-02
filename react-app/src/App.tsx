@@ -2,7 +2,8 @@ import React from 'react';
 import {
     BrowserRouter as Router,
     Switch,
-    Route
+    Route,
+    Redirect
 } from 'react-router-dom';
 import loadable from '@loadable/component';
 import {Container} from '@material-ui/core';
@@ -18,6 +19,7 @@ export default function App() {
                 <Container>
                     <Switch>
                         <Route path="/stock/:ticker" component={loadable(() => import('./components/routes/StockPage'))} />
+                        <Redirect from="/" to="/stock/BRKA" />
                     </Switch>
                 </Container>
             </Router>

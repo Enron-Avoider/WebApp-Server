@@ -198,12 +198,11 @@ module.exports = {
       await this.cached(
         redisClient,
         `https://simfin.com/api/v1/companies/id/${simId}/shares/aggregated?api-key=${this.keys.simfin}`,
-        "get",
+        "get"
       ).then((r) => {
-          
         // return r.sort((a, b) => a.date - b.date)
         return r;
-      })
+      });
 
     shareClasses = async ({ simId, years }, redisClient) =>
       (
@@ -236,5 +235,11 @@ module.exports = {
               .find((p) => p.date.includes(`${y}-09-2`))
         ),
       }));
+    logo = async ({ ticker },  redisClient) =>
+      this.cached(
+        redisClient,
+        `https://cloud.iexapis.com/stable/stock/${ticker}/logo?token=${this.keys.iex}`,
+        "get"
+      );
   },
 };

@@ -11,11 +11,13 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Button
+    Button,
+    TextField
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import Fab from '@material-ui/core/Fab';
+import NewCalcRowModal from './NewCalcRowModal';
 
 import { useBackgrounds } from '@components/shared/styles';
 
@@ -26,22 +28,7 @@ export default function Table(
     { columns: Column<{}>[], data: {}[], title: string, calculations?: any }
 ) {
 
-    console.log({
-        data,
-        calculations
-    })
-
     const { bg1 } = useBackgrounds();
-
-    const [open, setOpen] = React.useState(false);
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
 
     const {
         getTableProps,
@@ -87,7 +74,10 @@ export default function Table(
                                     {rows.map((row: any) => {
                                         prepareRow(row);
                                         return (
-                                            <div {...row.getRowProps()} className="tr">
+                                            <div {...row.getRowProps()} className={`
+                                                tr
+                                                ${row.original.type === 'total' ? 'total' : ''}
+                                            `}>
                                                 {row.cells.map((cell: any) => (
                                                     <div
                                                         {...cell.getCellProps()}
@@ -109,34 +99,7 @@ export default function Table(
                         </ScrollSyncPane>
                     </div>
                 </Paper>
-                <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    m={-1}
-                    mb={-3}
-                >
-                    <Fab size="small" color="primary" aria-label="add" onClick={handleClickOpen}>
-                        <AddIcon />
-                    </Fab>
-                </Box>
-                <Dialog
-                    open={open}
-                    onClose={handleClose}
-                >
-                    <DialogTitle>Add a new Ratio to TABLENAME</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText>
-                            Let Google help apps determine location. This means sending anonymous location data to
-                            Google, even when no apps are running.
-                    </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleClose} color="primary" autoFocus>
-                            Add
-                    </Button>
-                    </DialogActions>
-                </Dialog>
+                <NewCalcRowModal />
             </div>
 
         </Box>

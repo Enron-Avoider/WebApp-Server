@@ -19,6 +19,7 @@ const typeDefs = gql`
         shareClasses: [ShareClasses],
         years: [Int],
         yearlyFinancials: YearlyFinancials,
+        logo: String,
         # yearlyPrices: [JSON] 
     }
 
@@ -50,8 +51,8 @@ const resolvers = {
   Query: {
     findSimfinStockByName: async (_source, params, { dataSources, redisClient }) =>
         [
+            ... await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(params, redisClient),
             ... await dataSources.messyFinanceDataAPI.findSimfinStockByName(params, redisClient),
-            ... await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(params, redisClient)
         ],
 
     getSimfinCompanyById: async (_source, params, { dataSources, redisClient }) => 
@@ -59,8 +60,8 @@ const resolvers = {
 
     getSimfinCompanyByTicker: async (_source, params, { dataSources, redisClient }) => {
         const stocks = [
+            ... await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(params, redisClient),
             ... await dataSources.messyFinanceDataAPI.findSimfinStockByName(params, redisClient),
-            ... await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(params, redisClient)
         ]
 
         return  dataSources.messyFinanceDataAPI.getSimfinCompanyById({id: stocks[0].simId}, redisClient)
@@ -90,7 +91,12 @@ const resolvers = {
         financialTableMap(
             _source.years,
             await dataSources.messyFinanceDataAPI.yearlyFinancials(_source, redisClient),
-        )
+        ),
+
+    logo: async (_source, params, { dataSources, redisClient }) => {
+        const res = (await dataSources.messyFinanceDataAPI.logo(_source, redisClient));
+        return res ? res.url : null;
+    }
 
     // yearlyPrices: async (_source, params, { dataSources, redisClient }) =>
     //     dataSources.messyFinanceDataAPI.yearlyPrices(_source, redisClient),

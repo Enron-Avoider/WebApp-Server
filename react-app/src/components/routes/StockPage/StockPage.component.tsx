@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
-import { Paper, Grid, Box, Typography } from '@material-ui/core';
+import { Paper, Grid, Box, Typography, Avatar } from '@material-ui/core';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { ArrowDropDown, ArrowDropUp } from '@material-ui/icons';
@@ -18,6 +18,7 @@ const TICKER_QUERY = gql`
         getSimfinCompanyByTicker(name: $ticker) {
             name
             ticker
+            logo
             simId
             fyearEnd
             employees
@@ -115,31 +116,52 @@ export default function StockPage() {
     return data ? (
         <Box pb={2}>
             <Paper>
-                <Box p={2} mt={2}>
-                    <Box display="flex" alignItems="center">
-                        <Typography variant="h5">
-                            {stock.name}
-                        </Typography>
-                        <Box ml={1}>
-                            <Typography variant="h5">
-                                <b>({ticker})</b>
-                            </Typography>
-                        </Box>
-                    </Box>
+                <Box display="flex" flexDirection="row" p={2} mt={2}>
                     <div>
-                        {/* <p>Employees: {stock.employees}</p> */}
-                        <Typography variant="body1">Sector Name: {stock.sectorName}</Typography>
+                        <Box display="flex" alignItems="center">
+                            <Typography variant="h5">
+                                {stock.name}
+                            </Typography>
+                            <Box ml={1}>
+                                <Typography variant="h5">
+                                    <b>({ticker})</b>
+                                </Typography>
+                            </Box>
+                        </Box>
+                        <div>
+                            {/* <p>Employees: {stock.employees}</p> */}
+                            <Typography variant="body1">Sector Name: {stock.sectorName}</Typography>
 
-                        <Typography variant="body1">Share Classes: {
-                            stock.shareClasses.map((s: any, i: Number) =>
-                                s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
-                            )}
-                        </Typography>
+                            <Typography variant="body1">Share Classes: {
+                                stock.shareClasses.map((s: any, i: Number) =>
+                                    s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
+                                )}
+                            </Typography>
+                        </div>
                     </div>
+                    <Box p={2} display="flex" justifyContent="flex-end" flex={1}>
+                        <Avatar src={stock.logo} />
+                    </Box>
                 </Box>
             </Paper>
 
             <ScrollSync><>
+
+                <Paper>
+                    <Table
+                        title={'Charts'}
+                        columns={columns}
+                        data={calc}
+                    />
+                </Paper>
+
+                <Paper>
+                    <Table
+                        title={'Calculations'}
+                        columns={columns}
+                        data={calc}
+                    />
+                </Paper>
 
                 <Paper>
                     <Table
@@ -217,8 +239,8 @@ export default function StockPage() {
             </></ScrollSync>
         </Box>
     ) : (
-        <Box p={5} m={5} height="100vh" display="flex" alignItems="center" justifyContent="center">
-            <CircularProgress size={100} />
-        </Box>
-    );
+            <Box p={5} m={5} height="100vh" display="flex" alignItems="center" justifyContent="center">
+                <CircularProgress size={100} />
+            </Box>
+        );
 }

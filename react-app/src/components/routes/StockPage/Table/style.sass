@@ -1,31 +1,35 @@
 .TableContainer
-    // padding-bottom: 5px
-    // margin-bottom: 20px
-    // padding: 1rem
-    // font-size: 14px
 
     .table 
         border-radius: 4px
-        // border: 1px solid #ddd
         width: 100%
         max-height: 500px
+
+        .body .tr
+            &:hover
+                .td
+                    background-color: #515151
 
         .tr:last-child 
             .td 
                 border-bottom: 0
-            
+        
+        .tr.total
+            border-top: 1px solid rgba(0, 0, 0, 0.8)
+            font-weight: 900
+
         .td
             &:not(:first-child)
                 font-family: dm, Menlo, Monaco, "Courier New", monospace
+                color: rgba(255,255,255, 0.8)
 
         .th, .td:first-child
-            font-weight: 500
-            background-color: #515151
+            background-color: #424242
+            
 
         .td:first-child
             &.relevant
                 color: #d500f9
-                font-weight: 900
 
             &.calc
                 color: orange
@@ -61,7 +65,9 @@
                     overflow: visible
 
                     span
+                        // background-color: #424242
                         background-color: #515151
+                        // background-color: rgba(66, 66, 66, 0.8)
                         padding: 10px
 
                 // span
