@@ -6,26 +6,22 @@ import {
     Paper,
     Box,
     Typography,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Button,
-    TextField
 } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
-import EditIcon from '@material-ui/icons/Edit';
-import Fab from '@material-ui/core/Fab';
 import NewCalcRowModal from './NewCalcRowModal';
 
 import { useBackgrounds } from '@components/shared/styles';
 
 import "./style.sass";
 
+const getQuartile = (v: number, quartiles: number[]) =>
+    (v < quartiles[0]) ? 'q1' :
+        (v < quartiles[1]) ? 'q2' :
+            (v < quartiles[2]) ? 'q3' :
+                'q4';
+
 export default function Table(
-    { columns, data, title='', calculations=[] }:
-    { columns: Column<{}>[], data: {}[], title: string, calculations?: any }
+    { columns, data, title = '', calculations = [] }:
+        { columns: Column<{}>[], data: {}[], title: string, calculations?: any }
 ) {
 
     const { bg1 } = useBackgrounds();
@@ -85,10 +81,19 @@ export default function Table(
                                                             td
                                                             ${row.subRows.length ? 'relevant' : ''}
                                                             ${row.original.type === 'calc' ? 'calc' : ''}
+                                                            ${
+                                                            row.original.changePercentage && getQuartile(
+                                                                Number(row.original.changePercentage[cell.column.id]),
+                                                                row.original.changePercentage.quartiles
+                                                            )
+                                                            }
                                                         `}
+                                                        title={
+                                                            row.original.changePercentage &&
+                                                            `${row.original.changePercentage[cell.column.id]}%`
+                                                        }
                                                     >
                                                         {cell.render('Cell')}
-                                                        {/* {row.original.type === 'calc' ? 'edit' : ''} */}
                                                     </div>
                                                 ))}
                                             </div>

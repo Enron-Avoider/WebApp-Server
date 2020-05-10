@@ -53,7 +53,7 @@ module.exports = {
       )),
       years: ((yearFrom = 2010) =>
         Array.from(
-          { length: new Date().getFullYear() - yearFrom + 1 },
+          { length: new Date().getFullYear() - yearFrom },
           (v, k) => yearFrom + k
         ))(),
     });

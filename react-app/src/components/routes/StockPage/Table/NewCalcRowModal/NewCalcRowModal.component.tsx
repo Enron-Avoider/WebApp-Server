@@ -40,27 +40,22 @@ export default function NewCalcRowModal() {
         console.log({
             e, v
         });
-        setInputValue(v.map((v: any) => v.replace('_','')));
+        setInputValue(v);
+
+        // TODO: filter options based on last (eg: if row only allow  math)
+        // setInputValue(v.map((v: any) => v.value ? v.value.replace('_','') : v));
     }
 
-    const top100Films = [
-        { title: 'The Shawshank Redemption_', year: 1994 },
-        { title: 'The Godfather_', year: 1972 },
-        { title: 'Forrest Gump_', year: 1994 },
-        { title: 'Inception_', year: 2010 },
-        { title: 'The Lord of the Rings: The Two Towers_', year: 2002 },
-        { title: "One Flew Over the Cuckoo's Nest", year: 1975 },
-        { title: 'Goodfellas_', year: 1990 },
-        { title: 'The Matrix_', year: 1999 },
-        { title: 'Seven Samurai_', year: 1954 },
-        { title: 'Star Wars: Episode IV - A New Hope_', year: 1977 },
-        { title: 'City of God_', year: 2002 },
-        { title: 'Se7en_', year: 1995 },
-        { title: 'The Silence of the Lambs_', year: 1991 },
-        { title: "It's a Wonderful Life", year: 1946 },
-        { title: 'Life Is Beautiful_', year: 1997 },
-        { title: 'The Usual Suspects_', year: 1995 },
-        { title: 'Léon: The Professional_', year: 1994 },
+    const options = [
+        { value: 'yearlyFinancials.pl[Net Income Available to Common Shareholders]', title: 'Net Income Available to Common Shareholders', type: 'Income Statement' },
+        { value: 'aggregatedShares[common-outstanding-basic]', title: 'Common Outstanding Basic', type: 'Shares' },
+
+        { value: '/', title: '/', type: 'Math' },
+        { value: '*', title: '*', type: 'Math' },
+        { value: '+', title: '+', type: 'Math' },
+        { value: '-', title: '-', type: 'Math' },
+        { value: '(', title: '(', type: 'Math' },
+        { value: ")", title: ')', type: 'Math' },
     ];
 
     return (
@@ -84,27 +79,16 @@ export default function NewCalcRowModal() {
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Add a new Ratio to TABLENAME</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
+                    {/* <DialogContentText>
                         Let Google help apps determine location. This means sending
                         anonymous location data to Google, even when no apps are running.
-                    </DialogContentText>
-                    {/* <TextField
-                        id="outlined-multiline-static"
-                        label="Multiline"
-                        multiline
-                        fullWidth
-                        rows={4}
-                        defaultValue="Default Value"
-                        variant="outlined"
-                    /> */}
+                    </DialogContentText> */}
                     <Autocomplete
                         multiple
-                        options={top100Films.map((option) => option.title)}
-                        // getOptionLabel={(option) => option.title}
+                        options={options}
+                        getOptionLabel={(option) => option.title}
                         value={inputValue}
-                        // defaultValue={[top100Films[1].title, 'teeeest']}
-                        // filterSelectedOptions
-                        // onChange={handleOnChange}
+                        groupBy={(option) => `${option.type}`}
                         forcePopupIcon={false}
                         onChange={(event, newInputValue) => {
                             handleOnChange(event, newInputValue);
@@ -113,20 +97,19 @@ export default function NewCalcRowModal() {
                             <TextField
                                 {...params}
                                 variant="outlined"
-                                label="filterSelectedOptions"
-                                placeholder="Favorites"
+                                label="Calculation"
+                                placeholder=""
                             />
                         )}
-                        renderTags={(value: string[], getTagProps) =>
-                            value.map((option: string, index: number) => {
+                        renderTags={(value: any[], getTagProps) =>
+                            value.map((option: any, index: number) => {
                                 console.log({ ...getTagProps({ index }) })
                                 return (
                                     <Chip
                                         variant="outlined"
-                                        // deleteIcon={false}
-                                        label={option}
+                                        label={option.title}
                                         {...getTagProps({ index })}
-                                        onDelete={false}
+                                        onDelete={undefined}
                                     />
                                 )
                             })

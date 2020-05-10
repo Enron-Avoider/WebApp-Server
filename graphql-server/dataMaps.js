@@ -1,8 +1,14 @@
-// TODO: Move all this to server
-
 const numeral = require("numeral");
+const math = require("mathjs");
 
 const priceTableMap = (years, shareClassName, yearlyPrices) =>
+//   dataPointValuesToTableRow(
+//     yearlyPrices.priceData.map(x => x.closeAdj),
+//     years,
+//     shareClassName
+//     // totalTypeRows.includes(dataPoint.standardisedName)
+//   );
+
   yearlyPrices.priceData.reduce(
     (acc, curr, i) => ({
       ...acc,
@@ -66,21 +72,39 @@ const isolateShares = (years, aggregatedShares) => {
 };
 
 const financialTableMap = (years, yearlyFinancials) => {
+  const addRowPrior = [
+    {
+      to: "Cash, Cash Equivalents & Short Term Investments",
+      row: {
+        title: "Assets",
+      },
+    },
+    {
+      to: "Payables & Accruals",
+      row: {
+        title: "Liabilities",
+      },
+    },
+  ];
 
-    const addRowPrior = [
-        {
-            to: 'Cash, Cash Equivalents & Short Term Investments',
-            row: {
-                title: 'Assets'
-            },
-        },
-        {
-            to: 'Payables & Accruals',
-            row: {
-                title: 'Liabilities'
-            },
-        }
-    ]
+  const totalTypeRows = [
+    "Gross Profit",
+    "Operating Income (Loss)",
+    "Pretax Income (Loss)",
+    "Net Income Available to Common Shareholders",
+    "Total Current Assets",
+    "Total Noncurrent Assets",
+    "Total Assets",
+    "Total Current Liabilities",
+    "Total Noncurrent Liabilities",
+    "Total Liabilities",
+    "Total Equity",
+    "Total Liabilities & Equity",
+    "Cash from Operating Activities",
+    "Cash from Investing Activities",
+    "Cash from Financing Activities",
+    "Net Changes in Cash",
+  ];
 
   return Object.getOwnPropertyNames(yearlyFinancials).reduce(
     (acc, key, i) => ({
@@ -89,13 +113,19 @@ const financialTableMap = (years, yearlyFinancials) => {
         .filter((dataPoint) => dataPoint.value.find((e) => Number(e)))
         .reduce((acc, dataPoint, i) => {
           if (dataPoint.displayLevel === "0") {
-
-            const rowPrior = addRowPrior.find((r) => r.to === dataPoint.standardisedName);
+            const rowPrior = addRowPrior.find(
+              (r) => r.to === dataPoint.standardisedName
+            );
 
             return [
-                ...acc,
-                ...(typeof rowPrior !== 'undefined') ? [rowPrior.row] : [],
-                dataPointValuesToTableRow(dataPoint, years)
+              ...acc,
+              ...(typeof rowPrior !== "undefined" ? [rowPrior.row] : []),
+              dataPointValuesToTableRow(
+                dataPoint.value,
+                years,
+                dataPoint.standardisedName,
+                totalTypeRows.includes(dataPoint.standardisedName)
+              ),
             ];
           } else if (dataPoint.displayLevel === "1") {
             return [
@@ -105,7 +135,12 @@ const financialTableMap = (years, yearlyFinancials) => {
                     ...tableRow,
                     subRows: [
                       ...tableRow.subRows,
-                      dataPointValuesToTableRow(dataPoint, years),
+                      dataPointValuesToTableRow(
+                        dataPoint.value,
+                        years,
+                        dataPoint.standardisedName,
+                        totalTypeRows.includes(dataPoint.standardisedName)
+                      ),
                     ],
                   };
                 } else {
@@ -125,7 +160,12 @@ const financialTableMap = (years, yearlyFinancials) => {
                           ...tableSubRow,
                           subRows: [
                             ...tableSubRow.subRows,
-                            dataPointValuesToTableRow(dataPoint, years),
+                            dataPointValuesToTableRow(
+                              dataPoint.value,
+                              years,
+                              dataPoint.standardisedName,
+                              totalTypeRows.includes(dataPoint.standardisedName)
+                            ),
                           ],
                         };
                       } else {
@@ -148,35 +188,45 @@ const financialTableMap = (years, yearlyFinancials) => {
   );
 };
 
-const dataPointValuesToTableRow = (dataPoint, years) => {
-  const totalTypeRows = [
-    "Gross Profit",
-    "Operating Income (Loss)",
-    "Pretax Income (Loss)",
-    "Net Income Available to Common Shareholders",
-    "Total Current Assets",
-    "Total Noncurrent Assets",
-    "Total Assets",
-    "Total Current Liabilities",
-    "Total Noncurrent Liabilities",
-    "Total Liabilities",
-    "Total Equity",
-    "Total Liabilities & Equity",
-    "Cash from Operating Activities",
-    "Cash from Investing Activities",
-    "Cash from Financing Activities",
-    "Net Changes in Cash",
-  ];
+const dataPointValuesToTableRow = (values, years, title, isTotalRow) => {
 
-  return dataPoint.value.reduce(
+  const changePercentage = values
+    .map(
+      (value, i) =>
+        i === 0 || !value || !values[i - 1]
+          ? 0
+          : ((value - values[i - 1]) /
+              Math.abs(values[i - 1])) *
+            100,
+      {}
+    )
+    .reduce(
+      (acc, value, i, array) => ({
+        ...(i === 0
+          ? {
+              max: Math.max(...array.filter((v, i) => i > 0)).toFixed(0),
+              min: Math.min(...array.filter((v, i) => i > 0)).toFixed(0),
+              quartiles: math
+                .quantileSeq(array, [1 / 4, 1 / 2, 3 / 4, 1])
+                .map((x) => x.toFixed(1)),
+            }
+          : {}),
+        ...acc,
+        [`${years[i]}`]: value.toFixed(0),
+      }),
+      {}
+    );
+
+  return values.reduce(
     (acc, value, i) => ({
       ...acc,
       [`${years[i]}`]: numeral(value).format("(0.00a)"),
     }),
     {
-      title: dataPoint.standardisedName,
+      title,
       subRows: [],
-      ...totalTypeRows.includes(dataPoint.standardisedName) ? { type: 'total'} : {}
+      changePercentage,
+      ...(isTotalRow ? { type: "total" } : {}),
     }
   );
 };

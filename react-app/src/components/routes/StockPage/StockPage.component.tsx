@@ -37,23 +37,6 @@ const TICKER_QUERY = gql`
                 bs
                 cf
             }
-            # yearlyPrices
-            # industryCompanies {
-            #     name
-            #     sectorName
-            #     # years
-            #     # yearlyFinancials {
-            #     #   pl
-            #     #   bs
-            #     #   cf
-            #     # }
-            #     # shareClasses {
-            #     #   shareClassId
-            #     #   shareClassName
-            #     #   shareClassType
-            #     #   yearlyPrices
-            #     # }
-            # }
         }
     }
 `;
@@ -62,7 +45,7 @@ export default function StockPage() {
 
     const { ticker } = useParams();
 
-    const [visibleFinancials, setVisibleFinancials] = useState(() => ['pl', 'bs', 'cf']);
+    const [visibleFinancials, setVisibleFinancials] = useState(() => ['pl', 'bs']);
 
     const handleVisibleFinancials = (event: React.MouseEvent<HTMLElement>, newFormats: string[]) => {
         setVisibleFinancials(newFormats);
@@ -115,35 +98,49 @@ export default function StockPage() {
 
     return data ? (
         <Box pb={2}>
-            <Paper>
-                <Box display="flex" flexDirection="row" p={2} mt={2}>
-                    <div>
-                        <Box display="flex" alignItems="center">
-                            <Typography variant="h5">
-                                {stock.name}
-                            </Typography>
-                            <Box ml={1}>
-                                <Typography variant="h5">
-                                    <b>({ticker})</b>
-                                </Typography>
+
+            <Grid container spacing={3}>
+                <Grid item xs={8}>
+                    <Paper>
+                        <Box display="flex" flexDirection="row" p={2} mt={2}>
+                            <div>
+                                <Box display="flex" alignItems="center">
+                                    <Typography variant="h5">
+                                        {stock.name}
+                                    </Typography>
+                                    <Box ml={1}>
+                                        <Typography variant="h5">
+                                            <b>({ticker})</b>
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                                <div>
+                                    {/* <p>Employees: {stock.employees}</p> */}
+                                    <Typography variant="body1">Sector Name: {stock.sectorName}</Typography>
+
+                                    <Typography variant="body1">Share Classes: {
+                                        stock.shareClasses.map((s: any, i: Number) =>
+                                            s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
+                                        )}
+                                    </Typography>
+                                </div>
+                            </div>
+                            <Box p={2} display="flex" justifyContent="flex-end" flex={1}>
+                                <Avatar src={stock.logo} />
                             </Box>
                         </Box>
-                        <div>
-                            {/* <p>Employees: {stock.employees}</p> */}
-                            <Typography variant="body1">Sector Name: {stock.sectorName}</Typography>
+                    </Paper>
 
-                            <Typography variant="body1">Share Classes: {
-                                stock.shareClasses.map((s: any, i: Number) =>
-                                    s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
-                                )}
-                            </Typography>
-                        </div>
-                    </div>
-                    <Box p={2} display="flex" justifyContent="flex-end" flex={1}>
-                        <Avatar src={stock.logo} />
-                    </Box>
-                </Box>
-            </Paper>
+
+                </Grid>
+                <Grid item xs={4}>
+                    <Paper>
+                        <Box display="flex" flexDirection="row" p={2} mt={2}>
+                            Flower chart will go here
+                        </Box>
+                    </Paper>
+                </Grid>
+            </Grid>
 
             <ScrollSync><>
 
