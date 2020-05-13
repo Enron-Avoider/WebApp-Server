@@ -8,6 +8,8 @@ import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { ArrowDropDown, ArrowDropUp } from '@material-ui/icons';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import deepFind from 'deep-find';
+
 import { priceTableMap, outstandingSharesTableMap, mergeCalculationsWithTable } from './dataMaps';
 import { doCalculations, calculations } from './calculations'
 
@@ -25,12 +27,8 @@ const TICKER_QUERY = gql`
             sectorName
             sectorCode
             aggregatedShares
-            shareClasses {
-                shareClassId
-                shareClassName
-                shareClassType
-                yearlyPrices
-            }
+            price
+            shareClasses
             years
             yearlyFinancials {
                 pl
@@ -58,10 +56,6 @@ export default function StockPage() {
     const stock = data && data.getSimfinCompanyByTicker;
 
     const calc = stock && doCalculations(calculations, stock.years, stock);
-
-    // const priceTableData = stock && priceTableMap(stock.years, stock.shareClasses);
-
-    // const outstandingSharesTableData = stock && outstandingSharesTableMap(stock.years, stock.aggregatedShares);
 
     const columns = stock && [
         {
@@ -94,7 +88,25 @@ export default function StockPage() {
         }))
     ];
 
-    console.log({ stock, columns, calc });
+    const calcRowOptions = stock && [
+        { path: 'price', tableName: 'price' },
+        { path: 'shareClasses', tableName: 'shareClasses' },
+        { path: 'aggregatedShares', tableName: 'aggregatedShares' },
+        { path: 'yearlyFinancials.bs', tableName: 'yearlyFinancials.bs' },
+        { path: 'yearlyFinancials.cf', tableName: 'yearlyFinancials.cf' },
+        { path: 'yearlyFinancials.pl', tableName: 'yearlyFinancials.pl' }
+    ].reduce((acc: any, table: any) => {
+        return [
+            ...acc,
+            ...deepFind(stock, table.path).map((row: any) => ({
+                value: `${table.path}[${row.title}]`,
+                title: row.title,
+                type: table.tableName
+            }))
+        ];
+    }, []);
+
+    console.log({ stock, columns, calc, calcRowOptions });
 
     return data ? (
         <Box pb={2}>
@@ -166,7 +178,8 @@ export default function StockPage() {
                         columns={columns}
                         data={
                             [
-                                stock.shareClasses[0].yearlyPrices,
+                                ...stock.price,
+                                ...stock.shareClasses,
                                 ...stock.aggregatedShares
                             ]
                         }

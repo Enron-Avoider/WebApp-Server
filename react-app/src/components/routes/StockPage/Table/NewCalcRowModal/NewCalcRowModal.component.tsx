@@ -79,12 +79,11 @@ export default function NewCalcRowModal() {
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Add a new Ratio to TABLENAME</DialogTitle>
                 <DialogContent>
-                    {/* <DialogContentText>
-                        Let Google help apps determine location. This means sending
-                        anonymous location data to Google, even when no apps are running.
-                    </DialogContentText> */}
                     <Autocomplete
                         multiple
+                        autoComplete
+                        autoHighlight
+                        autoSelect
                         options={options}
                         getOptionLabel={(option) => option.title}
                         value={inputValue}
@@ -115,10 +114,6 @@ export default function NewCalcRowModal() {
                             })
                         }
                     />
-
-
-
-
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary" autoFocus>

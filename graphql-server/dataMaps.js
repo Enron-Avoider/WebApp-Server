@@ -14,7 +14,7 @@ const priceTableMap = (years, shareClassName, yearlyPrices) =>
       ...acc,
       [`${years[i]}`]: numeral(curr ? curr.closeAdj : "0").format("(0.00a)"),
     }),
-    { title: shareClassName }
+    { title: `${shareClassName}` }
   );
 
 const outstandingSharesTableMap = (years, aggregatedShares) => {
