@@ -14,7 +14,8 @@
     "paths": {
         "@env": ["environments/index"],
         "@components/*": ["src/components/*"],
-        "@assets/*": ["src/assets/*"]
+        "@assets/*": ["src/assets/*"],
+        "@queries/*": ["src/graphql-queries/*"]
     }
   },
   "include": [

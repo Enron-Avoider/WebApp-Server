@@ -1,57 +1,30 @@
 import React, { useState } from 'react';
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
-import { gql } from "apollo-boost";
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
 import { Paper, Grid, Box, Typography, Avatar } from '@material-ui/core';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import { ArrowDropDown, ArrowDropUp } from '@material-ui/icons';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import deepFind from 'deep-find';
+
+import TICKER_QUERY from '@queries/ticker';
 
 import { priceTableMap, outstandingSharesTableMap, mergeCalculationsWithTable } from './dataMaps';
 import { doCalculations, calculations } from './calculations'
-
 import Table from './Table';
-
-const TICKER_QUERY = gql`
-    query($ticker: String!) { 
-        getSimfinCompanyByTicker(name: $ticker) {
-            name
-            ticker
-            logo
-            simId
-            fyearEnd
-            employees
-            sectorName
-            sectorCode
-            aggregatedShares
-            price
-            shareClasses
-            years
-            yearlyFinancials {
-                pl
-                bs
-                cf
-            }
-        }
-    }
-`;
 
 export default function StockPage() {
 
     const { ticker } = useParams();
+    const { loading, error, data } = useQuery(TICKER_QUERY, {
+        variables: { ticker },
+    });
 
     const [visibleFinancials, setVisibleFinancials] = useState(() => ['pl', 'bs']);
 
     const handleVisibleFinancials = (event: React.MouseEvent<HTMLElement>, newFormats: string[]) => {
         setVisibleFinancials(newFormats);
     };
-
-    const { loading, error, data } = useQuery(TICKER_QUERY, {
-        variables: { ticker },
-    });
 
     const stock = data && data.getSimfinCompanyByTicker;
 
@@ -88,25 +61,7 @@ export default function StockPage() {
         }))
     ];
 
-    const calcRowOptions = stock && [
-        { path: 'price', tableName: 'price' },
-        { path: 'shareClasses', tableName: 'shareClasses' },
-        { path: 'aggregatedShares', tableName: 'aggregatedShares' },
-        { path: 'yearlyFinancials.bs', tableName: 'yearlyFinancials.bs' },
-        { path: 'yearlyFinancials.cf', tableName: 'yearlyFinancials.cf' },
-        { path: 'yearlyFinancials.pl', tableName: 'yearlyFinancials.pl' }
-    ].reduce((acc: any, table: any) => {
-        return [
-            ...acc,
-            ...deepFind(stock, table.path).map((row: any) => ({
-                value: `${table.path}[${row.title}]`,
-                title: row.title,
-                type: table.tableName
-            }))
-        ];
-    }, []);
-
-    console.log({ stock, columns, calc, calcRowOptions });
+    console.log({ stock, columns, calc });
 
     return data ? (
         <Box pb={2}>

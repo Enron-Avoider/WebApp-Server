@@ -12,13 +12,11 @@ export const calculations = [
             b: 'aggregatedShares[common-outstanding-basic]',
         },
         calc: 'a/b',
-        input: '@yearlyFinancials.pl[Net Income Available to Common Shareholders]/@aggregatedShares[common-outstanding-basic]'
     },
 ];
 
 export const doCalculations = (calculations: any, years: any, stock: any) =>
     calculations
-        // .filter((c: any) => c.onTable === forTable)
         .map((forTable: any) => {
             const scope = Object.entries(forTable.scope)
                 .reduce((acc: any, [key, value]: any, i: number) => ({
@@ -37,27 +35,24 @@ export const doCalculations = (calculations: any, years: any, stock: any) =>
                 ...acc,
                 [`${year}`]:
                     numeral(
-                        math.evaluate(forTable.calc, Object.entries(forTable.scope)
-                            .reduce((acc: any, [key, value]: any, i: number) => ({
-                                ...acc,
-                                [key]: numeral(scope[key][year]).value(),
-                            }), {}))
+                        (() => {
+                            try { 
+                                return math.evaluate(
+                                    forTable.calc,
+                                    Object.entries(forTable.scope)
+                                        .reduce((acc: any, [key, value]: any, i: number) => ({
+                                            ...acc,
+                                            [key]: numeral(scope[key][year]).value(),
+                                        }), {})
+                                )
+                            } 
+                            catch(e) {
+                                return i;
+                            }
+                        })()
                     ).format('(0.00a)')
             }), { title: forTable.title, type: 'calc',  onTable: forTable.onTable })
 
-            console.log({ scope, calc });
+            // console.log({ scope, c: forTable.calc });
             return calc;
-
-
-            // const populatedScope = c.scope.
-
-            // console.log({
-            //     c,
-            //     a: deepFind(stock, c.scope.a),
-            //     b: deepFind(stock, c.scope.b)
-            // });
-
-
-
-            return [];
         });
