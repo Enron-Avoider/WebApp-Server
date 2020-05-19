@@ -3,7 +3,16 @@ import numeral from 'numeral';
 import * as math from 'mathjs';
 // https://github.com/yashprit/deep-find#readme
 
-export const calculations = [
+export type CalculationType = {
+    onTable?: string,
+    title?: string,
+    scope: {
+        [key: string]: string,
+    },
+    calc: string,
+}
+
+export const calculations: CalculationType[] = [
     {
         onTable: 'Income Statement',
         title: 'Income per Share',
@@ -15,44 +24,45 @@ export const calculations = [
     },
 ];
 
-export const doCalculations = (calculations: any, years: any, stock: any) =>
+export const scopeToRows = (scope: { [key: string]: string }, stock: any,) => Object.entries(scope)
+    .reduce((acc: any, [key, value]: any, i: number) => ({
+        ...acc,
+        [key]: (([table, row]) => {
+            if (row) {
+                return deepFind(stock, table)
+                    .find((row_: any) => row_.title === row)
+            } else {
+                return deepFind(stock, table)
+            }
+        })(value.replace(']', '').split('[')),
+    }), {});
+
+export const doCalculations = (calculations: CalculationType[], years: number[], stock: any, title?: string) =>
     calculations
-        .map((forTable: any) => {
-            const scope = Object.entries(forTable.scope)
-                .reduce((acc: any, [key, value]: any, i: number) => ({
-                    ...acc,
-                    [key]: (([table, row]) => {
-                        if (row) {
-                            return deepFind(stock, table)
-                                .find((row_: any) => row_.title === row)
-                        } else {
-                            return deepFind(stock, table)
-                        }
-                    })(value.replace(']', '').split('[')),
-                }), {});
+        .map(forTable => {
+            const scopeRows = scopeToRows(forTable.scope, stock);
 
             const calc = years.reduce((acc: any, year: any, i: number) => ({
                 ...acc,
                 [`${year}`]:
                     numeral(
                         (() => {
-                            try { 
+                            try {
                                 return math.evaluate(
                                     forTable.calc,
                                     Object.entries(forTable.scope)
                                         .reduce((acc: any, [key, value]: any, i: number) => ({
                                             ...acc,
-                                            [key]: numeral(scope[key][year]).value(),
+                                            [key]: numeral(scopeRows[key][year]).value(),
                                         }), {})
                                 )
-                            } 
-                            catch(e) {
-                                return i;
+                            }
+                            catch (e) {
+                                return 0;
                             }
                         })()
                     ).format('(0.00a)')
-            }), { title: forTable.title, type: 'calc',  onTable: forTable.onTable })
+            }), { title: forTable.title || title, type: 'calc', onTable: forTable.onTable })
 
-            // console.log({ scope, c: forTable.calc });
             return calc;
         });

@@ -30,38 +30,7 @@ export default function StockPage() {
 
     const calc = stock && doCalculations(calculations, stock.years, stock);
 
-    const columns = stock && [
-        {
-            id: 'expander',
-            Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }: any) => (
-                <span {...getToggleAllRowsExpandedProps()}>
-                    {isAllRowsExpanded ? 'expand none' : 'expand all'}
-                </span>
-            ),
-            Cell: ({ row, cell }: any) =>
-                <span
-                    {...row.getToggleRowExpandedProps({
-                        style: {
-                            paddingLeft: `${row.depth * 1}rem`,
-                        },
-                    })}
-                // className={row.original.checkPossible ? 'relevant' : ''}
-                >
-                    {cell.value}
-                    {/* {row.canExpand ? (row.isExpanded ? <ArrowDropUp /> : <ArrowDropDown />) : null} */}
-                </span>,
-            accessor: 'title',
-            sticky: 'left',
-            width: 170
-        },
-        ...stock.years.map((y: number) => ({
-            Header: y,
-            accessor: `${y}`,
-            width: 90
-        }))
-    ];
-
-    console.log({ stock, columns, calc });
+    console.log({ stock, calc });
 
     return data ? (
         <Box pb={2}>
@@ -114,7 +83,7 @@ export default function StockPage() {
                 <Paper>
                     <Table
                         title={'Charts'}
-                        columns={columns}
+                        years={stock.years}
                         data={calc}
                     />
                 </Paper>
@@ -122,7 +91,7 @@ export default function StockPage() {
                 <Paper>
                     <Table
                         title={'Calculations'}
-                        columns={columns}
+                        years={stock.years}
                         data={calc}
                     />
                 </Paper>
@@ -130,7 +99,7 @@ export default function StockPage() {
                 <Paper>
                     <Table
                         title={'Shares'}
-                        columns={columns}
+                        years={stock.years}
                         data={
                             [
                                 ...stock.price,
@@ -166,12 +135,11 @@ export default function StockPage() {
                                     <Paper elevation={5}>
                                         <Table
                                             title={'Income Statement'}
-                                            columns={columns}
+                                            years={stock.years}
                                             data={[
                                                 ...stock.yearlyFinancials.pl,
                                                 ...calc.filter((c: any) => c.onTable === 'Income Statement')
                                             ]}
-                                            calculations={calc.filter((c: any) => c.onTable === 'Income Statement')}
                                         />
                                     </Paper>
                                 </Grid>
@@ -181,7 +149,7 @@ export default function StockPage() {
                                     <Paper elevation={5}>
                                         <Table
                                             title={'Balance Sheet'}
-                                            columns={columns}
+                                            years={stock.years}
                                             data={stock.yearlyFinancials.bs}
                                         />
                                     </Paper>
@@ -192,7 +160,7 @@ export default function StockPage() {
                                     <Paper elevation={5}>
                                         <Table
                                             title={'Cash Flow'}
-                                            columns={columns}
+                                            years={stock.years}
                                             data={stock.yearlyFinancials.cf}
                                         />
                                     </Paper>

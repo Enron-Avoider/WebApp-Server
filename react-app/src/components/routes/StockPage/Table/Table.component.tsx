@@ -20,11 +20,43 @@ const getQuartile = (v: number, quartiles: number[]) =>
                 'q4';
 
 export default function Table(
-    { columns, data, title = '', calculations = [] }:
-        { columns: Column<{}>[], data: {}[], title: string, calculations?: any }
+    { years, data, title = '', allowNewCalc = true }:
+        { years: number[], data: {}[], title?: string, allowNewCalc?: boolean }
 ) {
 
     const { bg1 } = useBackgrounds();
+
+    const columns = React.useMemo(() => [
+        {
+            id: 'expander',
+            Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }: any) => (
+                <span {...getToggleAllRowsExpandedProps()}>
+                    {isAllRowsExpanded ? 'expand none' : 'expand all'}
+                </span>
+            ),
+            Cell: ({ row, cell }: any) =>
+                <span
+                    {...row.getToggleRowExpandedProps({
+                        style: {
+                            paddingLeft: `${row.depth * 1}rem`,
+                        },
+                    })}
+                // className={row.original.checkPossible ? 'relevant' : ''}
+                >
+                    {cell.value}
+                    {/* {row.canExpand ? (row.isExpanded ? <ArrowDropUp /> : <ArrowDropDown />) : null} */}
+                </span>,
+            accessor: 'title',
+            sticky: 'left',
+            width: 170
+        },
+        ...years.map((y: number) => ({
+            Header: y,
+            accessor: `${y}`,
+            width: 90
+        }))
+    ], []);
+
 
     const {
         getTableProps,
@@ -46,66 +78,68 @@ export default function Table(
     return (
 
         <Box p={2} mt={2}>
-            <Typography variant="h5" gutterBottom>
-                {title}
-            </Typography>
 
-            <div className={`TableContainer`}>
-                <Paper elevation={3}>
-                    <div className={`${bg1}`}>
-                        <ScrollSyncPane>
-                            <div {...getTableProps()} className="table sticky">
-                                <div className="header">
-                                    {headerGroups.map((headerGroup: any) => (
-                                        <div {...headerGroup.getHeaderGroupProps()} className="tr">
-                                            {headerGroup.headers.map((column: any) => (
-                                                <div {...column.getHeaderProps()} className="th">
-                                                    {column.render('Header')}
+            {title && (
+                <Typography variant="h5" gutterBottom>
+                    {title}
+                </Typography>
+            )}
+
+            <Paper elevation={3}>
+                <div className={`${bg1}`}>
+                    <ScrollSyncPane>
+                        <div {...getTableProps()} className="table sticky">
+                            <div className="header">
+                                {headerGroups.map((headerGroup: any) => (
+                                    <div {...headerGroup.getHeaderGroupProps()} className="tr">
+                                        {headerGroup.headers.map((column: any) => (
+                                            <div {...column.getHeaderProps()} className="th">
+                                                {column.render('Header')}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                            <div {...getTableBodyProps()} className="body">
+                                {rows.map((row: any) => {
+                                    prepareRow(row);
+                                    return (
+                                        <div {...row.getRowProps()} className={`
+                                            tr
+                                            ${row.original.type === 'total' ? 'total' : ''}
+                                        `}>
+                                            {row.cells.map((cell: any) => (
+                                                <div
+                                                    {...cell.getCellProps()}
+                                                    className={`
+                                                        td
+                                                        ${row.subRows.length ? 'relevant' : ''}
+                                                        ${row.original.type === 'calc' ? 'calc' : ''}
+                                                        ${
+                                                        row.original.changePercentage && getQuartile(
+                                                            Number(row.original.changePercentage[cell.column.id]),
+                                                            row.original.changePercentage.quartiles
+                                                        )
+                                                        }
+                                                    `}
+                                                    title={
+                                                        row.original.changePercentage &&
+                                                        `${row.original.changePercentage[cell.column.id]}%`
+                                                    }
+                                                >
+                                                    {cell.render('Cell')}
                                                 </div>
                                             ))}
                                         </div>
-                                    ))}
-                                </div>
-                                <div {...getTableBodyProps()} className="body">
-                                    {rows.map((row: any) => {
-                                        prepareRow(row);
-                                        return (
-                                            <div {...row.getRowProps()} className={`
-                                                tr
-                                                ${row.original.type === 'total' ? 'total' : ''}
-                                            `}>
-                                                {row.cells.map((cell: any) => (
-                                                    <div
-                                                        {...cell.getCellProps()}
-                                                        className={`
-                                                            td
-                                                            ${row.subRows.length ? 'relevant' : ''}
-                                                            ${row.original.type === 'calc' ? 'calc' : ''}
-                                                            ${
-                                                            row.original.changePercentage && getQuartile(
-                                                                Number(row.original.changePercentage[cell.column.id]),
-                                                                row.original.changePercentage.quartiles
-                                                            )
-                                                            }
-                                                        `}
-                                                        title={
-                                                            row.original.changePercentage &&
-                                                            `${row.original.changePercentage[cell.column.id]}%`
-                                                        }
-                                                    >
-                                                        {cell.render('Cell')}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                    );
+                                })}
                             </div>
-                        </ScrollSyncPane>
-                    </div>
-                </Paper>
-                <NewCalcRowModal />
-            </div>
+                        </div>
+                    </ScrollSyncPane>
+                </div>
+            </Paper>
+
+            {allowNewCalc && <NewCalcRowModal />}
 
         </Box>
 

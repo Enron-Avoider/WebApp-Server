@@ -21,7 +21,9 @@ import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 
 import TICKER_QUERY from '@queries/ticker';
-import { doCalculations } from '../../calculations';
+import { doCalculations, scopeToRows, CalculationType } from '../../calculations';
+
+import Table from './../../Table';
 
 import "./style.sass";
 
@@ -62,13 +64,12 @@ export default function NewCalcRowModal() {
         setOpen(false);
     };
 
-    const [inputValue, setInputValue] = React.useState([]);
+    const [titleValue, setTitleValue] = React.useState('');
+    
+    const [autocompleteValue, setAutocompleteValue] = React.useState([]);
 
     const handleOnChange = (e: any, v: any) => {
-        setInputValue(v);
-
-        // TODO: filter options based on last (eg: if row only allow  math)
-        // setInputValue(v.map((v: any) => v.value ? v.value.replace('_','') : v));
+        setAutocompleteValue(v);
     }
 
     const options = [
@@ -83,11 +84,11 @@ export default function NewCalcRowModal() {
 
     // const calc = stock && doCalculations(calculations, stock.years, stock);
 
-    const calc = [
-        inputValue.reduce((acc: any, curr: any, i: number) => {
+    const calc: CalculationType[] = [
+        autocompleteValue.reduce((acc: any, curr: any, i: number) => {
             // console.log(curr.type);
 
-            const letterIndex = (10+Object.keys(acc.scope).length).toString(36)
+            const letterIndex = (10 + Object.keys(acc.scope).length).toString(36)
 
             return ({
                 scope: {
@@ -102,7 +103,9 @@ export default function NewCalcRowModal() {
         })
     ];
 
-    const calcRow = doCalculations(calc, stock.years, stock);
+    const calcRow = doCalculations(calc, stock.years, stock, titleValue);
+
+    const scopeRows = scopeToRows(calc[0].scope, stock);
 
     return (
         <>
@@ -127,13 +130,18 @@ export default function NewCalcRowModal() {
                 <Box
                     minWidth={450}
                 >
-                    <DialogTitle>Add a new Ratio</DialogTitle>
+                    <DialogTitle>Add a new Calculation</DialogTitle>
                     <DialogContent>
 
                         <TextField
                             label="Name"
                             fullWidth
-                            size="small"
+                            // size="small"
+                            variant="outlined"
+                            value={titleValue}
+                            onChange={(event: any) => {
+                                setTitleValue(event.target.value);
+                            }}
                         />
 
                         <Box p={2}></Box>
@@ -145,7 +153,7 @@ export default function NewCalcRowModal() {
                             // autoSelect
                             options={options}
                             getOptionLabel={(option) => option.title}
-                            value={inputValue}
+                            value={autocompleteValue}
                             groupBy={(option) => `${option.type}`}
                             forcePopupIcon={false}
                             onChange={(event, newInputValue) => {
@@ -179,15 +187,28 @@ export default function NewCalcRowModal() {
                             }
                         />
 
-                        <Box p={2}></Box>
 
-                        <pre>{JSON.stringify(calcRow, null, 2)}</pre>
+                        <Box m={-2} mt={2}>
+                            <Table
+                                // title={'Income Statement'}
+                                years={stock.years}
+                                data={[
+                                    ...Object.values(scopeRows),
+                                    ...calcRow
+                                ]}
+                                allowNewCalc={false}
+                            />
+                        </Box>
+
+                        {/* <Box p={2}></Box>
+
+                        <pre>{JSON.stringify(scopeRows, null, 2)}</pre>
 
                         <Box p={2}></Box>
 
                         <pre>{JSON.stringify(calc, null, 2)}</pre>
 
-                        <Box p={2}></Box>
+                        <Box p={2}></Box> */}
 
                     </DialogContent>
                     <DialogActions>
