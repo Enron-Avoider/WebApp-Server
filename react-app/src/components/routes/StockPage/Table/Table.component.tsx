@@ -2,13 +2,15 @@ import React from "react";
 import { useTable, useBlockLayout, useExpanded, Column } from "react-table";
 import { useSticky } from 'react-table-sticky';
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
+import { useParams, Link as Link_ } from "react-router-dom";
 import {
     Paper,
     Box,
     Typography,
+    Link
 } from '@material-ui/core';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import NewCalcRowModal from '../NewCalcRowModal';
+import NewCalcRowButton from '../NewCalcRowButton';
 
 import { useBackgrounds } from '@components/shared/styles';
 
@@ -25,6 +27,9 @@ export default function Table(
         { years: number[], data: {}[], title?: string, allowNewCalc?: boolean }
 ) {
 
+    const { ticker, rowTitle } = useParams();
+
+    // Dumb AF: delete
     const { bg1 } = useBackgrounds();
 
     const columns = React.useMemo(() => [
@@ -49,7 +54,12 @@ export default function Table(
                         <span className="arrow"><ArrowDropDownIcon /></span> :
                         ''
                     }
-                    {cell.value}
+                    {row.original.type === 'calc' ?
+                        <Link component={Link_} color="inherit" to={`/stock/${ticker}/calculations/${title}/${cell.value}`}>
+                            {cell.value}
+                        </Link> :
+                        cell.value
+                    }
                     <span
                         title={`quartiles of change`}
                         className="quartiles"
@@ -141,7 +151,7 @@ export default function Table(
                                                         row.original.changePercentage &&
                                                         `${row.original.changePercentage[cell.column.id]}%`
                                                     }
-                                                >
+                                                >   
                                                     {cell.render('Cell')}
                                                 </div>
                                             ))}
@@ -154,7 +164,7 @@ export default function Table(
                 </div>
             </Paper>
 
-            {allowNewCalc && <NewCalcRowModal />}
+            {allowNewCalc && <NewCalcRowButton title={title} />}
 
         </Box>
 

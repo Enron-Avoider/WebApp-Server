@@ -12,6 +12,7 @@ import getCalculations from '@state/effects/getCalculations';
 
 import { doCalculations } from './calculations'
 import Table from './Table';
+import CalcRowModal from './CalcRowModal';
 
 export const StockPage: FunctionComponent = () => {
 
@@ -81,6 +82,8 @@ export const StockPage: FunctionComponent = () => {
             </Grid>
 
             <ScrollSync><>
+
+                <CalcRowModal />
 
                 <Paper>
                     <Table
