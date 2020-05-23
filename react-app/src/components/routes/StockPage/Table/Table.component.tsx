@@ -7,7 +7,8 @@ import {
     Box,
     Typography,
 } from '@material-ui/core';
-import NewCalcRowModal from './NewCalcRowModal';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import NewCalcRowModal from '../NewCalcRowModal';
 
 import { useBackgrounds } from '@components/shared/styles';
 
@@ -30,9 +31,10 @@ export default function Table(
         {
             id: 'expander',
             Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }: any) => (
-                <span {...getToggleAllRowsExpandedProps()}>
-                    {isAllRowsExpanded ? 'expand none' : 'expand all'}
-                </span>
+                <></>
+                // <span {...getToggleAllRowsExpandedProps()}>
+                //     {isAllRowsExpanded ? 'expand none' : 'expand all'}
+                // </span>
             ),
             Cell: ({ row, cell }: any) =>
                 <span
@@ -43,7 +45,20 @@ export default function Table(
                     })}
                 // className={row.original.checkPossible ? 'relevant' : ''}
                 >
+                    {row.subRows.length ?
+                        <span className="arrow"><ArrowDropDownIcon /></span> :
+                        ''
+                    }
                     {cell.value}
+                    <span
+                        title={`quartiles of change`}
+                        className="quartiles"
+                    >
+                        {row.original.changePercentage?.quartiles.map((q: any, i: number) => (
+                            <span key={`q${i + 1}`} className={`quartile q${i + 1}`}>{q}%</span>
+                        )).reverse()}
+                    </span>
+                    {/* 10% 20% 70% 90% */}
                     {/* {row.canExpand ? (row.isExpanded ? <ArrowDropUp /> : <ArrowDropDown />) : null} */}
                 </span>,
             accessor: 'title',

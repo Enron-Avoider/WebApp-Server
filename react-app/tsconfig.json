@@ -15,7 +15,7 @@
         "@env": ["environments/index"],
         "@components/*": ["src/components/*"],
         "@assets/*": ["src/assets/*"],
-        "@queries/*": ["src/graphql-queries/*"]
+        "@state/*": ["src/state/*"]
     }
   },
   "include": [

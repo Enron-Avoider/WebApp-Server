@@ -20,10 +20,10 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 
-import TICKER_QUERY from '@queries/ticker';
-import { doCalculations, scopeToRows, CalculationType } from '../../calculations';
+import TICKER_QUERY from '@state/graphql-queries/ticker';
+import { doCalculations, scopeToRows, CalculationType } from '../calculations';
 
-import Table from './../../Table';
+import Table from '../Table';
 
 import "./style.sass";
 
@@ -65,7 +65,8 @@ export default function NewCalcRowModal() {
     };
 
     const [titleValue, setTitleValue] = React.useState('');
-    
+    const [aboutValue, setAboutValue] = React.useState('');
+
     const [autocompleteValue, setAutocompleteValue] = React.useState([]);
 
     const handleOnChange = (e: any, v: any) => {
@@ -130,19 +131,39 @@ export default function NewCalcRowModal() {
                 <Box
                     minWidth={450}
                 >
-                    <DialogTitle>Add a new Calculation</DialogTitle>
+                    <DialogTitle>Calculation Builder <span title="just kidding, copy this all you want">™️</span></DialogTitle>
                     <DialogContent>
 
-                        <TextField
-                            label="Name"
-                            fullWidth
-                            // size="small"
-                            variant="outlined"
-                            value={titleValue}
-                            onChange={(event: any) => {
-                                setTitleValue(event.target.value);
-                            }}
-                        />
+                        <Box display="flex" justifyContent="space-around">
+
+                            <Box flex={1} mr={3}>
+                                <TextField
+                                    label="Name"
+                                    fullWidth
+                                    // size="small"
+                                    // variant="outlined"
+                                    value={titleValue}
+                                    onChange={(event: any) => {
+                                        setTitleValue(event.target.value);
+                                    }}
+                                />
+                            </Box>
+
+                            <Box flex={2} ml={3}>
+                                <TextField
+                                    label="About"
+                                    fullWidth
+                                    multiline
+                                    // size="small"
+                                    // variant="outlined"
+                                    value={aboutValue}
+                                    onChange={(event: any) => {
+                                        setAboutValue(event.target.value);
+                                    }}
+                                />
+                            </Box>
+
+                        </Box>
 
                         <Box p={2}></Box>
 
@@ -173,9 +194,9 @@ export default function NewCalcRowModal() {
                                         <Chip
                                             variant={option.type === 'Math' ? 'default' : 'outlined'}
                                             label={`
-                                                ${(option.type !== 'Math' && option.type !== 'Price') ? option.type + ' >' : ''}
-                                                ${option.title}
-                                            `}
+                                                        ${(option.type !== 'Math' && option.type !== 'Price') ? option.type + ' >' : ''}
+                                                        ${option.title}
+                                                    `}
                                             {...getTagProps({ index })}
                                             className={`${option.type}`}
                                             color={option.type === 'Math' ? 'primary' : 'default'}

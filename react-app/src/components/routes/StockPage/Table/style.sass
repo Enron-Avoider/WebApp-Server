@@ -16,7 +16,27 @@
         border-top: 1px solid rgba(0, 0, 0, 0.8)
         font-weight: 900
 
-    .td
+    .arrow
+        position: relative
+        width: 0
+        height: 0
+        display: block
+        left: -23px
+
+    .quartiles
+        opacity: 0
+        transition: opacity 0.5s
+        margin-left: 5px
+        font-size: 10px
+        padding: 0px 3px
+
+        > span
+            padding: 0px 5px
+
+    .td:hover .quartiles
+        opacity: 1
+
+    .td, .quartile
         &:not(:first-child)
             font-family: dm, Menlo, Monaco, "Courier New", monospace
             color: rgba(255,255,255, 0.8)
@@ -39,7 +59,7 @@
 
     .td:first-child
         &.relevant
-            color: #d500f9
+            // color: #d500f9
 
         &.calc
             color: orange
@@ -74,7 +94,7 @@
                 text-overflow: initial
                 overflow: visible
 
-                span
+                > span
                     // background-color: #424242
                     background-color: #515151
                     // background-color: rgba(66, 66, 66, 0.8)

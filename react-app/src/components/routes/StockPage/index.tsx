@@ -1,3 +1,3 @@
-import StockPage from './StockPage.component';
+import { StockPage } from './StockPage.component';
 
 export default StockPage;

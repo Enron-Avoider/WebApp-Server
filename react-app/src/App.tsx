@@ -6,9 +6,10 @@ import {
     Redirect
 } from 'react-router-dom';
 import loadable from '@loadable/component';
-import {Container} from '@material-ui/core';
+import {Container, Box} from '@material-ui/core';
 
 import Header from '@components/shared/Header';
+import Footer from '@components/shared/Footer';
 
 export default function App() {
     return (
@@ -18,9 +19,11 @@ export default function App() {
 
                 <Container>
                     <Switch>
+                    <Route path="/page2" component={loadable(() => import('./components/routes/Page2'))} />
                         <Route path="/stock/:ticker" component={loadable(() => import('./components/routes/StockPage'))} />
                         <Redirect from="/" to="/stock/BRKA" />
                     </Switch>
+                    <Footer />
                 </Container>
             </Router>
         </>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, FunctionComponent } from 'react';
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
@@ -7,32 +7,34 @@ import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import TICKER_QUERY from '@queries/ticker';
+import TICKER_QUERY from '@state/graphql-queries/ticker';
+import getCalculations from '@state/effects/getCalculations';
 
-import { priceTableMap, outstandingSharesTableMap, mergeCalculationsWithTable } from './dataMaps';
-import { doCalculations, calculations } from './calculations'
+import { doCalculations } from './calculations'
 import Table from './Table';
 
-export default function StockPage() {
+export const StockPage: FunctionComponent = () => {
 
     const { ticker } = useParams();
     const { loading, error, data } = useQuery(TICKER_QUERY, {
         variables: { ticker },
     });
+    const stock = data && data.getSimfinCompanyByTicker;
+
+    const [calculations] = getCalculations();
+    const calc = stock && doCalculations(calculations, stock.years, stock);
+
+    console.log({ calculations });
 
     const [visibleFinancials, setVisibleFinancials] = useState(() => ['pl', 'bs']);
-
     const handleVisibleFinancials = (event: React.MouseEvent<HTMLElement>, newFormats: string[]) => {
         setVisibleFinancials(newFormats);
     };
 
-    const stock = data && data.getSimfinCompanyByTicker;
+    // console.log({ stock, calc });
+    console.log({ loading, error });
 
-    const calc = stock && doCalculations(calculations, stock.years, stock);
-
-    console.log({ stock, calc });
-
-    return data ? (
+    return !loading && !error ? (
         <Box pb={2}>
 
             <Grid container spacing={3}>
@@ -172,8 +174,8 @@ export default function StockPage() {
             </></ScrollSync>
         </Box>
     ) : (
-            <Box p={5} m={5} height="100vh" display="flex" alignItems="center" justifyContent="center">
-                <CircularProgress size={100} />
-            </Box>
-        );
+        <Box p={5} m={5} height="100vh" display="flex" alignItems="center" justifyContent="center">
+            <CircularProgress size={100} />
+        </Box>
+    );
 }
