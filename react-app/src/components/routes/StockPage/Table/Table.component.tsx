@@ -12,8 +12,6 @@ import {
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import NewCalcRowButton from '../NewCalcRowButton';
 
-import { useBackgrounds } from '@components/shared/styles';
-
 import "./style.sass";
 
 const getQuartile = (v: number, quartiles: number[]) =>
@@ -28,9 +26,6 @@ export default function Table(
 ) {
 
     const { ticker, rowTitle } = useParams();
-
-    // Dumb AF: delete
-    const { bg1 } = useBackgrounds();
 
     const columns = React.useMemo(() => [
         {
@@ -48,6 +43,7 @@ export default function Table(
                             paddingLeft: `${row.depth * 1}rem`,
                         },
                     })}
+                    title=""
                 // className={row.original.checkPossible ? 'relevant' : ''}
                 >
                     {row.subRows.length ?
@@ -111,7 +107,7 @@ export default function Table(
             )}
 
             <Paper elevation={3}>
-                <div className={`${bg1}`}>
+                <Box bgcolor="grey.800">
                     <ScrollSyncPane>
                         <div {...getTableProps()} className="table sticky">
                             <div className="header">
@@ -161,7 +157,7 @@ export default function Table(
                             </div>
                         </div>
                     </ScrollSyncPane>
-                </div>
+                </Box>
             </Paper>
 
             {allowNewCalc && <NewCalcRowButton title={title} />}

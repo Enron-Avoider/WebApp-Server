@@ -25,6 +25,7 @@ export const calculations: CalculationType[] = [
 ];
 
 export const scopeToRows = (scope: { [key: string]: string }, stock: any,) => Object.entries(scope)
+    .filter(([key, value]: any) => !!value && key !== '__typename')
     .reduce((acc: any, [key, value]: any, i: number) => ({
         ...acc,
         [key]: (([table, row]) => {
@@ -37,11 +38,13 @@ export const scopeToRows = (scope: { [key: string]: string }, stock: any,) => Ob
         })(value.replace(']', '').split('[')),
     }), {});
 
-export const doCalculations = (calculations: CalculationType[], years: number[], stock: any, title?: string) =>
-    calculations
+export const doCalculations = (
+    calculations: CalculationType[], years: number[], stock: any, title?: string
+) =>
+    Object.entries(calculations)
+        .map(([key, value]: any) => value)
         .map(forTable => {
             const scopeRows = scopeToRows(forTable.scope, stock);
-
             const calc = years.reduce((acc: any, year: any, i: number) => ({
                 ...acc,
                 [`${year}`]:
@@ -51,6 +54,7 @@ export const doCalculations = (calculations: CalculationType[], years: number[],
                                 return math.evaluate(
                                     forTable.calc,
                                     Object.entries(forTable.scope)
+                                        .filter(([key, value]: any) => !!value && key !== '__typename')
                                         .reduce((acc: any, [key, value]: any, i: number) => ({
                                             ...acc,
                                             [key]: numeral(scopeRows[key][year]).value(),

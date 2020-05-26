@@ -13,7 +13,9 @@ import env from '@env';
 import App from './App';
 import './index.scss';
 import { GET_TODOS } from '@state/graphql-queries/todos';
-import { resolvers } from '@state/graphql-resolvers/todo';
+import { GET_CALCULATIONS } from '@state/graphql-queries/calculations';
+import { todoResolvers } from '@state/graphql-resolvers/todo';
+import { calculationsResolvers } from '@state/graphql-resolvers/calculations';
 
 console.log({ env });
 
@@ -27,17 +29,17 @@ console.log({ env });
     const client = new ApolloClient({
         uri: 'http://localhost:4000/',
         cache,
-        resolvers
+        resolvers: { ...todoResolvers, ...calculationsResolvers }
     });
-    /* Initialize the local state if not yet */
+
     try {
-        cache.readQuery({
-            query: GET_TODOS
-        });
+        cache.readQuery({ query: GET_CALCULATIONS });
+        cache.readQuery({ query: GET_TODOS });
     } catch (error) {
         cache.writeData({
             data: {
-                todos: []
+                todos: [],
+                calculations: []
             }
         });
     }
@@ -49,7 +51,8 @@ console.log({ env });
             secondary: purple,
             background: {
                 default: '#212121',
-                paper: '#333'
+                paper: '#333',
+                // grey1: theme.palette.grey['800']
             }
         },
     });

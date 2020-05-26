@@ -24,11 +24,11 @@ export default function App() {
                             component={loadable(() => import('./components/routes/Page2'))}
                         />
                         <Route
-                            path="/stock/:ticker"
+                            path="/stock/:ticker/calculations/:tableName/:rowTitle"
                             component={loadable(() => import('./components/routes/StockPage'))}
                         />
                         <Route
-                            path="/stock/:ticker/calculations/:tableName/:rowTitle"
+                            path="/stock/:ticker"
                             component={loadable(() => import('./components/routes/StockPage'))}
                         />
                         <Redirect from="/" to="/stock/BRKA" />

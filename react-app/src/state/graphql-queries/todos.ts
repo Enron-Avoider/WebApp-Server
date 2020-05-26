@@ -3,7 +3,7 @@ import { gql } from "apollo-boost";
 export const GET_TODOS = gql`
   {
     todos @client {
-    #   id
+      id
       name
       completed
       test {

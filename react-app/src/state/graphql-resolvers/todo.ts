@@ -1,7 +1,7 @@
 // import RandomID from "random-id";
 import { GET_TODOS } from "../graphql-queries/todos";
 
-export const resolvers = {
+export const todoResolvers = {
   Mutation: {
     addTodo: (_: any, todo: any, { cache }: any) => {
       const { todos } = cache.readQuery({ query: GET_TODOS });

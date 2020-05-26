@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useParams, Link, useRouteMatch, useHistory } from "react-router-dom";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useMutation } from "@apollo/react-hooks";
 import deepFind from 'deep-find';
 import {
     Paper,
@@ -17,10 +17,14 @@ import {
     Chip
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import AddIcon from '@material-ui/icons/Add';
-import EditIcon from '@material-ui/icons/Edit';
 
 import TICKER_QUERY from '@state/graphql-queries/ticker';
+import {
+    GET_CALCULATIONS,
+    ADD_CALCULATION,
+    REMOVE_CALCULATION,
+    SAVE_CALCULATION
+} from '@state/graphql-queries/calculations';
 import { doCalculations, scopeToRows, CalculationType } from '../calculations';
 
 import Table from '../Table';
@@ -33,6 +37,13 @@ export default function NewCalcRowModal() {
     const { loading, error, data } = useQuery(TICKER_QUERY, {
         variables: { ticker },
     });
+    const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
+        variables: { ticker },
+    });
+    const [addCalculation] = useMutation(ADD_CALCULATION);
+    const [removeCalculation] = useMutation(REMOVE_CALCULATION);
+    const [saveCalculation] = useMutation(SAVE_CALCULATION);
+    const [existing, setExistinging] = React.useState<Object>({});
 
     const path = `/stock/${ticker}/calculations/`;
 
@@ -74,11 +85,6 @@ export default function NewCalcRowModal() {
         setAutocompleteValue(v);
     }
 
-    useEffect(() => {
-        console.log({ rowTitle });
-    }, [rowTitle]);
-
-
     const options = [
         { value: '/', title: '/', type: 'Math' },
         { value: '*', title: '*', type: 'Math' },
@@ -89,6 +95,7 @@ export default function NewCalcRowModal() {
         ...calcRowOptions
     ];
 
+    // autocompleteValue to calc
     const calc: CalculationType[] = [
         autocompleteValue.reduce((acc: any, curr: any, i: number) => {
             // console.log(curr.type);
@@ -108,9 +115,62 @@ export default function NewCalcRowModal() {
         })
     ];
 
+    const handleAdd = async () => {
+        await addCalculation({
+            variables: {
+                title: titleValue,
+                about: aboutValue,
+                onTable: 'hum',
+                calc: calc[0].calc,
+                scope: calc[0].scope
+            }
+        });
+        handleClose();
+    }
+
+    const handleRemove = async () => {
+        await removeCalculation({
+            variables: {
+                title: rowTitle,
+            }
+        });
+        handleClose();
+    }
+
+    const handleSave = async () => {
+        await saveCalculation({
+            variables: {
+                newTitle: titleValue,
+                title: rowTitle,
+                about: aboutValue,
+                onTable: 'hum',
+                calc: calc[0].calc,
+                scope: calc[0].scope
+            }
+        });
+        handleClose();
+    }
+
     const calcRow = doCalculations(calc, stock.years, stock, titleValue);
 
     const scopeRows = scopeToRows(calc[0].scope, stock);
+
+    useEffect(() => {
+        const existing = calculations.calculations.find((c: any) => c.title === rowTitle);
+        setExistinging(existing);
+        if (existing) {
+            setTitleValue(existing.title);
+            setAboutValue(existing.about);
+            const autocompleteValue = existing?.calc.split('').map((letter: string) => {
+                if (['a', 'b', 'c', 'd', 'e', 'f', 'g'].includes(letter)) {
+                    return options.find((op) => op.value === existing.scope[letter])
+                } else {
+                    return options.find((op) => op.value === letter)
+                }
+            });
+            setAutocompleteValue(autocompleteValue);
+        }
+    }, [calculations, rowTitle]);
 
     return (
         <Dialog open={routeMatchesOpen} onClose={handleClose}>
@@ -207,9 +267,11 @@ export default function NewCalcRowModal() {
                         />
                     </Box>
 
-                    {/* <Box p={2}></Box>
+                    {/*
 
-                    <pre>{JSON.stringify(scopeRows, null, 2)}</pre>
+                    <Box p={2}></Box>
+
+                    <pre>{JSON.stringify(autocompleteValue, null, 2)}</pre>
 
                     <Box p={2}></Box>
 
@@ -219,12 +281,22 @@ export default function NewCalcRowModal() {
 
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary" autoFocus>
-                        Save
-                    </Button>
-                    <Button onClick={handleClose} color="primary" autoFocus>
-                        Add
-                    </Button>
+                    {existing && (
+                        <>
+                            <Button onClick={handleRemove} color="primary">
+                                Remove
+                            </Button>
+
+                            <Button onClick={handleSave} color="secondary">
+                                Save
+                            </Button>
+                        </>
+                    )}
+                    {!existing && (
+                        <Button onClick={handleAdd} color="secondary">
+                            Add
+                        </Button>
+                    )}
                 </DialogActions>
             </Box>
         </Dialog>
