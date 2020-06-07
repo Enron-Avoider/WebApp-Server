@@ -29,10 +29,33 @@ const typeDefs = gql`
     cf: [JSON]
   }
 
+  type Sector {
+    name: String
+    numberOfStocks: Int
+    # yearlyFinancials: YearlyFinancials
+    aggregatedShares: [JSON]
+    aggregatedSharesIsolated: JSON
+    price: [JSON]
+  }
+
+  type Industry {
+    name: String
+    numberOfStocks: Int
+    # yearlyFinancials: YearlyFinancials
+    aggregatedShares: [JSON]
+    aggregatedSharesIsolated: JSON
+    price: [JSON]
+  }
+
   type Query {
     findSimfinStockByName(name: String): [SimfinStock]
     getSimfinCompanyById(id: String): SimfinStock
     getSimfinCompanyByTicker(name: String): SimfinStock
+
+    getSector(name: String): JSON
+    getAllSectors: JSON
+    getIndustry(name: String): JSON
+    getAllIndustries: JSON
   }
 `;
 module.exports = {
