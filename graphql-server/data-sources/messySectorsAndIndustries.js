@@ -1,5 +1,13 @@
 const fs = require("fs");
+const numeral = require("numeral");
 const { RESTDataSource } = require("apollo-datasource-rest");
+
+const {
+  financialTableMap,
+  outstandingSharesTableMap,
+  priceTableMap,
+  isolateShares,
+} = require("../dataMaps");
 
 const STOCK_TO_SECTOR_FILE = "./data-sources/stockToSector.json";
 
@@ -85,18 +93,86 @@ module.exports = {
       return sectorStocks;
     };
 
-    getIndustry = async (name) => {
+    getIndustry = async (name, dataSources) => {
+      const years = ((yearFrom = 2010) =>
+        Array.from(
+          { length: new Date().getFullYear() - yearFrom },
+          (v, k) => yearFrom + k
+        ))();
+
       const { analysis, stocks } = await this.getSimVizData();
 
       const industry = analysis.FinVizIndustry.find(
         (s) => Object.keys(s)[0] === name
       );
 
-      const industryStocks = stocks.filter(
-        (s) => s.FinVizIndustry === Object.keys(industry)[0]
+      const stocksWithSimId = await Promise.all(
+        stocks
+          .filter((s) => s.FinVizIndustry === Object.keys(industry)[0])
+          .map(async (s) => {
+            const stock = await [
+              ...(await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(
+                {
+                  name: s.ticker,
+                }
+              )),
+              ...(await dataSources.messyFinanceDataAPI.findSimfinStockByName({
+                name: s.name,
+              })),
+            ][0];
+            return {
+              ...s,
+              simId: stock.simId,
+            };
+          })
       );
 
-      return industryStocks;
+      const stocksWithFinancialData = await Promise.all(
+        stocksWithSimId.map(async (s) => {
+          const financialData = await financialTableMap(
+            years,
+            await dataSources.messyFinanceDataAPI.yearlyFinancials({
+              years,
+              simId: s.simId,
+            })
+          );
+          return {
+            ...s,
+            financialData,
+          };
+        })
+      );
+
+      const calc = ["pl", "bs", "cf"].reduce((a, t) => {
+        const rows = stocksWithFinancialData.reduce((acc, s, i) => {
+          const rows = s.financialData[t].map((f) => f.title);
+          return [...new Set([...acc, ...rows])];
+        }, []);
+
+        return {
+          ...a,
+          [t]: rows.map((r) =>
+            years.reduce(
+              (a_, y) => {
+                const yearCalc = stocksWithFinancialData.reduce((a__, s) => {
+                  const v = s.financialData[t].find((r_) => r_.title === r)
+                    ? s.financialData[t].find((r_) => r_.title === r)[y]
+                    : 0;
+                  return a__ + numeral(v).value();
+                }, 0);
+
+                return {
+                  ...a_,
+                  [y]: yearCalc,
+                };
+              },
+              { title: r }
+            )
+          ),
+        };
+      }, {});
+
+      return calc;
     };
 
     getAllSectors = async () => {

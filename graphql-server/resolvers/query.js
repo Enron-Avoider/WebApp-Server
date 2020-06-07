@@ -36,7 +36,7 @@ module.exports = {
       dataSources.messySectorsAndIndustries.getAllSectors(),
 
     getIndustry: async (_source, params, { dataSources }) =>
-      dataSources.messySectorsAndIndustries.getIndustry(params.name),
+      dataSources.messySectorsAndIndustries.getIndustry(params.name, dataSources),
 
     getAllIndustries: async (_source, params, { dataSources }) =>
       dataSources.messySectorsAndIndustries.getAllIndustries(),
