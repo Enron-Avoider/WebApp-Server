@@ -4,9 +4,12 @@ import { AppBar, Toolbar, Typography, IconButton } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import { Grid, makeStyles, Box, Button, Menu, MenuItem, useMediaQuery } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
+
 import logoImg from '@assets/penrose.png';
+import StockSearcher from '@components/shared/StockSearcher';
 
 import './style.sass';
+
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
@@ -22,8 +25,6 @@ const useStyles = makeStyles((theme) => ({
         'padding-top': '3px'
     }
 }));
-
-import StockSearcher from './StockSearcher';
 
 export default function Header() {
     const classes = useStyles();

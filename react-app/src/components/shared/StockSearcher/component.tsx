@@ -66,10 +66,10 @@ export default function StockSearcher() {
                                 loading
                             </MenuItem>
                         )}
-                        {data && data.findSimfinStockByName.map((d: any) => (
+                        {data && data.findSimfinStockByName.map((d: any, i: number) => (
                             <MenuItem
                                 // className="list-group-item"
-                                key={d.ticker}
+                                key={d.ticker+" "+i}
                                 component={Link}
                                 to={`/stock/${d.ticker}`}
                             >

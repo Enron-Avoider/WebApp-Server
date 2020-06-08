@@ -2,16 +2,28 @@ import React, { useState, FunctionComponent } from 'react';
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
-import { Paper, Grid, Box, Typography, Avatar } from '@material-ui/core';
+import { Link } from 'react-router-dom';
+
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import {
+    Paper,
+    Grid,
+    Box,
+    Typography,
+    Avatar,
+    InputLabel,
+    MenuListItem,
+    ListSubheader,
+    FormControl,
+    Select,
+    IconButton,
+    ClickAwayListener,
+    MenuList,
+    Button
+} from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
 
 import TICKER_QUERY from '@state/graphql-queries/ticker';
 import { GET_CALCULATIONS } from '@state/graphql-queries/calculations';
@@ -20,6 +32,7 @@ import getCalculations from '@state/effects/getCalculations';
 import { doCalculations } from './calculations'
 import Table from './Table';
 import CalcRowModal from './CalcRowModal';
+import AddCard from './AddCard';
 
 export const StockPage: FunctionComponent = () => {
 
@@ -41,309 +54,246 @@ export const StockPage: FunctionComponent = () => {
         setVisibleFinancials(newFormats);
     };
 
+    const [showAddCard, setShowAddCard] = useState(false);
+    const toggleShowAddCard = () => setShowAddCard(!showAddCard);
+
     // console.log({ stock, calc });
     // console.log({ calc });
 
     return !loading && !error ? (
-        <Box pb={2}>
-            <ScrollSync>
-                <Grid container spacing={3}>
+        <ScrollSync>
+            <>
+                <Box pb={2}>
+                    <CalcRowModal />
+                    <Grid container spacing={3}>
 
-                    <Grid item xs={5}>
-                        <>
+                        <Grid item xs={11}>
+                            <>
 
-                            <Grid container spacing={3}>
-                                <Grid item xs={8}>
-                                    <Paper>
-                                        <Box display="flex" flexDirection="row" p={2} mt={2}>
-                                            <div>
-                                                <Box display="flex" alignItems="center">
-                                                    <Typography variant="h5">
-                                                        {stock.name}
-                                                    </Typography>
-                                                    <Box ml={1}>
-                                                        <Typography variant="h5">
-                                                            <b>({ticker})</b>
-                                                        </Typography>
-                                                    </Box>
-                                                </Box>
+                                <Grid container spacing={3}>
+                                    <Grid item xs={8}>
+                                        <Paper>
+                                            <Box display="flex" flexDirection="row" p={2} mt={2}>
                                                 <div>
-                                                    {/* <p>Employees: {stock.employees}</p> */}
-                                                    <Typography variant="body1">Sector Name: {stock.sectorName}</Typography>
+                                                    <Box display="flex" alignItems="center">
+                                                        <Typography variant="h5">
+                                                            {stock.name}
+                                                        </Typography>
+                                                        <Box ml={1}>
+                                                            <Typography variant="h5">
+                                                                <b>({ticker})</b>
+                                                            </Typography>
+                                                        </Box>
+                                                    </Box>
+                                                    <div>
+                                                        {/* <p>Employees: {stock.employees}</p> */}
+                                                        <Typography variant="body1">Sector Name: {stock.sectorName}</Typography>
 
-                                                    <Typography variant="body1">Share Classes: {
-                                                        stock.shareClasses.map((s: any, i: Number) =>
-                                                            s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
-                                                        )}
-                                                    </Typography>
+                                                        <Typography variant="body1">Share Classes: {
+                                                            stock.shareClasses.map((s: any, i: Number) =>
+                                                                s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
+                                                            )}
+                                                        </Typography>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <Box p={2} display="flex" justifyContent="flex-end" flex={1}>
-                                                <Avatar src={stock.logo} />
                                             </Box>
+                                        </Paper>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <Box
+                                            p={2}
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="center"
+                                            height="100%"
+                                        >
+                                            <Avatar variant="rounded" src={stock.logo} />
                                         </Box>
-                                    </Paper>
-
-
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={4}>
-                                    <Paper style={{ height: 'calc(100% - 16px)' }}>
-                                        <Box display="flex" flexDirection="column" justifyContent="space-around" p={2} mt={2}>
-                                            <Box flex="1">
-                                                <FormControl style={{ width: '100%' }}>
-                                                    <InputLabel htmlFor="grouped-select">⍴ Correlation</InputLabel>
-                                                    <Select defaultValue="" id="grouped-select">
-                                                        <MenuItem value="">
-                                                            <em>⍴ between selected and all</em>
-                                                        </MenuItem>
-                                                        <ListSubheader>Category 1</ListSubheader>
-                                                        <MenuItem value={1}>Option 1</MenuItem>
-                                                        <MenuItem value={2}>Option 2</MenuItem>
-                                                        <ListSubheader>Category 2</ListSubheader>
-                                                        <MenuItem value={3}>Option 3</MenuItem>
-                                                        <MenuItem value={4}>Option 4</MenuItem>
-                                                    </Select>
-                                                </FormControl>
-                                            </Box>
-                                        </Box>
-                                    </Paper>
-                                </Grid>
-                            </Grid>
 
-                            <CalcRowModal />
+                                <Paper>
+                                    <Table
+                                        title={'Calculations'}
+                                        years={stock.years}
+                                        data={calculationResults}
+                                    />
+                                </Paper>
 
-                            <Paper>
-                                <Table
-                                    title={'Calculations'}
-                                    years={stock.years}
-                                    data={calculationResults}
-                                />
-                            </Paper>
+                                <Paper>
+                                    <Table
+                                        title={'Shares'}
+                                        years={stock.years}
+                                        data={
+                                            [
+                                                ...stock.price,
+                                                ...stock.shareClasses,
+                                                ...stock.aggregatedShares
+                                            ]
+                                        }
+                                    />
+                                </Paper>
 
-                            <Paper>
-                                <Table
-                                    title={'Shares'}
-                                    years={stock.years}
-                                    data={
-                                        [
-                                            ...stock.price,
-                                            ...stock.shareClasses,
-                                            ...stock.aggregatedShares
-                                        ]
-                                    }
-                                />
-                            </Paper>
+                                <Paper>
+                                    <Box p={2} mt={2}>
 
-                            <Paper>
-                                <Box p={2} mt={2}>
-
-                                    <Box
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="space-between"
-                                    >
-                                        <Typography variant="h5" gutterBottom>
-                                            Financial Statements
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="space-between"
+                                        >
+                                            <Typography variant="h5" gutterBottom>
+                                                Financial Statements
                                 </Typography>
 
-                                        <ToggleButtonGroup value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
-                                            <ToggleButton value="pl">Income Statement</ToggleButton>
-                                            <ToggleButton value="bs">Balance Sheet</ToggleButton>
-                                            <ToggleButton value="cf">Cash Flow</ToggleButton>
-                                        </ToggleButtonGroup>
+                                            <ToggleButtonGroup value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
+                                                <ToggleButton value="pl">Income Statement</ToggleButton>
+                                                <ToggleButton value="bs">Balance Sheet</ToggleButton>
+                                                <ToggleButton value="cf">Cash Flow</ToggleButton>
+                                            </ToggleButtonGroup>
+                                        </Box>
+
+                                        <Grid container spacing={3}>
+                                            {visibleFinancials.includes('pl') && (
+                                                <Grid item xs={(12 / visibleFinancials.length) as any}>
+                                                    <Paper elevation={5}>
+                                                        <Table
+                                                            title={'Income Statement'}
+                                                            years={stock.years}
+                                                            data={[
+                                                                ...stock.yearlyFinancials.pl,
+                                                                ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
+                                                            ]}
+                                                        />
+                                                    </Paper>
+                                                </Grid>
+                                            )}
+                                            {visibleFinancials.includes('bs') && (
+                                                <Grid item xs={(12 / visibleFinancials.length) as any}>
+                                                    <Paper elevation={5}>
+                                                        <Table
+                                                            title={'Balance Sheet'}
+                                                            years={stock.years}
+                                                            data={stock.yearlyFinancials.bs}
+                                                        />
+                                                    </Paper>
+                                                </Grid>
+                                            )}
+                                            {visibleFinancials.includes('cf') && (
+                                                <Grid item xs={(12 / visibleFinancials.length) as any}>
+                                                    <Paper elevation={5}>
+                                                        <Table
+                                                            title={'Cash Flow'}
+                                                            years={stock.years}
+                                                            data={stock.yearlyFinancials.cf}
+                                                        />
+                                                    </Paper>
+                                                </Grid>
+                                            )}
+                                        </Grid>
                                     </Box>
+                                </Paper>
+                            </>
+                        </Grid>
 
-                                    <Grid container spacing={3}>
-                                        {visibleFinancials.includes('pl') && (
-                                            <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                <Paper elevation={5}>
-                                                    <Table
-                                                        title={'Income Statement'}
-                                                        years={stock.years}
-                                                        data={[
-                                                            ...stock.yearlyFinancials.pl,
-                                                            ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
-                                                        ]}
-                                                    />
-                                                </Paper>
-                                            </Grid>
-                                        )}
-                                        {visibleFinancials.includes('bs') && (
-                                            <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                <Paper elevation={5}>
-                                                    <Table
-                                                        title={'Balance Sheet'}
-                                                        years={stock.years}
-                                                        data={stock.yearlyFinancials.bs}
-                                                    />
-                                                </Paper>
-                                            </Grid>
-                                        )}
-                                        {visibleFinancials.includes('cf') && (
-                                            <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                <Paper elevation={5}>
-                                                    <Table
-                                                        title={'Cash Flow'}
-                                                        years={stock.years}
-                                                        data={stock.yearlyFinancials.cf}
-                                                    />
-                                                </Paper>
-                                            </Grid>
-                                        )}
-                                    </Grid>
-                                </Box>
-                            </Paper>
-                        </>
-                    </Grid>
-                    <Grid item xs={5}>
-                        <>
-
-                            <Grid container spacing={3}>
-                                <Grid item xs={8}>
-                                    <Paper>
-                                        <Box display="flex" flexDirection="row" p={2} mt={2}>
-                                            <div>
-                                                <Box display="flex" alignItems="center">
-                                                    <Typography variant="h5">
-                                                        {stock.name}
-                                                    </Typography>
-                                                    <Box ml={1}>
-                                                        <Typography variant="h5">
-                                                            <b>({ticker})</b>
-                                                        </Typography>
+                        <Grid item xs={1}>
+                            <Box
+                                position="sticky"
+                                top="88px"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                mt={3}
+                            >
+                                <Box position="relative">
+                                    <IconButton color="primary" onClick={toggleShowAddCard}>
+                                        <AddIcon />
+                                    </IconButton>
+                                    {showAddCard && (
+                                        <ClickAwayListener
+                                            onClickAway={toggleShowAddCard}
+                                        >
+                                            <Box position="absolute" right="0" top="0">
+                                                <MenuList
+                                                    id="simple-menuList-2"
+                                                    // anchorEl={anchorEl}
+                                                    keepMounted
+                                                    // open={Boolean(anchorEl)}
+                                                    // onClose={handleClose}
+                                                >
+                                                    <Box display="flex" flexDirection="column" justifyContent="center" alignContent="center">
+                                                        <Box my={1} mx={2}>
+                                                            <Button
+                                                                startIcon={`🏦`}
+                                                                variant="contained"
+                                                                color="secondary"
+                                                                component={Link}
+                                                                to="/stock/BRKA"
+                                                                fullWidth
+                                                            >
+                                                                Berkshire
+                                                            </Button>
+                                                        </Box>
+                                                        <Box my={1} mx={2}>
+                                                            <Button
+                                                                startIcon={`👍`}
+                                                                variant="contained"
+                                                                color="secondary"
+                                                                component={Link}
+                                                                to="/stock/FB"
+                                                                fullWidth
+                                                            >
+                                                                Facebook
+                                                            </Button>
+                                                        </Box>
+                                                        <Box my={1} mx={2}>
+                                                            <Button
+                                                                startIcon={`🛰`}
+                                                                variant="contained"
+                                                                color="secondary"
+                                                                component={Link}
+                                                                to="/stock/GOOG"
+                                                                fullWidth
+                                                            >
+                                                                Google
+                                                            </Button>
+                                                        </Box>
+                                                        <Box my={1} mx={2}>
+                                                            <Button
+                                                                startIcon={`🚛`}
+                                                                variant="contained"
+                                                                color="secondary"
+                                                                component={Link}
+                                                                to="/stock/AMZN"
+                                                                fullWidth
+                                                            >
+                                                                Amazon
+                                                            </Button>
+                                                        </Box>
+                                                        <Box my={1} mx={2}>
+                                                            <Button
+                                                                startIcon={`🚘`}
+                                                                variant="contained"
+                                                                color="secondary"
+                                                                component={Link}
+                                                                to="/stock/TSLA"
+                                                                fullWidth
+                                                            >
+                                                                Tesla
+                                                            </Button>
+                                                        </Box>
                                                     </Box>
-                                                </Box>
-                                                <div>
-                                                    {/* <p>Employees: {stock.employees}</p> */}
-                                                    <Typography variant="body1">Sector Name: {stock.sectorName}</Typography>
-
-                                                    <Typography variant="body1">Share Classes: {
-                                                        stock.shareClasses.map((s: any, i: Number) =>
-                                                            s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
-                                                        )}
-                                                    </Typography>
-                                                </div>
-                                            </div>
-                                            <Box p={2} display="flex" justifyContent="flex-end" flex={1}>
-                                                <Avatar src={stock.logo} />
+                                                </MenuList>
                                             </Box>
-                                        </Box>
-                                    </Paper>
-
-
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Paper style={{ height: 'calc(100% - 16px)' }}>
-                                        <Box display="flex" flexDirection="column" justifyContent="space-around" p={2} mt={2}>
-                                            <Box flex="1">
-                                                <FormControl style={{ width: '100%' }}>
-                                                    <InputLabel htmlFor="grouped-select">⍴ Correlation</InputLabel>
-                                                    <Select defaultValue="" id="grouped-select">
-                                                        <MenuItem value="">
-                                                            <em>⍴ between selected and all</em>
-                                                        </MenuItem>
-                                                        <ListSubheader>Category 1</ListSubheader>
-                                                        <MenuItem value={1}>Option 1</MenuItem>
-                                                        <MenuItem value={2}>Option 2</MenuItem>
-                                                        <ListSubheader>Category 2</ListSubheader>
-                                                        <MenuItem value={3}>Option 3</MenuItem>
-                                                        <MenuItem value={4}>Option 4</MenuItem>
-                                                    </Select>
-                                                </FormControl>
-                                            </Box>
-                                        </Box>
-                                    </Paper>
-                                </Grid>
-                            </Grid>
-
-                            <CalcRowModal />
-
-                            <Paper>
-                                <Table
-                                    title={'Calculations'}
-                                    years={stock.years}
-                                    data={calculationResults}
-                                />
-                            </Paper>
-
-                            <Paper>
-                                <Table
-                                    title={'Shares'}
-                                    years={stock.years}
-                                    data={
-                                        [
-                                            ...stock.price,
-                                            ...stock.shareClasses,
-                                            ...stock.aggregatedShares
-                                        ]
-                                    }
-                                />
-                            </Paper>
-
-                            <Paper>
-                                <Box p={2} mt={2}>
-
-                                    <Box
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="space-between"
-                                    >
-                                        <Typography variant="h5" gutterBottom>
-                                            Financial Statements
-                                </Typography>
-
-                                        <ToggleButtonGroup value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
-                                            <ToggleButton value="pl">Income Statement</ToggleButton>
-                                            <ToggleButton value="bs">Balance Sheet</ToggleButton>
-                                            <ToggleButton value="cf">Cash Flow</ToggleButton>
-                                        </ToggleButtonGroup>
-                                    </Box>
-
-                                    <Grid container spacing={3}>
-                                        {visibleFinancials.includes('pl') && (
-                                            <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                <Paper elevation={5}>
-                                                    <Table
-                                                        title={'Income Statement'}
-                                                        years={stock.years}
-                                                        data={[
-                                                            ...stock.yearlyFinancials.pl,
-                                                            ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
-                                                        ]}
-                                                    />
-                                                </Paper>
-                                            </Grid>
-                                        )}
-                                        {visibleFinancials.includes('bs') && (
-                                            <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                <Paper elevation={5}>
-                                                    <Table
-                                                        title={'Balance Sheet'}
-                                                        years={stock.years}
-                                                        data={stock.yearlyFinancials.bs}
-                                                    />
-                                                </Paper>
-                                            </Grid>
-                                        )}
-                                        {visibleFinancials.includes('cf') && (
-                                            <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                <Paper elevation={5}>
-                                                    <Table
-                                                        title={'Cash Flow'}
-                                                        years={stock.years}
-                                                        data={stock.yearlyFinancials.cf}
-                                                    />
-                                                </Paper>
-                                            </Grid>
-                                        )}
-                                    </Grid>
+                                        </ClickAwayListener>
+                                    )}
                                 </Box>
-                            </Paper>
-                        </>
+                            </Box>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </ScrollSync>
-        </Box>
+                </Box>
+            </>
+        </ScrollSync>
     ) : (
             <Box p={5} m={5} height="100vh" display="flex" alignItems="center" justifyContent="center">
                 <CircularProgress size={100} />

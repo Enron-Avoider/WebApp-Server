@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTable, useBlockLayout, useExpanded, Column } from "react-table";
 import { useSticky } from 'react-table-sticky';
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
@@ -7,10 +7,17 @@ import {
     Paper,
     Box,
     Typography,
-    Link
+    Link,
+    IconButton,
+    Card,
+    CardActions,
+    CardContent,
+    Button,
+    ClickAwayListener
 } from '@material-ui/core';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import { ArrowDropDown, Equalizer } from '@material-ui/icons';
 import NewCalcRowButton from '../NewCalcRowButton';
+import GraphCard from './GraphCard';
 
 import "./style.sass";
 
@@ -26,6 +33,8 @@ export default function Table(
 ) {
 
     const { ticker, rowTitle } = useParams();
+
+    const [showGraph, setShowGraph] = useState(false);
 
     const columns = React.useMemo(() => [
         {
@@ -47,12 +56,12 @@ export default function Table(
                 // className={row.original.checkPossible ? 'relevant' : ''}
                 >
                     {row.subRows.length ?
-                        <span className="arrow"><ArrowDropDownIcon /></span> :
+                        <span className="arrow"><ArrowDropDown /></span> :
                         ''
                     }
                     {row.original.type === 'calc' ?
                         <Link component={Link_} color="inherit" to={`/stock/${ticker}/calculations/${title}/${cell.value}`}>
-                            {cell.value}
+                            {cell.value || ''}
                         </Link> :
                         cell.value
                     }
@@ -101,9 +110,23 @@ export default function Table(
         <Box p={2} mt={2}>
 
             {title && (
-                <Typography variant="h5" gutterBottom>
-                    {title}
-                </Typography>
+                <Box position="relative" mt={-1} display="flex" justifyContent="space-between" alignItems="center">
+                    <Typography variant="h5">
+                        {title}
+                    </Typography>
+                    <IconButton color="primary" onClick={() => setShowGraph(!showGraph)}>
+                        <Equalizer />
+                    </IconButton>
+
+                    {showGraph && (
+                        <ClickAwayListener onClickAway={() => setShowGraph(!showGraph)}>
+                            <Box position="absolute" zIndex="2" right="0" top="0">
+                                <GraphCard />
+                            </Box>
+                        </ClickAwayListener>
+                    )}
+
+                </Box>
             )}
 
             <Paper elevation={3}>
@@ -147,7 +170,7 @@ export default function Table(
                                                         row.original.changePercentage &&
                                                         `${row.original.changePercentage[cell.column.id]}%`
                                                     }
-                                                >   
+                                                >
                                                     {cell.render('Cell')}
                                                 </div>
                                             ))}

@@ -34,10 +34,12 @@ module.exports = {
       });
 
     findSimfinStockByName = async ({ name }) =>
+    console.log({ name }) || // Henry Jack & Associates Inc
       this.cached(
-        `https://simfin.com/api/v1/info/find-id/name-search/${name}?api-key=${this.keys.simfin}`,
+        `https://simfin.com/api/v1/info/find-id/name-search/${name.replace(/[^\w\s]/gi, '')}?api-key=${this.keys.simfin}`,
         "get"
       );
+      
 
     findSimfinStockByTicker = async ({ name }) =>
       this.cached(
