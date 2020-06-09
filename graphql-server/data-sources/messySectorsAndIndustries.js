@@ -77,7 +77,16 @@ module.exports = {
       };
     };
 
-    getSectorAndIndustryForStock = (ticker) => [];
+    getSectorAndIndustryForStock = async ({ ticker }) => 
+        (s => ({
+            sector: s.FinVizSector,
+            industry: s.FinVizIndustry
+        }))
+        (
+            (await this.getSimVizData())
+                .stocks
+                .find(s => s.ticker === ticker)
+        );
 
     getSector = async (name) => {
       const { analysis, stocks } = await this.getSimVizData();
@@ -94,6 +103,10 @@ module.exports = {
     };
 
     getIndustry = async (name, dataSources) => {
+      // if cached
+
+      // else
+
       const years = ((yearFrom = 2010) =>
         Array.from(
           { length: new Date().getFullYear() - yearFrom },
@@ -110,16 +123,11 @@ module.exports = {
         stocks
           .filter((s) => s.FinVizIndustry === Object.keys(industry)[0])
           .map(async (s) => {
-            const stock = await [
-              ...(await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(
-                {
-                  name: s.ticker,
-                }
-              )),
-              ...(await dataSources.messyFinanceDataAPI.findSimfinStockByName({
-                name: s.name,
-              })),
-            ][0];
+            const stock = (
+              await dataSources.messyFinanceDataAPI.findSimfinStockByTicker({
+                name: s.ticker,
+              })
+            )[0];
             return {
               ...s,
               simId: stock.simId,
@@ -172,7 +180,14 @@ module.exports = {
         };
       }, {});
 
-      return calc;
+      return {
+        name,
+        companies: stocksWithSimId,
+        yearlyFinancialsAddedUp: {
+          years,
+          ...calc,
+        },
+      };
     };
 
     getAllSectors = async () => {

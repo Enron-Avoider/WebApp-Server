@@ -9,12 +9,9 @@ const typeDefs = gql`
     name: String
     fyearEnd: String
     employees: String
-    sectorName: String
-    sectorCode: String
+    sectorAndIndustry: SectorAndIndustry
     industryCompanies: [SimfinStock]
-    aggregatedShares: [JSON]
     aggregatedSharesIsolated: JSON
-    price: [JSON]
     shareClasses: [JSON]
     years: [Int]
     yearlyFinancials: YearlyFinancials
@@ -24,27 +21,34 @@ const typeDefs = gql`
 
   type YearlyFinancials {
     years: [Int]
+    aggregatedShares: [JSON]
+    price: [JSON]
     pl: [JSON]
     bs: [JSON]
     cf: [JSON]
   }
 
+  type SectorAndIndustry {
+    sector: String
+    industry: String
+  }
+
   type Sector {
     name: String
-    numberOfStocks: Int
-    # yearlyFinancials: YearlyFinancials
-    aggregatedShares: [JSON]
-    aggregatedSharesIsolated: JSON
-    price: [JSON]
+    companies: [SimfinStock]
+    yearlyFinancialAddedUp: YearlyFinancials
+    # aggregatedShares: [JSON]
+    # aggregatedSharesIsolated: JSON
+    # price: [JSON]
   }
 
   type Industry {
     name: String
-    numberOfStocks: Int
-    # yearlyFinancials: YearlyFinancials
-    aggregatedShares: [JSON]
-    aggregatedSharesIsolated: JSON
-    price: [JSON]
+    companies: [SimfinStock]
+    yearlyFinancialsAddedUp: YearlyFinancials
+    # aggregatedShares: [JSON]
+    # aggregatedSharesIsolated: JSON
+    # price: [JSON]
   }
 
   type Query {
@@ -52,9 +56,9 @@ const typeDefs = gql`
     getSimfinCompanyById(id: String): SimfinStock
     getSimfinCompanyByTicker(name: String): SimfinStock
 
-    getSector(name: String): JSON
+    getSector(name: String): Sector
     getAllSectors: JSON
-    getIndustry(name: String): JSON
+    getIndustry(name: String): Industry
     getAllIndustries: JSON
   }
 `;

@@ -1,6 +1,3 @@
-const { gql } = require("apollo-server");
-const GraphQLJSON = require("graphql-type-json");
-
 const {
   financialTableMap,
   outstandingSharesTableMap,
@@ -9,38 +6,12 @@ const {
 } = require("../dataMaps");
 
 module.exports = {
-  // JSON: GraphQLJSON,
-  SimfinStock: {
-    aggregatedShares: async (_source, params, { dataSources }) =>
-      outstandingSharesTableMap(
-        _source.years,
-        await dataSources.messyFinanceDataAPI.aggregatedShares(_source)
-      ),
-
+  SimfinStock: {      
     aggregatedSharesIsolated: async (_source, params, { dataSources }) =>
       isolateShares(
         _source.years,
         await dataSources.messyFinanceDataAPI.aggregatedShares(_source)
       ),
-
-    price: async (_source, params, { dataSources }) => {
-      const shareClasses = await dataSources.messyFinanceDataAPI.shareClasses(
-        _source
-      );
-
-      return await [
-        priceTableMap(
-          _source.years,
-          "price",
-          await dataSources.messyFinanceDataAPI.pricesForShareClasses({
-            simId: _source.simId,
-            shareClassId: shareClasses[0].shareClassId,
-            years: _source.years,
-          })
-        ),
-      ];
-    },
-
     shareClasses: async (_source, params, { dataSources }) => {
       const shareClasses = await dataSources.messyFinanceDataAPI.shareClasses(
         _source
@@ -73,7 +44,6 @@ module.exports = {
       //     )
       // ),
     },
-
     industryCompanies: async (_source, params, { dataSources }) =>
       (
         await dataSources.messyFinanceDataAPI.getSimfinIndustryCompanies(
@@ -86,23 +56,35 @@ module.exports = {
         })),
       })),
 
-    yearlyFinancials: async (_source, params, { dataSources }) =>
-      financialTableMap(
-        _source.years,
-        await dataSources.messyFinanceDataAPI.yearlyFinancials(_source)
-      ),
-
+    yearlyFinancials: async (_source, params, { dataSources }) => ({
+        years: _source.years,
+        ...financialTableMap(
+          _source.years,
+          await dataSources.messyFinanceDataAPI.yearlyFinancials(_source)
+        ),
+        aggregatedShares: outstandingSharesTableMap(
+            _source.years,
+            await dataSources.messyFinanceDataAPI.aggregatedShares(_source)
+          ),
+        price: await (async (shareClasses) => await [
+            priceTableMap(
+              _source.years,
+              "price",
+              await dataSources.messyFinanceDataAPI.pricesForShareClasses({
+                simId: _source.simId,
+                shareClassId: shareClasses[0].shareClassId,
+                years: _source.years,
+              })
+            ),
+          ])(await dataSources.messyFinanceDataAPI.shareClasses(
+            _source
+          ))
+    }),
     logo: async (_source, params, { dataSources }) => {
       const res = await dataSources.messyFinanceDataAPI.logo(_source);
       return res ? res.url : null;
     },
-
-    // yearlyPrices: async (_source, params, { dataSources,  }) =>
-    //     dataSources.messyFinanceDataAPI.yearlyPrices(_source, ),
-  },
-
-  //   ShareClasses: {
-  //     yearlyPrices: async (_source, params, { dataSources,  }) =>
-  //         priceTableMap(_source.years, _source.shareClassName, await dataSources.messyFinanceDataAPI.pricesForShareClasses(_source, ))
-  //   }
+    sectorAndIndustry: async (_source, params, { dataSources }) => 
+        await dataSources.messySectorsAndIndustries.getSectorAndIndustryForStock(_source)
+  }
 };

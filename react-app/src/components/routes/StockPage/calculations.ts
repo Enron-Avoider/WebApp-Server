@@ -18,7 +18,7 @@ export const calculations: CalculationType[] = [
         title: 'Income per Share',
         scope: {
             a: 'yearlyFinancials.pl[Net Income Available to Common Shareholders]',
-            b: 'aggregatedShares[common-outstanding-basic]',
+            b: 'yearlyFinancials.aggregatedShares[common-outstanding-basic]',
         },
         calc: 'a/b',
     },

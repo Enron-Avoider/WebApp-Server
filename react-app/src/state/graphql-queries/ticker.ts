@@ -9,16 +9,18 @@ export default gql`
             simId
             fyearEnd
             employees
-            sectorName
-            sectorCode
-            aggregatedShares
-            price
+            sectorAndIndustry{
+                sector
+                industry
+            }
             shareClasses
-            years
             yearlyFinancials {
+                years
                 pl
                 bs
                 cf
+                aggregatedShares
+                price
             }
         }
     }

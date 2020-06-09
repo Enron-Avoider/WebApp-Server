@@ -54,9 +54,8 @@ export default function NewCalcRowModal() {
     const stock = data && data.getSimfinCompanyByTicker;
 
     const calcRowOptions = stock ? [
-        { path: 'price', tableName: 'Price' },
-        { path: 'shareClasses', tableName: 'Share Classes' },
-        { path: 'aggregatedShares', tableName: 'Aggregated Shares' },
+        { path: 'yearlyFinancials.price', tableName: 'Price' },
+        { path: 'yearlyFinancials.aggregatedShares', tableName: 'Aggregated Shares' },
         { path: 'yearlyFinancials.bs', tableName: 'Balance Sheet' },
         { path: 'yearlyFinancials.cf', tableName: 'Cash Flow' },
         { path: 'yearlyFinancials.pl', tableName: 'Income Statement' }
@@ -151,7 +150,7 @@ export default function NewCalcRowModal() {
         handleClose();
     }
 
-    const calcRow = doCalculations(calc, stock.years, stock, titleValue);
+    const calcRow = doCalculations(calc, stock.yearlyFinancials.years, stock, titleValue);
 
     const scopeRows = scopeToRows(calc[0].scope, stock);
 
@@ -258,7 +257,7 @@ export default function NewCalcRowModal() {
                     <Box m={-2} mt={2}>
                         <Table
                             // title={'Income Statement'}
-                            years={stock.years}
+                            years={stock.yearlyFinancials.years}
                             data={[
                                 ...Object.values(scopeRows),
                                 ...calcRow

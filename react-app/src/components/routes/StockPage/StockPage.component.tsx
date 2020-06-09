@@ -13,11 +13,6 @@ import {
     Box,
     Typography,
     Avatar,
-    InputLabel,
-    MenuListItem,
-    ListSubheader,
-    FormControl,
-    Select,
     IconButton,
     ClickAwayListener,
     MenuList,
@@ -44,10 +39,7 @@ export const StockPage: FunctionComponent = () => {
         variables: { ticker },
     });
     const stock = data && data.getSimfinCompanyByTicker;
-    const calculationResults = stock && doCalculations(calculations?.calculations, stock.years, stock);
-    // getQuartiles
-    // getCorrelation
-    // getRegression
+    const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
 
     const [visibleFinancials, setVisibleFinancials] = useState(() => ['pl']);
     const handleVisibleFinancials = (event: React.MouseEvent<HTMLElement>, newFormats: string[]) => {
@@ -120,7 +112,7 @@ export const StockPage: FunctionComponent = () => {
                                 <Paper>
                                     <Table
                                         title={'Calculations'}
-                                        years={stock.years}
+                                        years={stock.yearlyFinancials.years}
                                         data={calculationResults}
                                     />
                                 </Paper>
@@ -128,12 +120,12 @@ export const StockPage: FunctionComponent = () => {
                                 <Paper>
                                     <Table
                                         title={'Shares'}
-                                        years={stock.years}
+                                        years={stock.yearlyFinancials.years}
                                         data={
                                             [
-                                                ...stock.price,
-                                                ...stock.shareClasses,
-                                                ...stock.aggregatedShares
+                                                ...stock.yearlyFinancials.price,
+                                                // ...stock.shareClasses,
+                                                ...stock.yearlyFinancials.aggregatedShares
                                             ]
                                         }
                                     />
@@ -164,7 +156,7 @@ export const StockPage: FunctionComponent = () => {
                                                     <Paper elevation={5}>
                                                         <Table
                                                             title={'Income Statement'}
-                                                            years={stock.years}
+                                                            years={stock.yearlyFinancials.years}
                                                             data={[
                                                                 ...stock.yearlyFinancials.pl,
                                                                 ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
@@ -178,7 +170,7 @@ export const StockPage: FunctionComponent = () => {
                                                     <Paper elevation={5}>
                                                         <Table
                                                             title={'Balance Sheet'}
-                                                            years={stock.years}
+                                                            years={stock.yearlyFinancials.years}
                                                             data={stock.yearlyFinancials.bs}
                                                         />
                                                     </Paper>
@@ -189,7 +181,7 @@ export const StockPage: FunctionComponent = () => {
                                                     <Paper elevation={5}>
                                                         <Table
                                                             title={'Cash Flow'}
-                                                            years={stock.years}
+                                                            years={stock.yearlyFinancials.years}
                                                             data={stock.yearlyFinancials.cf}
                                                         />
                                                     </Paper>
