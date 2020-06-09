@@ -159,6 +159,7 @@ module.exports = {
 
         return {
           ...a,
+          years,
           [t]: rows.map((r) =>
             years.reduce(
               (a_, y) => {

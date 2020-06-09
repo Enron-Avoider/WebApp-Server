@@ -21,6 +21,8 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 
 import TICKER_QUERY from '@state/graphql-queries/ticker';
+import INDUSTRY_QUERY from '@state/graphql-queries/industry';
+import SECTOR_QUERY from '@state/graphql-queries/sector';
 import { GET_CALCULATIONS } from '@state/graphql-queries/calculations';
 import getCalculations from '@state/effects/getCalculations';
 
@@ -38,8 +40,23 @@ export const StockPage: FunctionComponent = () => {
     const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
         variables: { ticker },
     });
+
     const stock = data && data.getSimfinCompanyByTicker;
     const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
+
+    const { loading: loading__, error: error__, data: industryData } = stock ? useQuery(INDUSTRY_QUERY, {
+        variables: { name: stock.sectorAndIndustry.industry },
+    }) : { loading: false, error: false, data: false };
+
+    const industry = industryData && industryData.getIndustry;
+
+    // const { loading: loading___, error: error___, data: sector } = stock ? useQuery(SECTOR_QUERY, {
+    //     variables: { name: stock.sectorAndIndustry.sector },
+    // }) : { loading: false, error: false, data: false };
+
+    console.log({
+        industry, // sector
+    });
 
     const [visibleFinancials, setVisibleFinancials] = useState(() => ['pl']);
     const handleVisibleFinancials = (event: React.MouseEvent<HTMLElement>, newFormats: string[]) => {
@@ -55,11 +72,11 @@ export const StockPage: FunctionComponent = () => {
     return !loading && !error ? (
         <ScrollSync>
             <>
-                <Box pb={2}>
+                <Box pb={2} overflow="auto">
                     <CalcRowModal />
-                    <Grid container spacing={3}>
+                    <Grid container spacing={3} direction="row" wrap="nowrap">
 
-                        <Grid item xs={11}>
+                        <Grid item xs={7}>
                             <>
 
                                 <Box mt={2}>
@@ -80,13 +97,13 @@ export const StockPage: FunctionComponent = () => {
                                                         </Box>
                                                         <div>
                                                             {/* <p>Employees: {stock.employees}</p> */}
-                                                            <Typography variant="body1">Sector Name: {stock.sectorName}</Typography>
+                                                            <Typography variant="body1">{stock.sectorAndIndustry.sector} ・ {stock.sectorAndIndustry.industry}</Typography>
 
-                                                            <Typography variant="body1">Share Classes: {
+                                                            {/* <Typography variant="body1">Share Classes: {
                                                                 stock.shareClasses.map((s: any, i: Number) =>
                                                                     s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
                                                                 )}
-                                                            </Typography>
+                                                            </Typography> */}
                                                         </div>
                                                     </div>
                                                 </Box>
@@ -192,6 +209,142 @@ export const StockPage: FunctionComponent = () => {
                                 </Paper>
                             </>
                         </Grid>
+
+                        { !loading__ && !error__ && (
+                            <Grid item xs={7}>
+                                <>
+
+                                    <Box mt={2}>
+                                        <Grid container spacing={3}>
+                                            <Grid item xs={8}>
+                                                <Paper>
+                                                    <Box display="flex" flexDirection="row" p={2}>
+                                                        <div>
+                                                            <Box display="flex" alignItems="center">
+                                                                <Typography variant="h5">
+                                                                    {industry.name}
+                                                                </Typography>
+                                                                {/* <Box ml={1}>
+                                                                    <Typography variant="h5">
+                                                                        <b>({ticker})</b>
+                                                                    </Typography>
+                                                                </Box> */}
+                                                            </Box>
+                                                            <div>
+                                                                {/* <p>Employees: {stock.employees}</p> */}
+                                                                <Typography variant="body1">{' '}</Typography>
+
+                                                                {/* <Typography variant="body1">Share Classes: {
+                                                                    stock.shareClasses.map((s: any, i: Number) =>
+                                                                        s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
+                                                                    )}
+                                                                </Typography> */}
+                                                            </div>
+                                                        </div>
+                                                    </Box>
+                                                </Paper>
+                                            </Grid>
+                                            <Grid item xs={4} container>
+                                                <Box flex={1}>
+                                                    <Paper style={{ height: '100%' }}>
+                                                        {/* <Box
+                                                            display="flex"
+                                                            alignItems="center"
+                                                            justifyContent="center"
+                                                            height="100%"
+                                                        >
+                                                            <Avatar variant="rounded" src={stock.logo} />
+                                                        </Box> */}
+                                                    </Paper>
+                                                </Box>
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
+
+                                    {/* <Paper>
+                                        <Table
+                                            title={'Calculations'}
+                                            years={industry.yearlyFinancialsAddedUp.years}
+                                            data={calculationResults}
+                                        />
+                                    </Paper> */}
+
+                                    {/* <Paper>
+                                        <Table
+                                            title={'Shares'}
+                                            years={stock.yearlyFinancials.years}
+                                            data={
+                                                [
+                                                    ...stock.yearlyFinancials.price,
+                                                    // ...stock.shareClasses,
+                                                    ...stock.yearlyFinancials.aggregatedShares
+                                                ]
+                                            }
+                                        />
+                                    </Paper> */}
+
+                                    <Paper>
+                                        <Box p={2} mt={2}>
+
+                                            <Box
+                                                display="flex"
+                                                alignItems="center"
+                                                justifyContent="space-between"
+                                            >
+                                                <Typography variant="h5" gutterBottom>
+                                                    Financial Statements
+                                                </Typography>
+
+                                                <ToggleButtonGroup value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
+                                                    <ToggleButton value="pl">Income Statement</ToggleButton>
+                                                    <ToggleButton value="bs">Balance Sheet</ToggleButton>
+                                                    <ToggleButton value="cf">Cash Flow</ToggleButton>
+                                                </ToggleButtonGroup>
+                                            </Box>
+
+                                            <Grid container spacing={3}>
+                                                {visibleFinancials.includes('pl') && (
+                                                    <Grid item xs={(12 / visibleFinancials.length) as any}>
+                                                        <Paper elevation={5}>
+                                                            <Table
+                                                                title={'Income Statement'}
+                                                                years={industry.yearlyFinancialsAddedUp.years}
+                                                                data={[
+                                                                    ...industry.yearlyFinancialsAddedUp.pl,
+                                                                    ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
+                                                                ]}
+                                                            />
+                                                        </Paper>
+                                                    </Grid>
+                                                )}
+                                                {visibleFinancials.includes('bs') && (
+                                                    <Grid item xs={(12 / visibleFinancials.length) as any}>
+                                                        <Paper elevation={5}>
+                                                            <Table
+                                                                title={'Balance Sheet'}
+                                                                years={industry.yearlyFinancialsAddedUp.years}
+                                                                data={industry.yearlyFinancialsAddedUp.bs}
+                                                            />
+                                                        </Paper>
+                                                    </Grid>
+                                                )}
+                                                {visibleFinancials.includes('cf') && (
+                                                    <Grid item xs={(12 / visibleFinancials.length) as any}>
+                                                        <Paper elevation={5}>
+                                                            <Table
+                                                                title={'Cash Flow'}
+                                                                years={industry.yearlyFinancialsAddedUp.years}
+                                                                data={industry.yearlyFinancialsAddedUp.cf}
+                                                            />
+                                                        </Paper>
+                                                    </Grid>
+                                                )}
+                                            </Grid>
+                                        </Box>
+                                    </Paper>
+                                </>
+                            </Grid>
+                        )}
 
                         <Grid item xs={1}>
                             <Box
