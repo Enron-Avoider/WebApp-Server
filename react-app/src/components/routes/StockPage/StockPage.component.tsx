@@ -70,47 +70,52 @@ export const StockPage: FunctionComponent = () => {
                         <Grid item xs={11}>
                             <>
 
-                                <Grid container spacing={3}>
-                                    <Grid item xs={8}>
-                                        <Paper>
-                                            <Box display="flex" flexDirection="row" p={2} mt={2}>
-                                                <div>
-                                                    <Box display="flex" alignItems="center">
-                                                        <Typography variant="h5">
-                                                            {stock.name}
-                                                        </Typography>
-                                                        <Box ml={1}>
-                                                            <Typography variant="h5">
-                                                                <b>({ticker})</b>
-                                                            </Typography>
-                                                        </Box>
-                                                    </Box>
+                                <Box mt={2}>
+                                    <Grid container spacing={3}>
+                                        <Grid item xs={8}>
+                                            <Paper>
+                                                <Box display="flex" flexDirection="row" p={2}>
                                                     <div>
-                                                        {/* <p>Employees: {stock.employees}</p> */}
-                                                        <Typography variant="body1">Sector Name: {stock.sectorName}</Typography>
+                                                        <Box display="flex" alignItems="center">
+                                                            <Typography variant="h5">
+                                                                {stock.name}
+                                                            </Typography>
+                                                            <Box ml={1}>
+                                                                <Typography variant="h5">
+                                                                    <b>({ticker})</b>
+                                                                </Typography>
+                                                            </Box>
+                                                        </Box>
+                                                        <div>
+                                                            {/* <p>Employees: {stock.employees}</p> */}
+                                                            <Typography variant="body1">Sector Name: {stock.sectorName}</Typography>
 
-                                                        <Typography variant="body1">Share Classes: {
-                                                            stock.shareClasses.map((s: any, i: Number) =>
-                                                                s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
-                                                            )}
-                                                        </Typography>
+                                                            <Typography variant="body1">Share Classes: {
+                                                                stock.shareClasses.map((s: any, i: Number) =>
+                                                                    s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
+                                                                )}
+                                                            </Typography>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                </Box>
+                                            </Paper>
+                                        </Grid>
+                                        <Grid item xs={4} container>
+                                            <Box flex={1}>
+                                                <Paper style={{ height: '100%' }}>
+                                                    <Box
+                                                        display="flex"
+                                                        alignItems="center"
+                                                        justifyContent="center"
+                                                        height="100%"
+                                                    >
+                                                        <Avatar variant="rounded" src={stock.logo} />
+                                                    </Box>
+                                                </Paper>
                                             </Box>
-                                        </Paper>
+                                        </Grid>
                                     </Grid>
-                                    <Grid item xs={4}>
-                                        <Box
-                                            p={2}
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="center"
-                                            height="100%"
-                                        >
-                                            <Avatar variant="rounded" src={stock.logo} />
-                                        </Box>
-                                    </Grid>
-                                </Grid>
+                                </Box>
 
                                 <Paper>
                                     <Table
@@ -218,8 +223,8 @@ export const StockPage: FunctionComponent = () => {
                                                     id="simple-menuList-2"
                                                     // anchorEl={anchorEl}
                                                     keepMounted
-                                                    // open={Boolean(anchorEl)}
-                                                    // onClose={handleClose}
+                                                // open={Boolean(anchorEl)}
+                                                // onClose={handleClose}
                                                 >
                                                     <Box display="flex" flexDirection="column" justifyContent="center" alignContent="center">
                                                         <Box my={1} mx={2}>
