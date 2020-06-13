@@ -1,9 +1,9 @@
 const { ApolloServer } = require("apollo-server");
 const redis = require("redis");
 
-const { typeDefs } = require("./types");
-const { MessyFinanceDataAPI, MessySectorsAndIndustries } = require("./data-sources");
-const { stocks, query } = require("./resolvers");
+const { typeDefs } = require("./state/types");
+const { MessyFinanceDataAPI, MessySectorsAndIndustries } = require("./state/data-sources");
+const { stocks, query, mutation } = require("./state/resolvers");
 
 const redisClient = redis.createClient({
   port: 13082,
@@ -15,7 +15,8 @@ const server = new ApolloServer({
   typeDefs,
   resolvers: {
       ...stocks,
-      ...query
+      ...query,
+      ...mutation
   },
   dataSources: () => ({
     messyFinanceDataAPI: new MessyFinanceDataAPI(redisClient),

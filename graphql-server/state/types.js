@@ -61,6 +61,10 @@ const typeDefs = gql`
     getIndustry(name: String): Industry
     getAllIndustries: JSON
   }
+
+  type Mutation {
+    resetCache(key: String!): JSON
+  }
 `;
 module.exports = {
   typeDefs,
