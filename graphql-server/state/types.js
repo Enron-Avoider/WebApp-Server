@@ -56,6 +56,7 @@ const typeDefs = gql`
     getSimfinCompanyById(id: String): SimfinStock
     getSimfinCompanyByTicker(name: String): SimfinStock
 
+    getStockToSectorAndIndustryData: JSON
     getSector(name: String): Sector
     getAllSectors: JSON
     getIndustry(name: String): Industry

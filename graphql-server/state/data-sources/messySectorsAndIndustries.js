@@ -9,35 +9,33 @@ const {
   isolateShares,
 } = require("../dataMaps");
 
-const STOCK_TO_SECTOR_FILE = "./data-sources/stockToSector.json";
+const STOCK_TO_SECTOR_FILE = "./state/data-sources/stockToSector.json";
 
 module.exports = {
   MessySectorsAndIndustries: class extends RESTDataSource {
-    constructor() {
+    constructor(redisClient) {
       super();
+
+      this.redisClient = redisClient;
     }
 
-    cached = async (redisClient, url, httpCall, body, differentiator) =>
+    cached = async ({ cacheHash, Fn }) =>
       await new Promise((res, rej) => {
-        const cacheHash = url + differentiator + JSON.stringify(body);
         // console.log({ cacheHash });
-        return redisClient.get(cacheHash, async (err, reply) => {
-          // console.log({ err, reply });
+        return this.redisClient.get(cacheHash, async (err, reply) => {
+          //   console.log({ err, reply });
           if (reply) {
             res(JSON.parse(reply));
           } else {
-            // console.log({ url, body });
-            const apiRes = await this[httpCall](url, body).catch(
-              (r, e) => null
-            );
-            // console.log({ apiRes });
-            redisClient.set(cacheHash, JSON.stringify(apiRes));
-            res(apiRes);
+            const r = await Fn().catch((r, e) => null);
+            // console.log({ r });
+            this.redisClient.set(cacheHash, JSON.stringify(r));
+            res(r);
           }
         });
       });
 
-    getSimVizData = async () => {
+    getStockToSectorAndIndustryData = async () => {
       const stocks = (
         await new Promise((resolve, reject) => {
           fs.readFile(STOCK_TO_SECTOR_FILE, "utf8", (err, buffer) => {
@@ -61,7 +59,8 @@ module.exports = {
             )
             .map((n) => ({
               [n]: array.filter((s) => s[name] === n).length,
-            }));
+            }))
+            .sort((a, b) => Object.values(b)[0] - Object.values(a)[0]);
 
         return {
           sector: explore("sector", array),
@@ -77,19 +76,18 @@ module.exports = {
       };
     };
 
-    getSectorAndIndustryForStock = async ({ ticker }) => 
-        (s => ({
-            sector: s.FinVizSector,
-            industry: s.FinVizIndustry
-        }))
-        (
-            (await this.getSimVizData())
-                .stocks
-                .find(s => s.ticker === ticker)
-        );
+    getSectorAndIndustryForStock = async ({ ticker }) =>
+      ((s) => ({
+        sector: s.FinVizSector,
+        industry: s.FinVizIndustry,
+      }))(
+        (await this.getStockToSectorAndIndustryData()).stocks.find(
+          (s) => s.ticker === ticker
+        )
+      );
 
     getSector = async (name) => {
-      const { analysis, stocks } = await this.getSimVizData();
+      const { analysis, stocks } = await this.getStockToSectorAndIndustryData();
 
       const sector = analysis.FinVizSector.find(
         (s) => Object.keys(s)[0] === name
@@ -103,96 +101,105 @@ module.exports = {
     };
 
     getIndustry = async (name, dataSources) => {
-      // if cached
+      const Fn = async () => {
+        const years = ((yearFrom = 2010) =>
+          Array.from(
+            { length: new Date().getFullYear() - yearFrom },
+            (v, k) => yearFrom + k
+          ))();
 
-      // else
+        const {
+          analysis,
+          stocks,
+        } = await this.getStockToSectorAndIndustryData();
 
-      const years = ((yearFrom = 2010) =>
-        Array.from(
-          { length: new Date().getFullYear() - yearFrom },
-          (v, k) => yearFrom + k
-        ))();
+        const industry = analysis.FinVizIndustry.find(
+          (s) => Object.keys(s)[0] === name
+        );
 
-      const { analysis, stocks } = await this.getSimVizData();
+        const stocksWithSimId = await Promise.all(
+          stocks
+            .filter((s) => s.FinVizIndustry === Object.keys(industry)[0])
+            .map(async (s) => {
+              const stock = (
+                await dataSources.messyFinanceDataAPI.findSimfinStockByTicker({
+                  name: s.ticker,
+                  save: false,
+                })
+              )[0];
+              return {
+                ...s,
+                simId: stock.simId,
+              };
+            })
+        );
 
-      const industry = analysis.FinVizIndustry.find(
-        (s) => Object.keys(s)[0] === name
-      );
-
-      const stocksWithSimId = await Promise.all(
-        stocks
-          .filter((s) => s.FinVizIndustry === Object.keys(industry)[0])
-          .map(async (s) => {
-            const stock = (
-              await dataSources.messyFinanceDataAPI.findSimfinStockByTicker({
-                name: s.ticker,
+        const stocksWithFinancialData = await Promise.all(
+          stocksWithSimId.map(async (s) => {
+            const financialData = await financialTableMap(
+              years,
+              await dataSources.messyFinanceDataAPI.yearlyFinancials({
+                years,
+                simId: s.simId,
+                save: false,
               })
-            )[0];
+            );
             return {
               ...s,
-              simId: stock.simId,
+              financialData,
             };
           })
-      );
+        );
 
-      const stocksWithFinancialData = await Promise.all(
-        stocksWithSimId.map(async (s) => {
-          const financialData = await financialTableMap(
-            years,
-            await dataSources.messyFinanceDataAPI.yearlyFinancials({
-              years,
-              simId: s.simId,
-            })
-          );
+        const calc = ["pl", "bs", "cf"].reduce((a, t) => {
+          const rows = stocksWithFinancialData.reduce((acc, s, i) => {
+            const rows = s.financialData[t].map((f) => f.title);
+            return [...new Set([...acc, ...rows])];
+          }, []);
+
           return {
-            ...s,
-            financialData,
-          };
-        })
-      );
+            ...a,
+            years,
+            [t]: rows.map((r) =>
+              years.reduce(
+                (a_, y) => {
+                  const yearCalc = stocksWithFinancialData.reduce((a__, s) => {
+                    const v = s.financialData[t].find((r_) => r_.title === r)
+                      ? s.financialData[t].find((r_) => r_.title === r)[y]
+                      : 0;
+                    return a__ + numeral(v).value();
+                  }, 0);
 
-      const calc = ["pl", "bs", "cf"].reduce((a, t) => {
-        const rows = stocksWithFinancialData.reduce((acc, s, i) => {
-          const rows = s.financialData[t].map((f) => f.title);
-          return [...new Set([...acc, ...rows])];
-        }, []);
+                  return {
+                    ...a_,
+                    [y]: yearCalc,
+                  };
+                },
+                { title: r }
+              )
+            ),
+          };
+        }, {});
 
         return {
-          ...a,
-          years,
-          [t]: rows.map((r) =>
-            years.reduce(
-              (a_, y) => {
-                const yearCalc = stocksWithFinancialData.reduce((a__, s) => {
-                  const v = s.financialData[t].find((r_) => r_.title === r)
-                    ? s.financialData[t].find((r_) => r_.title === r)[y]
-                    : 0;
-                  return a__ + numeral(v).value();
-                }, 0);
-
-                return {
-                  ...a_,
-                  [y]: yearCalc,
-                };
-              },
-              { title: r }
-            )
-          ),
+          name,
+          companies: stocksWithSimId,
+          yearlyFinancialsAddedUp: {
+            years,
+            ...calc,
+          },
         };
-      }, {});
-
-      return {
-        name,
-        companies: stocksWithSimId,
-        yearlyFinancialsAddedUp: {
-          years,
-          ...calc,
-        },
       };
+
+      return this.cached({
+        cacheHash: `/Industry/${name}`,
+        Fn,
+      });
     };
 
     getAllSectors = async () => {
-      const data = await (await this.getSimVizData()).analysis;
+      const data = await (await this.getStockToSectorAndIndustryData())
+        .analysis;
 
       return data.FinVizIndustry.sort(
         (a, b) => Object.values(b)[0] - Object.values(a)[0]
@@ -200,7 +207,8 @@ module.exports = {
     };
 
     getAllIndustries = async () => {
-      const data = await (await this.getSimVizData()).analysis;
+      const data = await (await this.getStockToSectorAndIndustryData())
+        .analysis;
 
       return data.FinVizIndustry.sort(
         (a, b) => Object.values(b)[0] - Object.values(a)[0]

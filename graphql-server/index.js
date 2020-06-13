@@ -20,7 +20,7 @@ const server = new ApolloServer({
   },
   dataSources: () => ({
     messyFinanceDataAPI: new MessyFinanceDataAPI(redisClient),
-    messySectorsAndIndustries: new MessySectorsAndIndustries(),
+    messySectorsAndIndustries: new MessySectorsAndIndustries(redisClient),
   }),
   context: async ({ req }) => ({
     redisClient,

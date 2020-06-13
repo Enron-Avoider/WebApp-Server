@@ -66,8 +66,6 @@ export const StockPage: FunctionComponent = () => {
     const [showAddCard, setShowAddCard] = useState(false);
     const toggleShowAddCard = () => setShowAddCard(!showAddCard);
 
-    // console.log({ stock, calc });
-    // console.log({ calc });
 
     return !loading && !error ? (
         <ScrollSync>
@@ -210,7 +208,8 @@ export const StockPage: FunctionComponent = () => {
                             </>
                         </Grid>
 
-                        {!loading__ && !error__ && (
+                        
+                        {!loading__ && !error__ && false && (
                             <Grid item xs={7}>
                                 <>
 
@@ -354,6 +353,7 @@ export const StockPage: FunctionComponent = () => {
                                 alignItems="center"
                                 justifyContent="center"
                                 mt={3}
+                                zIndex={2}
                             >
                                 <Box position="relative">
                                     <IconButton color="primary" onClick={toggleShowAddCard}>
