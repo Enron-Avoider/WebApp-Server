@@ -20,8 +20,8 @@ export default function App() {
                 <Container>
                     <Switch>
                         <Route
-                            path="/page2"
-                            component={loadable(() => import('./components/routes/Page2'))}
+                            path="/todo"
+                            component={loadable(() => import('./components/routes/TodoPage'))}
                         />
                         <Route
                             path="/stock/:ticker/calculations/:tableName/:rowTitle"

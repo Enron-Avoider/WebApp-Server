@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { ApolloProvider } from 'react-apollo';
 import ApolloClient from "apollo-boost";
 import { ThemeProvider } from '@material-ui/styles';
-import { createMuiTheme } from '@material-ui/core';
+import { createMuiTheme } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import purple from '@material-ui/core/colors/purple';
 import { InMemoryCache } from "apollo-cache-inmemory";
@@ -12,12 +12,12 @@ import env from '@env';
 
 import App from './App';
 import './index.scss';
-import { GET_TODOS } from '@state/graphql-queries/todos';
-import { GET_CALCULATIONS } from '@state/graphql-queries/calculations';
-import { todoResolvers } from '@state/graphql-resolvers/todo';
-import { calculationsResolvers } from '@state/graphql-resolvers/calculations';
+import { GET_TODOS } from '@state/byModel/Todos/todos.queries';
+import { GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
+import { todoResolvers } from '@state/byModel/Todos/todo.resolvers';
+import { calculationsResolvers } from '@state/byModel/Calculations/calculations.resolvers';
 
-console.log({ env });
+console.log({ env, todoResolvers, calculationsResolvers });
 
 (async () => {
 
@@ -29,7 +29,10 @@ console.log({ env });
     const client = new ApolloClient({
         uri: 'http://localhost:4000/',
         cache,
-        resolvers: { ...todoResolvers, ...calculationsResolvers }
+        resolvers: { Mutation: {
+            ...calculationsResolvers.Mutation,
+            ...todoResolvers.Mutation,
+        }}
     });
 
     try {

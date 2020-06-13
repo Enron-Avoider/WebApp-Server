@@ -1,0 +1,28 @@
+// import RandomID from "random-id";
+import { GET_TODOS } from "../graphql-queries/todos";
+
+export const todoResolvers = {
+  Mutation: {
+    addTodo: (_: any, todo: any, { cache }: any) => {
+        console.log('here');
+      const { todos } = cache.readQuery({ query: GET_TODOS });
+      let new_todo = {
+        // id: RandomID(10),
+        name: todo.name,
+        completed: false,
+        // test: {
+        //     test: 'test',
+        //     __typename: "test2"
+        // },
+        __typename: "todo"
+      };
+      cache.writeData({
+        data: {
+          todos: [...todos, new_todo]
+        }
+      });
+      console.log("TODOS: ", cache.readQuery({ query: GET_TODOS }));
+      return new_todo;
+    }
+  }
+};

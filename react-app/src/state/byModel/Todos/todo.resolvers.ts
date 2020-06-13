@@ -1,5 +1,5 @@
 // import RandomID from "random-id";
-import { GET_TODOS } from "../graphql-queries/todos";
+import { GET_TODOS } from "./todos.queries";
 
 export const todoResolvers = {
   Mutation: {
@@ -9,10 +9,10 @@ export const todoResolvers = {
         // id: RandomID(10),
         name: todo.name,
         completed: false,
-        test: {
-            test: 'test',
-            __typename: "test2"
-        },
+        // test: {
+        //     test: 'test',
+        //     __typename: "test2"
+        // },
         __typename: "todo"
       };
       cache.writeData({

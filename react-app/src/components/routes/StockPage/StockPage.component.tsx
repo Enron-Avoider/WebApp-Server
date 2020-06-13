@@ -16,15 +16,15 @@ import {
     IconButton,
     ClickAwayListener,
     MenuList,
-    Button
+    Button,
+    Card,
+    CardContent
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 
-import TICKER_QUERY from '@state/graphql-queries/ticker';
-import INDUSTRY_QUERY from '@state/graphql-queries/industry';
-import SECTOR_QUERY from '@state/graphql-queries/sector';
-import { GET_CALCULATIONS } from '@state/graphql-queries/calculations';
-import getCalculations from '@state/effects/getCalculations';
+import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
+import { GET_INDUSTRY, GET_SECTOR } from '@state/byModel/IndustriesAndSectors/industriesAndSectors.queries';
+import { GET_CALCULATIONS } from '@state/byModel/calculations/calculations.queries';
 
 import { doCalculations } from './calculations'
 import Table from './Table';
@@ -34,7 +34,7 @@ import AddCard from './AddCard';
 export const StockPage: FunctionComponent = () => {
 
     const { ticker } = useParams();
-    const { loading, error, data } = useQuery(TICKER_QUERY, {
+    const { loading, error, data } = useQuery(GET_STOCK, {
         variables: { ticker },
     });
     const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
@@ -44,13 +44,13 @@ export const StockPage: FunctionComponent = () => {
     const stock = data && data.getSimfinCompanyByTicker;
     const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
 
-    const { loading: loading__, error: error__, data: industryData } = stock ? useQuery(INDUSTRY_QUERY, {
+    const { loading: loading__, error: error__, data: industryData } = stock ? useQuery(GET_INDUSTRY, {
         variables: { name: stock.sectorAndIndustry.industry },
     }) : { loading: false, error: false, data: false };
 
     const industry = industryData && industryData.getIndustry;
 
-    // const { loading: loading___, error: error___, data: sector } = stock ? useQuery(SECTOR_QUERY, {
+    // const { loading: loading___, error: error___, data: sector } = stock ? useQuery(GET_SECTOR, {
     //     variables: { name: stock.sectorAndIndustry.sector },
     // }) : { loading: false, error: false, data: false };
 
@@ -72,7 +72,7 @@ export const StockPage: FunctionComponent = () => {
     return !loading && !error ? (
         <ScrollSync>
             <>
-                <Box pb={2} overflow="auto">
+                <Box pb={2}>
                     <CalcRowModal />
                     <Grid container spacing={3} direction="row" wrap="nowrap">
 
@@ -210,7 +210,7 @@ export const StockPage: FunctionComponent = () => {
                             </>
                         </Grid>
 
-                        { !loading__ && !error__ && (
+                        {!loading__ && !error__ && (
                             <Grid item xs={7}>
                                 <>
 
@@ -364,76 +364,80 @@ export const StockPage: FunctionComponent = () => {
                                             onClickAway={toggleShowAddCard}
                                         >
                                             <Box position="absolute" right="0" top="0">
-                                                <MenuList
-                                                    id="simple-menuList-2"
-                                                    // anchorEl={anchorEl}
-                                                    keepMounted
-                                                // open={Boolean(anchorEl)}
-                                                // onClose={handleClose}
-                                                >
-                                                    <Box display="flex" flexDirection="column" justifyContent="center" alignContent="center">
-                                                        <Box my={1} mx={2}>
-                                                            <Button
-                                                                startIcon={`🏦`}
-                                                                variant="contained"
-                                                                color="secondary"
-                                                                component={Link}
-                                                                to="/stock/BRKA"
-                                                                fullWidth
-                                                            >
-                                                                Berkshire
+                                                <Card>
+                                                    <CardContent>
+                                                        <MenuList
+                                                            id="simple-menuList-2"
+                                                        // anchorEl={anchorEl}
+                                                        // keepMounted
+                                                        // open={Boolean(anchorEl)}
+                                                        // onClose={handleClose}
+                                                        >
+                                                            <Box display="flex" flexDirection="column" justifyContent="center" alignContent="center">
+                                                                <Box my={1} mx={2}>
+                                                                    <Button
+                                                                        startIcon={`🏦`}
+                                                                        variant="contained"
+                                                                        color="secondary"
+                                                                        component={Link}
+                                                                        to="/stock/BRKA"
+                                                                        fullWidth
+                                                                    >
+                                                                        Berkshire
                                                             </Button>
-                                                        </Box>
-                                                        <Box my={1} mx={2}>
-                                                            <Button
-                                                                startIcon={`👍`}
-                                                                variant="contained"
-                                                                color="secondary"
-                                                                component={Link}
-                                                                to="/stock/FB"
-                                                                fullWidth
-                                                            >
-                                                                Facebook
+                                                                </Box>
+                                                                <Box my={1} mx={2}>
+                                                                    <Button
+                                                                        startIcon={`👍`}
+                                                                        variant="contained"
+                                                                        color="secondary"
+                                                                        component={Link}
+                                                                        to="/stock/FB"
+                                                                        fullWidth
+                                                                    >
+                                                                        Facebook
                                                             </Button>
-                                                        </Box>
-                                                        <Box my={1} mx={2}>
-                                                            <Button
-                                                                startIcon={`🛰`}
-                                                                variant="contained"
-                                                                color="secondary"
-                                                                component={Link}
-                                                                to="/stock/GOOG"
-                                                                fullWidth
-                                                            >
-                                                                Google
+                                                                </Box>
+                                                                <Box my={1} mx={2}>
+                                                                    <Button
+                                                                        startIcon={`🛰`}
+                                                                        variant="contained"
+                                                                        color="secondary"
+                                                                        component={Link}
+                                                                        to="/stock/GOOG"
+                                                                        fullWidth
+                                                                    >
+                                                                        Google
                                                             </Button>
-                                                        </Box>
-                                                        <Box my={1} mx={2}>
-                                                            <Button
-                                                                startIcon={`🚛`}
-                                                                variant="contained"
-                                                                color="secondary"
-                                                                component={Link}
-                                                                to="/stock/AMZN"
-                                                                fullWidth
-                                                            >
-                                                                Amazon
+                                                                </Box>
+                                                                <Box my={1} mx={2}>
+                                                                    <Button
+                                                                        startIcon={`🚛`}
+                                                                        variant="contained"
+                                                                        color="secondary"
+                                                                        component={Link}
+                                                                        to="/stock/AMZN"
+                                                                        fullWidth
+                                                                    >
+                                                                        Amazon
                                                             </Button>
-                                                        </Box>
-                                                        <Box my={1} mx={2}>
-                                                            <Button
-                                                                startIcon={`🚘`}
-                                                                variant="contained"
-                                                                color="secondary"
-                                                                component={Link}
-                                                                to="/stock/TSLA"
-                                                                fullWidth
-                                                            >
-                                                                Tesla
+                                                                </Box>
+                                                                <Box my={1} mx={2}>
+                                                                    <Button
+                                                                        startIcon={`🚘`}
+                                                                        variant="contained"
+                                                                        color="secondary"
+                                                                        component={Link}
+                                                                        to="/stock/TSLA"
+                                                                        fullWidth
+                                                                    >
+                                                                        Tesla
                                                             </Button>
-                                                        </Box>
-                                                    </Box>
-                                                </MenuList>
+                                                                </Box>
+                                                            </Box>
+                                                        </MenuList>
+                                                    </CardContent>
+                                                </Card>
                                             </Box>
                                         </ClickAwayListener>
                                     )}

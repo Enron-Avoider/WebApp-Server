@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from "@apollo/react-hooks";
 
-import { GET_TODOS, ADD_TODO } from "@state/graphql-queries/todos";
+import { GET_TODOS, ADD_TODO } from "@state/byModel/Todos/todos.queries";
 import Counter from '@components/Shared/Counter/Counter';
 
-export default function Page2() {
+export default function TodoPage() {
 
     const [task, setTask] = useState("");
     const { loading, error, data } = useQuery(GET_TODOS);
@@ -29,12 +29,13 @@ export default function Page2() {
             />
             <button
                 onClick={() => {
-                    setTask("");
+                    console.log('wtf', task);
                     addTodo({
                         variables: {
                             name: task
                         }
                     });
+                    // setTask("");
                 }}
             >
                 Add

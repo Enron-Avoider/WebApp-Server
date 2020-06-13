@@ -18,13 +18,13 @@ import {
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-import TICKER_QUERY from '@state/graphql-queries/ticker';
+import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import {
     GET_CALCULATIONS,
     ADD_CALCULATION,
     REMOVE_CALCULATION,
     SAVE_CALCULATION
-} from '@state/graphql-queries/calculations';
+} from '@state/byModel/Calculations/calculations.queries';
 import { doCalculations, scopeToRows, CalculationType } from '../calculations';
 
 import Table from '../Table';
@@ -34,7 +34,7 @@ import "./style.sass";
 export default function NewCalcRowModal() {
 
     const { ticker, rowTitle, tableName } = useParams();
-    const { loading, error, data } = useQuery(TICKER_QUERY, {
+    const { loading, error, data } = useQuery(GET_STOCK, {
         variables: { ticker },
     });
     const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
