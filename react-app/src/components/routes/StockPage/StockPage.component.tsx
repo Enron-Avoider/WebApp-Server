@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
 import { Link } from 'react-router-dom';
+import ReactResizeDetector from 'react-resize-detector';
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
@@ -30,80 +31,157 @@ import { doCalculations } from './calculations'
 import Table from './Table';
 import CalcRowModal from './CalcRowModal';
 import AddCard from './AddCard';
+import Stock from './Stock';
 
 export const StockPage: FunctionComponent = () => {
 
-    const { ticker } = useParams();
-    const { loading, error, data } = useQuery(GET_STOCK, {
-        variables: { ticker },
-    });
-    const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
-        variables: { ticker },
-    });
+    const { ticker, tickertwo } = useParams();
 
-    const stock = data && data.getSimfinCompanyByTicker;
-    const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
-
-    const { loading: loading__, error: error__, data: industryData } = stock ? useQuery(GET_INDUSTRY, {
-        variables: { name: stock.sectorAndIndustry.industry },
-    }) : { loading: false, error: false, data: false };
-
-    const industry = industryData && industryData.getIndustry;
-
-    // const { loading: loading___, error: error___, data: sector } = stock ? useQuery(GET_SECTOR, {
-    //     variables: { name: stock.sectorAndIndustry.sector },
-    // }) : { loading: false, error: false, data: false };
-
-    console.log({
-        industry, // sector
-    });
+    const [showAddCard, setShowAddCard] = useState(false);
+    const toggleShowAddCard = () => setShowAddCard(!showAddCard);
 
     const [visibleFinancials, setVisibleFinancials] = useState(() => ['pl']);
     const handleVisibleFinancials = (event: React.MouseEvent<HTMLElement>, newFormats: string[]) => {
         setVisibleFinancials(newFormats);
     };
 
-    const [showAddCard, setShowAddCard] = useState(false);
-    const toggleShowAddCard = () => setShowAddCard(!showAddCard);
+    const [showPercentage, setShowPercentage] = useState(false);
+    const toggleShowPercentage = () => setShowPercentage(!showPercentage);
 
+    return <ScrollSync>
+        <>
+            <Box pb={2}>
+                <CalcRowModal />
+                <Grid container spacing={3} direction="row" wrap="nowrap">
 
-    return !loading && !error ? (
-        <ScrollSync>
-            <>
-                <Box pb={2}>
-                    <CalcRowModal />
-                    <Grid container spacing={3} direction="row" wrap="nowrap">
+                    { ticker && (
+                        <Grid item xs={tickertwo ? 7 : 11}>
+                            <Stock
+                                ticker={ticker}
+                                visibleFinancials={visibleFinancials}
+                                handleVisibleFinancials={handleVisibleFinancials}
+                                showPercentage={showPercentage}
+                                toggleShowPercentage={toggleShowPercentage}
+                            />
+                        </Grid>
+                    )}
 
+                    { tickertwo && (
                         <Grid item xs={7}>
-                            <>
+                            <Stock
+                                ticker={tickertwo}
+                                visibleFinancials={visibleFinancials}
+                                handleVisibleFinancials={handleVisibleFinancials}
+                                showPercentage={showPercentage}
+                                toggleShowPercentage={toggleShowPercentage}
+                            />
+                        </Grid>
+                    )}
 
+                    <Grid item xs={1}>
+                        <Box
+                            position="sticky"
+                            top="88px"
+                            display="flex"
+                            mt={3}
+                            zIndex={2}
+                        >
+                            <Box position="relative">
+                                <IconButton color="primary" onClick={toggleShowAddCard}>
+                                    <AddIcon />
+                                </IconButton>
+                                {showAddCard && (
+                                    <ClickAwayListener
+                                        onClickAway={toggleShowAddCard}
+                                    >
+                                        <Box position="absolute" right="0" top="0">
+                                            <Card>
+                                                <CardContent>
+                                                    <MenuList
+                                                        // id="simple-menuList-2"
+                                                    // anchorEl={anchorEl}
+                                                    // keepMounted
+                                                    // open={Boolean(anchorEl)}
+                                                    // onClose={handleClose}
+                                                    >
+                                                        <Box display="flex" flexDirection="column" justifyContent="center" alignContent="center">
+                                                            <Box my={1} mx={2}>
+                                                                <Button
+                                                                    startIcon={`🏦`}
+                                                                    variant="contained"
+                                                                    color="secondary"
+                                                                    component={Link}
+                                                                    to={`/stock/${ticker}/stock/BRKA`}
+                                                                    fullWidth
+                                                                >
+                                                                    Berkshire
+                                                            </Button>
+                                                            </Box>
+                                                            <Box my={1} mx={2}>
+                                                                <Button
+                                                                    startIcon={`👍`}
+                                                                    variant="contained"
+                                                                    color="secondary"
+                                                                    component={Link}
+                                                                    to={`/stock/${ticker}/stock/FB`}
+                                                                    fullWidth
+                                                                >
+                                                                    Facebook
+                                                            </Button>
+                                                            </Box>
+                                                            <Box my={1} mx={2}>
+                                                                <Button
+                                                                    startIcon={`🛰`}
+                                                                    variant="contained"
+                                                                    color="secondary"
+                                                                    component={Link}
+                                                                    to={`/stock/${ticker}/GOOG`}
+                                                                    fullWidth
+                                                                >
+                                                                    Google
+                                                            </Button>
+                                                            </Box>
+                                                            <Box my={1} mx={2}>
+                                                                <Button
+                                                                    startIcon={`🚛`}
+                                                                    variant="contained"
+                                                                    color="secondary"
+                                                                    component={Link}
+                                                                    to={`/stock/${ticker}/stock/AMZN`}
+                                                                    fullWidth
+                                                                >
+                                                                    Amazon
+                                                            </Button>
+                                                            </Box>
+                                                            <Box my={1} mx={2}>
+                                                                <Button
+                                                                    startIcon={`🚘`}
+                                                                    variant="contained"
+                                                                    color="secondary"
+                                                                    component={Link}
+                                                                    to={`/stock/${ticker}/TSLA`}
+                                                                    fullWidth
+                                                                >
+                                                                    Tesla
+                                                            </Button>
+                                                            </Box>
+                                                        </Box>
+                                                    </MenuList>
+                                                </CardContent>
+                                            </Card>
+                                        </Box>
+                                    </ClickAwayListener>
+                                )}
+                            </Box>
+                        </Box>
+
+                        {/* {showAddCard && (
+                            <>
                                 <Box mt={2}>
                                     <Grid container spacing={3}>
                                         <Grid item xs={8}>
                                             <Paper>
-                                                <Box display="flex" flexDirection="row" p={2}>
-                                                    <div>
-                                                        <Box display="flex" alignItems="center">
-                                                            <Typography variant="h5">
-                                                                {stock.name}
-                                                            </Typography>
-                                                            <Box ml={1}>
-                                                                <Typography variant="h5">
-                                                                    <b>({ticker})</b>
-                                                                </Typography>
-                                                            </Box>
-                                                        </Box>
-                                                        <div>
-                                                            {/* <p>Employees: {stock.employees}</p> */}
-                                                            <Typography variant="body1">{stock.sectorAndIndustry.sector} ・ {stock.sectorAndIndustry.industry}</Typography>
-
-                                                            {/* <Typography variant="body1">Share Classes: {
-                                                                stock.shareClasses.map((s: any, i: Number) =>
-                                                                    s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
-                                                                )}
-                                                            </Typography> */}
-                                                        </div>
-                                                    </div>
+                                                <Box p={2} height={88}>
                                                 </Box>
                                             </Paper>
                                         </Grid>
@@ -111,13 +189,8 @@ export const StockPage: FunctionComponent = () => {
                                             <Box flex={1}>
                                                 <Paper style={{ height: '100%' }}>
                                                     <Box
-                                                        display="flex"
-                                                        alignItems="center"
-                                                        justifyContent="center"
-                                                        height="100%"
-                                                    >
-                                                        <Avatar variant="rounded" src={stock.logo} />
-                                                    </Box>
+                                                        height={88}
+                                                    ></Box>
                                                 </Paper>
                                             </Box>
                                         </Grid>
@@ -125,332 +198,23 @@ export const StockPage: FunctionComponent = () => {
                                 </Box>
 
                                 <Paper>
-                                    <Table
-                                        title={'Calculations'}
-                                        years={stock.yearlyFinancials.years}
-                                        data={calculationResults}
-                                    />
-                                </Paper>
-
-                                <Paper>
-                                    <Table
-                                        title={'Shares'}
-                                        years={stock.yearlyFinancials.years}
-                                        data={
-                                            [
-                                                ...stock.yearlyFinancials.price,
-                                                // ...stock.shareClasses,
-                                                ...stock.yearlyFinancials.aggregatedShares
-                                            ]
-                                        }
-                                    />
-                                </Paper>
-
-                                <Paper>
-                                    <Box p={2} mt={2}>
-
-                                        <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="space-between"
-                                        >
-                                            <Typography variant="h5" gutterBottom>
-                                                Financial Statements
-                                </Typography>
-
-                                            <ToggleButtonGroup value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
-                                                <ToggleButton value="pl">Income Statement</ToggleButton>
-                                                <ToggleButton value="bs">Balance Sheet</ToggleButton>
-                                                <ToggleButton value="cf">Cash Flow</ToggleButton>
-                                            </ToggleButtonGroup>
-                                        </Box>
-
-                                        <Grid container spacing={3}>
-                                            {visibleFinancials.includes('pl') && (
-                                                <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                    <Paper elevation={5}>
-                                                        <Table
-                                                            title={'Income Statement'}
-                                                            years={stock.yearlyFinancials.years}
-                                                            data={[
-                                                                ...stock.yearlyFinancials.pl,
-                                                                ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
-                                                            ]}
-                                                        />
-                                                    </Paper>
-                                                </Grid>
-                                            )}
-                                            {visibleFinancials.includes('bs') && (
-                                                <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                    <Paper elevation={5}>
-                                                        <Table
-                                                            title={'Balance Sheet'}
-                                                            years={stock.yearlyFinancials.years}
-                                                            data={stock.yearlyFinancials.bs}
-                                                        />
-                                                    </Paper>
-                                                </Grid>
-                                            )}
-                                            {visibleFinancials.includes('cf') && (
-                                                <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                    <Paper elevation={5}>
-                                                        <Table
-                                                            title={'Cash Flow'}
-                                                            years={stock.yearlyFinancials.years}
-                                                            data={stock.yearlyFinancials.cf}
-                                                        />
-                                                    </Paper>
-                                                </Grid>
-                                            )}
-                                        </Grid>
+                                    <Box m="16px" height={153}>
+                                        <Box width="1000px" />
                                     </Box>
+                                </Paper>
+
+                                <Paper>
+                                    <Box m="16px" height={227} />
+                                </Paper>
+
+                                <Paper>
+                                    <Box m="16px" height={676} />
                                 </Paper>
                             </>
-                        </Grid>
-
-                        
-                        {!loading__ && !error__ && false && (
-                            <Grid item xs={7}>
-                                <>
-
-                                    <Box mt={2}>
-                                        <Grid container spacing={3}>
-                                            <Grid item xs={8}>
-                                                <Paper>
-                                                    <Box display="flex" flexDirection="row" p={2}>
-                                                        <div>
-                                                            <Box display="flex" alignItems="center">
-                                                                <Typography variant="h5">
-                                                                    {industry.name}
-                                                                </Typography>
-                                                                {/* <Box ml={1}>
-                                                                    <Typography variant="h5">
-                                                                        <b>({ticker})</b>
-                                                                    </Typography>
-                                                                </Box> */}
-                                                            </Box>
-                                                            <div>
-                                                                {/* <p>Employees: {stock.employees}</p> */}
-                                                                <Typography variant="body1">{' '}</Typography>
-
-                                                                {/* <Typography variant="body1">Share Classes: {
-                                                                    stock.shareClasses.map((s: any, i: Number) =>
-                                                                        s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
-                                                                    )}
-                                                                </Typography> */}
-                                                            </div>
-                                                        </div>
-                                                    </Box>
-                                                </Paper>
-                                            </Grid>
-                                            <Grid item xs={4} container>
-                                                <Box flex={1}>
-                                                    <Paper style={{ height: '100%' }}>
-                                                        {/* <Box
-                                                            display="flex"
-                                                            alignItems="center"
-                                                            justifyContent="center"
-                                                            height="100%"
-                                                        >
-                                                            <Avatar variant="rounded" src={stock.logo} />
-                                                        </Box> */}
-                                                    </Paper>
-                                                </Box>
-                                            </Grid>
-                                        </Grid>
-                                    </Box>
-
-                                    {/* <Paper>
-                                        <Table
-                                            title={'Calculations'}
-                                            years={industry.yearlyFinancialsAddedUp.years}
-                                            data={calculationResults}
-                                        />
-                                    </Paper> */}
-
-                                    {/* <Paper>
-                                        <Table
-                                            title={'Shares'}
-                                            years={stock.yearlyFinancials.years}
-                                            data={
-                                                [
-                                                    ...stock.yearlyFinancials.price,
-                                                    // ...stock.shareClasses,
-                                                    ...stock.yearlyFinancials.aggregatedShares
-                                                ]
-                                            }
-                                        />
-                                    </Paper> */}
-
-                                    <Paper>
-                                        <Box p={2} mt={2}>
-
-                                            <Box
-                                                display="flex"
-                                                alignItems="center"
-                                                justifyContent="space-between"
-                                            >
-                                                <Typography variant="h5" gutterBottom>
-                                                    Financial Statements
-                                                </Typography>
-
-                                                <ToggleButtonGroup value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
-                                                    <ToggleButton value="pl">Income Statement</ToggleButton>
-                                                    <ToggleButton value="bs">Balance Sheet</ToggleButton>
-                                                    <ToggleButton value="cf">Cash Flow</ToggleButton>
-                                                </ToggleButtonGroup>
-                                            </Box>
-
-                                            <Grid container spacing={3}>
-                                                {visibleFinancials.includes('pl') && (
-                                                    <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                        <Paper elevation={5}>
-                                                            <Table
-                                                                title={'Income Statement'}
-                                                                years={industry.yearlyFinancialsAddedUp.years}
-                                                                data={[
-                                                                    ...industry.yearlyFinancialsAddedUp.pl,
-                                                                    ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
-                                                                ]}
-                                                            />
-                                                        </Paper>
-                                                    </Grid>
-                                                )}
-                                                {visibleFinancials.includes('bs') && (
-                                                    <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                        <Paper elevation={5}>
-                                                            <Table
-                                                                title={'Balance Sheet'}
-                                                                years={industry.yearlyFinancialsAddedUp.years}
-                                                                data={industry.yearlyFinancialsAddedUp.bs}
-                                                            />
-                                                        </Paper>
-                                                    </Grid>
-                                                )}
-                                                {visibleFinancials.includes('cf') && (
-                                                    <Grid item xs={(12 / visibleFinancials.length) as any}>
-                                                        <Paper elevation={5}>
-                                                            <Table
-                                                                title={'Cash Flow'}
-                                                                years={industry.yearlyFinancialsAddedUp.years}
-                                                                data={industry.yearlyFinancialsAddedUp.cf}
-                                                            />
-                                                        </Paper>
-                                                    </Grid>
-                                                )}
-                                            </Grid>
-                                        </Box>
-                                    </Paper>
-                                </>
-                            </Grid>
-                        )}
-
-                        <Grid item xs={1}>
-                            <Box
-                                position="sticky"
-                                top="88px"
-                                display="flex"
-                                alignItems="center"
-                                justifyContent="center"
-                                mt={3}
-                                zIndex={2}
-                            >
-                                <Box position="relative">
-                                    <IconButton color="primary" onClick={toggleShowAddCard}>
-                                        <AddIcon />
-                                    </IconButton>
-                                    {showAddCard && (
-                                        <ClickAwayListener
-                                            onClickAway={toggleShowAddCard}
-                                        >
-                                            <Box position="absolute" right="0" top="0">
-                                                <Card>
-                                                    <CardContent>
-                                                        <MenuList
-                                                            id="simple-menuList-2"
-                                                        // anchorEl={anchorEl}
-                                                        // keepMounted
-                                                        // open={Boolean(anchorEl)}
-                                                        // onClose={handleClose}
-                                                        >
-                                                            <Box display="flex" flexDirection="column" justifyContent="center" alignContent="center">
-                                                                <Box my={1} mx={2}>
-                                                                    <Button
-                                                                        startIcon={`🏦`}
-                                                                        variant="contained"
-                                                                        color="secondary"
-                                                                        component={Link}
-                                                                        to="/stock/BRKA"
-                                                                        fullWidth
-                                                                    >
-                                                                        Berkshire
-                                                            </Button>
-                                                                </Box>
-                                                                <Box my={1} mx={2}>
-                                                                    <Button
-                                                                        startIcon={`👍`}
-                                                                        variant="contained"
-                                                                        color="secondary"
-                                                                        component={Link}
-                                                                        to="/stock/FB"
-                                                                        fullWidth
-                                                                    >
-                                                                        Facebook
-                                                            </Button>
-                                                                </Box>
-                                                                <Box my={1} mx={2}>
-                                                                    <Button
-                                                                        startIcon={`🛰`}
-                                                                        variant="contained"
-                                                                        color="secondary"
-                                                                        component={Link}
-                                                                        to="/stock/GOOG"
-                                                                        fullWidth
-                                                                    >
-                                                                        Google
-                                                            </Button>
-                                                                </Box>
-                                                                <Box my={1} mx={2}>
-                                                                    <Button
-                                                                        startIcon={`🚛`}
-                                                                        variant="contained"
-                                                                        color="secondary"
-                                                                        component={Link}
-                                                                        to="/stock/AMZN"
-                                                                        fullWidth
-                                                                    >
-                                                                        Amazon
-                                                            </Button>
-                                                                </Box>
-                                                                <Box my={1} mx={2}>
-                                                                    <Button
-                                                                        startIcon={`🚘`}
-                                                                        variant="contained"
-                                                                        color="secondary"
-                                                                        component={Link}
-                                                                        to="/stock/TSLA"
-                                                                        fullWidth
-                                                                    >
-                                                                        Tesla
-                                                            </Button>
-                                                                </Box>
-                                                            </Box>
-                                                        </MenuList>
-                                                    </CardContent>
-                                                </Card>
-                                            </Box>
-                                        </ClickAwayListener>
-                                    )}
-                                </Box>
-                            </Box>
-                        </Grid>
+                        )} */}
                     </Grid>
-                </Box>
-            </>
-        </ScrollSync>
-    ) : (
-            <Box p={5} m={5} height="100vh" display="flex" alignItems="center" justifyContent="center">
-                <CircularProgress size={100} />
+                </Grid>
             </Box>
-        );
+        </>
+    </ScrollSync>;
 }

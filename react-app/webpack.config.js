@@ -33,7 +33,11 @@ const config = {
         use: ["style-loader", "css-loader", "sass-loader"],
       },
       {
-        test: /\.(png|svg|jpg|gif|ico)$/,
+        test: /\.svg$/,
+        use: ["@svgr/webpack", "file-loader"],
+      },
+      {
+        test: /\.(png|jpg|gif|ico)$/,
         use: ["file-loader"],
       },
     ],

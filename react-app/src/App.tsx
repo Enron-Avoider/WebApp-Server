@@ -28,8 +28,24 @@ export default function App() {
                             component={loadable(() => import('./components/routes/StockPage'))}
                         />
                         <Route
+                            path="/stock/:ticker/stock/:tickertwo"
+                            component={loadable(() => import('./components/routes/StockPage'))}
+                        />
+                        <Route
                             path="/stock/:ticker"
                             component={loadable(() => import('./components/routes/StockPage'))}
+                        />
+                        <Route
+                            path="/sector/:sector"
+                            component={loadable(() => import('./components/routes/SectorOrIndustry'))}
+                        />
+                        <Route
+                            path="/industry/:industry"
+                            component={loadable(() => import('./components/routes/SectorOrIndustry'))}
+                        />
+                        <Route
+                            path="/sectors-and-industries"
+                            component={loadable(() => import('./components/routes/SectorsAndIndustries'))}
                         />
                         <Redirect from="/" to="/stock/BRKA" />
                     </Switch>

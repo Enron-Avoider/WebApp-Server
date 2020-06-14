@@ -13,11 +13,14 @@ import {
     CardActions,
     CardContent,
     Button,
-    ClickAwayListener
+    ClickAwayListener,
+    SvgIcon
 } from '@material-ui/core';
 import { ArrowDropDown, Equalizer } from '@material-ui/icons';
+
 import NewCalcRowButton from '../NewCalcRowButton';
 import GraphCard from './GraphCard';
+import PercentageIcon from '@assets/percentage.svg';
 
 import "./style.sass";
 
@@ -28,8 +31,21 @@ const getQuartile = (v: number, quartiles: number[]) =>
                 'q4';
 
 export default function Table(
-    { years, data, title = '', allowNewCalc = true }:
-        { years: number[], data: {}[], title?: string, allowNewCalc?: boolean }
+    {
+        years,
+        data,
+        title = '',
+        allowNewCalc = true,
+        showPercentage,
+        toggleShowPercentage
+    } : {
+        years: number[],
+        data: {}[],
+        title?: string,
+        allowNewCalc?: boolean,
+        showPercentage?: any,
+        toggleShowPercentage?: any
+    }
 ) {
 
     const { ticker, rowTitle } = useParams();
@@ -114,9 +130,52 @@ export default function Table(
                     <Typography variant="h5">
                         {title}
                     </Typography>
-                    <IconButton color="primary" onClick={() => setShowGraph(!showGraph)}>
-                        <Equalizer />
-                    </IconButton>
+
+                    <Box>
+                        <IconButton color={showPercentage ? 'secondary' : 'primary'} onClick={toggleShowPercentage}>
+                            <SvgIcon viewBox="0 0 344 344">
+                                <path
+                                    d="M 99.00,57.23
+                                        C 81.98,61.14 68.86,69.77 61.32,86.00
+                                            46.16,118.63 69.68,157.58 106.00,158.00
+                                            114.15,158.09 122.63,156.87 130.00,153.19
+                                            168.76,133.86 166.91,77.59 128.00,60.88
+                                            121.65,58.15 114.86,57.01 108.00,57.23
+                                            104.64,57.00 102.36,57.00 99.00,57.23 Z
+                                        M 231.00,63.00
+                                        C 231.00,63.00 134.58,198.00 134.58,198.00
+                                            134.58,198.00 103.86,241.00 103.86,241.00
+                                            103.86,241.00 88.00,265.00 88.00,265.00
+                                            88.00,265.00 113.00,281.00 113.00,281.00
+                                            113.00,281.00 209.42,146.00 209.42,146.00
+                                            209.42,146.00 240.14,103.00 240.14,103.00
+                                            240.14,103.00 256.00,79.00 256.00,79.00
+                                            256.00,79.00 231.00,63.00 231.00,63.00 Z
+                                        M 108.00,86.71
+                                        C 114.86,87.22 120.15,89.25 124.36,95.02
+                                            133.88,108.01 125.02,127.21 109.00,128.24
+                                            88.32,129.57 78.43,102.78 95.02,90.64
+                                            99.23,87.55 102.94,86.86 108.00,86.71 Z
+                                        M 228.00,186.23
+                                        C 210.98,190.14 197.86,198.77 190.32,215.00
+                                            175.16,247.63 198.68,286.58 235.00,287.00
+                                            243.15,287.09 251.63,285.87 259.00,282.19
+                                            297.76,262.86 295.91,206.59 257.00,189.88
+                                            250.65,187.15 243.86,186.01 237.00,186.23
+                                            233.64,186.00 231.36,186.00 228.00,186.23 Z
+                                        M 237.00,215.71
+                                        C 243.86,216.22 249.15,218.25 253.36,224.02
+                                            262.88,237.01 254.02,256.21 238.00,257.24
+                                            217.32,258.57 207.43,231.78 224.02,219.64
+                                            228.23,216.55 231.94,215.86 237.00,215.71 Z"
+                                />
+                            </SvgIcon>
+                        </IconButton>
+                        {/* <IconButton color="primary" onClick={() => setShowGraph(!showGraph)}>
+                            <Equalizer />
+                        </IconButton> */}
+                    </Box>
+
 
                     {showGraph && (
                         <ClickAwayListener onClickAway={() => setShowGraph(!showGraph)}>
@@ -167,11 +226,16 @@ export default function Table(
                                                         }
                                                     `}
                                                     title={
-                                                        row.original.changePercentage &&
-                                                        `${row.original.changePercentage[cell.column.id]}%`
+                                                        cell.column.id !== 'expander' && row.original.changePercentage ? (
+                                                            showPercentage && row.original.changePercentage ?
+                                                                cell.value : `${row.original?.changePercentage[cell?.column?.id]}%`
+                                                        ) : ''
                                                     }
                                                 >
-                                                    {cell.render('Cell')}
+                                                    {showPercentage && row.original.changePercentage && cell.column.id !== 'expander' ?
+                                                        `${row.original.changePercentage[cell.column.id]}%` :
+                                                        cell.render('Cell')
+                                                    }
                                                 </div>
                                             ))}
                                         </div>
