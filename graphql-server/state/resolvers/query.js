@@ -5,9 +5,7 @@ module.exports = {
   // JSON: GraphQLJSON,
   Query: {
     findSimfinStockByName: async (_source, params, { dataSources }) => [
-      ...(await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(
-        params
-      )),
+      ...(await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(params)),
       ...(await dataSources.messyFinanceDataAPI.findSimfinStockByName(params)),
     ],
 
@@ -16,12 +14,8 @@ module.exports = {
 
     getSimfinCompanyByTicker: async (_source, params, { dataSources }) => {
       const stocks = [
-        ...(await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(
-          params
-        )),
-        ...(await dataSources.messyFinanceDataAPI.findSimfinStockByName(
-          params
-        )),
+        ...(await dataSources.messyFinanceDataAPI.findSimfinStockByTicker(params)),
+        ...(await dataSources.messyFinanceDataAPI.findSimfinStockByName(params)),
       ];
 
       return dataSources.messyFinanceDataAPI.getSimfinCompanyById({

@@ -12,7 +12,7 @@ const priceTableMap = (years, shareClassName, yearlyPrices) =>
   yearlyPrices.priceData.reduce(
     (acc, curr, i) => ({
       ...acc,
-      [`${years[i]}`]: numeral(curr ? curr.closeAdj : "0").format("(0.00a)"),
+      [`${years[i]}`]: curr ? curr.closeAdj : null//numeral(curr ? curr.closeAdj : "0").format("(0.00a)"),
     }),
     { title: `${shareClassName}` }
   );
@@ -28,9 +28,9 @@ const outstandingSharesTableMap = (years, aggregatedShares) => {
           ...acc,
           ...(years[i]
             ? {
-                [`${years[i]}`]: numeral(curr ? curr.value : "0").format(
-                  "(0.00a)"
-                ),
+                [`${years[i]}`]: curr ? curr.value : null, // numeral(curr ? curr.value : "0").format(
+                //  "(0.00a)"
+                //),
               }
             : {}),
         }),
@@ -220,12 +220,12 @@ const dataPointValuesToTableRow = (values, years, title, isTotalRow) => {
   return values.reduce(
     (acc, value, i) => ({
       ...acc,
-      [`${years[i]}`]: numeral(value).format("(0.00a)"),
+      [`${years[i]}`]: value//numeral(value).format("(0.00a)"),
     }),
     {
       title,
       subRows: [],
-      changePercentage,
+    //   changePercentage,
       ...(isTotalRow ? { type: "total" } : {}),
     }
   );

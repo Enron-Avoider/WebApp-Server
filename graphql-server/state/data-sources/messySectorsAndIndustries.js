@@ -19,7 +19,7 @@ module.exports = {
       this.redisClient = redisClient;
     }
 
-    cached = async ({ cacheHash, Fn }) =>
+    cached = async ({ cacheHash, Fn, save = true }) =>
       await new Promise((res, rej) => {
         // console.log({ cacheHash });
         return this.redisClient.get(cacheHash, async (err, reply) => {
@@ -29,7 +29,7 @@ module.exports = {
           } else {
             const r = await Fn().catch((r, e) => null);
             // console.log({ r });
-            this.redisClient.set(cacheHash, JSON.stringify(r));
+            if (save) { this.redisClient.set(cacheHash, JSON.stringify(r)); }
             res(r);
           }
         });

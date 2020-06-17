@@ -1,4 +1,10 @@
 const { RESTDataSource } = require("apollo-datasource-rest");
+const {
+  financialTableMap,
+  outstandingSharesTableMap,
+  priceTableMap,
+  isolateShares,
+} = require("../dataMaps");
 
 module.exports = {
   MessyFinanceDataAPI: class extends RESTDataSource {
@@ -13,7 +19,7 @@ module.exports = {
       };
     }
 
-    cached = async ({ url, httpCall, body, differentiator, save = true }) =>
+    cachedCall = async ({ url, httpCall, body, differentiator, save = true }) =>
       await new Promise((res, rej) => {
         const cacheHash = url + differentiator + JSON.stringify(body);
         // console.log({ cacheHash });
@@ -27,14 +33,34 @@ module.exports = {
               (r, e) => null
             );
             // console.log({ apiRes });
-            if (save) { this.redisClient.set(cacheHash, JSON.stringify(apiRes)); }
+            if (save) {
+              this.redisClient.set(cacheHash, JSON.stringify(apiRes));
+            }
             res(apiRes);
           }
         });
       });
 
+    cachedFn = async ({ cacheHash, Fn, save = true }) =>
+      await new Promise((res, rej) => {
+        // console.log({ cacheHash });
+        return this.redisClient.get(cacheHash, async (err, reply) => {
+          //   console.log({ err, reply });
+          if (reply) {
+            res(JSON.parse(reply));
+          } else {
+            const r = await Fn().catch((r, e) => null);
+            // console.log({ r });
+            if (save) {
+              this.redisClient.set(cacheHash, JSON.stringify(r));
+            }
+            res(r);
+          }
+        });
+      });
+
     findSimfinStockByName = async ({ name }) =>
-      this.cached({
+      this.cachedCall({
         url: `https://simfin.com/api/v1/info/find-id/name-search/${name.replace(
           /[^\w\s]/gi,
           ""
@@ -42,14 +68,15 @@ module.exports = {
         httpCall: "get",
       });
 
-    findSimfinStockByTicker = async ({ name }) =>
-      this.cached({
+    findSimfinStockByTicker = async ({ name, save = true }) =>
+      this.cachedCall({
         url: `https://simfin.com/api/v1/info/find-id/ticker/${name}?api-key=${this.keys.simfin}`,
         httpCall: "get",
+        save
       });
 
     getSimfinCompanyById = async ({ id }) => ({
-      ...(await this.cached({
+      ...(await this.cachedCall({
         url: `https://simfin.com/api/v1/companies/id/${id}?api-key=${this.keys.simfin}`,
         httpCall: "get",
       })),
@@ -61,7 +88,7 @@ module.exports = {
     });
 
     getSimfinIndustryCompanies = async (id) => {
-      const firstRequest = await this.cached({
+      const firstRequest = await this.cachedCall({
         url: `https://simfin.com/api/v1/finder?api-key=${this.keys.simfin}`,
         httpCall: "post",
         body: {
@@ -77,7 +104,7 @@ module.exports = {
         ].reduce(
           async (accUnresolved, curr, i) => {
             const accResolved = await accUnresolved;
-            const nextPage = await this.cached({
+            const nextPage = await this.cachedCall({
               url: `https://simfin.com/api/v1/finder?api-key=${this.keys.simfin}`,
               httpCall: "post",
               body: {
@@ -100,7 +127,7 @@ module.exports = {
       }
     };
 
-    yearlyFinancials = async ({ years, simId }) => {
+    yearlyFinancials = async ({ years, simId, save = false }) => {
       const transformToPerField = (statements) => {
         // gets all fields uniquely
         const fields = statements.reduce((acc, curr) => {
@@ -160,7 +187,7 @@ module.exports = {
               await Promise.all(
                 years.map(
                   async (year) =>
-                    await this.cached({
+                    await this.cachedCall({
                       url: `
                                 https://simfin.com/api/v1/companies/id/${simId}/statements/standardised
                                 ?api-key=${this.keys.simfin}
@@ -169,6 +196,7 @@ module.exports = {
                                 &stype=${statement}
                             `.replace(/\s/g, ""),
                       httpCall: "get",
+                      save
                     }).then((r, e) => r && r.values)
                 )
               )
@@ -179,10 +207,11 @@ module.exports = {
       );
     };
 
-    aggregatedShares = async ({ simId, years }) =>
-      await this.cached({
+    aggregatedShares = async ({ simId, years, save = false }) =>
+      await this.cachedCall({
         url: `https://simfin.com/api/v1/companies/id/${simId}/shares/aggregated?api-key=${this.keys.simfin}`,
         httpCall: "get",
+        save
       }).then((r) => {
         // return r.sort((a, b) => a.date - b.date)
         return r;
@@ -190,7 +219,7 @@ module.exports = {
 
     shareClasses = async ({ simId, years }) =>
       (
-        await this.cached({
+        await this.cachedCall({
           url: `https://simfin.com/api/v1/companies/id/${simId}/shares/classes/list?api-key=${this.keys.simfin}`,
           httpCall: "get",
         })
@@ -200,10 +229,11 @@ module.exports = {
         ...c,
       }));
 
-    pricesForShareClasses = async ({ simId, shareClassId, years }) =>
-      this.cached({
+    pricesForShareClasses = async ({ simId, shareClassId, years, save = false }) =>
+      this.cachedCall({
         url: `https://simfin.com/api/v1/companies/id/${simId}/shares/classes/${shareClassId}/prices?api-key=${this.keys.simfin}`,
         httpCall: "get",
+        save
       }).then((r) => ({
         ...r,
         priceData: years.map(
@@ -215,9 +245,40 @@ module.exports = {
         ),
       }));
     logo = async ({ ticker }) =>
-      this.cached({
+      this.cachedCall({
         url: `https://cloud.iexapis.com/stable/stock/${ticker}/logo?token=${this.keys.iex}`,
         httpCall: "get",
       });
+
+    allYearlyFinancials = async ({ years, simId }) => {
+      const Fn = async () => ({
+        years: years,
+        ...financialTableMap(
+          years,
+          await this.yearlyFinancials({ years, simId })
+        ),
+        aggregatedShares: outstandingSharesTableMap(
+          years,
+          await this.aggregatedShares({ years, simId })
+        ),
+        price: await (async (shareClasses) =>
+          await [
+            priceTableMap(
+              years,
+              "price",
+              await this.pricesForShareClasses({
+                simId: simId,
+                shareClassId: shareClasses[0].shareClassId,
+                years: years,
+              })
+            ),
+          ])(await this.shareClasses({ years, simId })),
+      });
+
+      return this.cachedFn({
+        cacheHash: `/allYearlyFinancials/${simId}`,
+        Fn,
+      });
+    };
   },
 };

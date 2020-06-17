@@ -11,7 +11,7 @@ const typeDefs = gql`
     employees: String
     sectorAndIndustry: SectorAndIndustry
     industryCompanies: [SimfinStock]
-    aggregatedSharesIsolated: JSON
+    # aggregatedSharesIsolated: JSON
     shareClasses: [JSON]
     years: [Int]
     yearlyFinancials: YearlyFinancials
