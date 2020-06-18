@@ -201,7 +201,7 @@ module.exports = {
       const data = await (await this.getStockToSectorAndIndustryData())
         .analysis;
 
-      return data.FinVizIndustry.sort(
+      return data.FinVizSector.sort(
         (a, b) => Object.values(b)[0] - Object.values(a)[0]
       );
     };

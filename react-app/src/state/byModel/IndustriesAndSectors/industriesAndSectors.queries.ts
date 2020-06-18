@@ -34,3 +34,15 @@ export const GET_SECTOR = gql`
         }
     }
 `;
+
+export const GET_ALL_INDUSTRIES = gql`
+    query {
+        getAllIndustries
+    }
+`;
+
+export const GET_ALL_SECTORS = gql`
+    query {
+        getAllSectors
+    }
+`;

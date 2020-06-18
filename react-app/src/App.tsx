@@ -37,11 +37,19 @@ export default function App() {
                         />
                         <Route
                             path="/sector/:sector"
-                            component={loadable(() => import('./components/routes/SectorOrIndustry'))}
+                            component={loadable(() => import('./components/routes/SectorsAndIndustries'))}
                         />
                         <Route
                             path="/industry/:industry"
-                            component={loadable(() => import('./components/routes/SectorOrIndustry'))}
+                            component={loadable(() => import('./components/routes/SectorsAndIndustries'))}
+                        />
+                        <Route
+                            path="/industries"
+                            component={loadable(() => import('./components/routes/SectorsAndIndustries'))}
+                        />
+                        <Route
+                            path="/sectors"
+                            component={loadable(() => import('./components/routes/SectorsAndIndustries'))}
                         />
                         <Route
                             path="/sectors-and-industries"
