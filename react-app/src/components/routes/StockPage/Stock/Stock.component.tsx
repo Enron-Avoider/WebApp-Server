@@ -23,13 +23,11 @@ import {
 import { Equalizer, FilterList } from '@material-ui/icons';
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
-import { GET_INDUSTRY, GET_SECTOR } from '@state/byModel/IndustriesAndSectors/industriesAndSectors.queries';
 import { GET_CALCULATIONS } from '@state/byModel/calculations/calculations.queries';
 
 import { doCalculations } from '../calculations'
 import Table from '../Table';
-import CalcRowModal from '../CalcRowModal';
-import AddCard from '../AddCard';
+import Charts from '../Charts';
 
 export const Stock: FunctionComponent<{
     ticker: string,
@@ -51,7 +49,6 @@ export const Stock: FunctionComponent<{
         const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
             variables: { ticker },
         });
-        const [showGraph, setShowGraph] = useState(false);
 
         const stock = data && data.getSimfinCompanyByTicker;
         const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
@@ -109,33 +106,12 @@ export const Stock: FunctionComponent<{
                 </Box>
 
                 <Paper>
-                    <Box p={2} mt={2}>
-                        <Box position="relative" mt={-1} display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography variant="h5">
-
-                            </Typography>
-
-                            <Box>
-                                <IconButton color="primary" onClick={() => setShowGraph(!showGraph)}>
-                                    <FilterList />
-                                </IconButton>
-
-                                <IconButton color="primary" onClick={() => setShowGraph(!showGraph)}>
-                                    <Equalizer />
-                                </IconButton>
-                            </Box>
-
-
-                            {showGraph && (
-                                <ClickAwayListener onClickAway={() => setShowGraph(!showGraph)}>
-                                    <Box position="absolute" zIndex="2" right="0" top="0">
-                                        TODO!
-                                    </Box>
-                                </ClickAwayListener>
-                            )}
-
-                        </Box>
-                    </Box>
+                    <Charts
+                        yearlyFinancials={stock.yearlyFinancials}
+                        calculations={calculationResults}
+                        showPercentage={showPercentage}
+                        toggleShowPercentage={toggleShowPercentage}
+                    />
                 </Paper>
 
                 <Paper>

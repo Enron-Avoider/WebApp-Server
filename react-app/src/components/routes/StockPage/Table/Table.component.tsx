@@ -3,6 +3,7 @@ import { useTable, useBlockLayout, useExpanded, Column } from "react-table";
 import { useSticky } from 'react-table-sticky';
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
 import { useParams, Link as Link_ } from "react-router-dom";
+import numeral from 'numeral';
 import {
     Paper,
     Box,
@@ -38,7 +39,7 @@ export default function Table(
         allowNewCalc = true,
         showPercentage,
         toggleShowPercentage
-    } : {
+    }: {
         years: number[],
         data: {}[],
         title?: string,
@@ -234,7 +235,9 @@ export default function Table(
                                                 >
                                                     {showPercentage && row.original.changePercentage && cell.column.id !== 'expander' ?
                                                         `${row.original.changePercentage[cell.column.id]}%` :
-                                                        cell.render('Cell')
+                                                        cell.column.id !== 'expander' ?
+                                                            numeral(cell.value).format('(0.00a)') :
+                                                            cell.render('Cell')
                                                     }
                                                 </div>
                                             ))}
