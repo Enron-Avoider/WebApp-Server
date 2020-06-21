@@ -48,24 +48,24 @@ export const doCalculations = (
             const calc = years.reduce((acc: any, year: any, i: number) => ({
                 ...acc,
                 [`${year}`]:
-                    numeral(
-                        (() => {
-                            try {
-                                return math.evaluate(
-                                    forTable.calc,
-                                    Object.entries(forTable.scope)
-                                        .filter(([key, value]: any) => !!value && key !== '__typename')
-                                        .reduce((acc: any, [key, value]: any, i: number) => ({
-                                            ...acc,
-                                            [key]: numeral(scopeRows[key][year]).value(),
-                                        }), {})
-                                )
-                            }
-                            catch (e) {
-                                return 0;
-                            }
-                        })()
-                    ).format('(0.00a)')
+
+                    (() => {
+                        try {
+                            return math.evaluate(
+                                forTable.calc,
+                                Object.entries(forTable.scope)
+                                    .filter(([key, value]: any) => !!value && key !== '__typename')
+                                    .reduce((acc: any, [key, value]: any, i: number) => ({
+                                        ...acc,
+                                        [key]: scopeRows[key][year],
+                                    }), {})
+                            )
+                        }
+                        catch (e) {
+                            return 0;
+                        }
+                    })()
+
             }), { title: forTable.title || title, type: 'calc', onTable: forTable.onTable })
 
             return calc;

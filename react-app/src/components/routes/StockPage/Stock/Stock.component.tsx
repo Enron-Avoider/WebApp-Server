@@ -28,6 +28,7 @@ import { GET_CALCULATIONS } from '@state/byModel/calculations/calculations.queri
 import { doCalculations } from '../calculations'
 import Table from '../Table';
 import Charts from '../Charts';
+import './style.sass';
 
 export const Stock: FunctionComponent<{
     ticker: string,
@@ -35,12 +36,16 @@ export const Stock: FunctionComponent<{
     handleVisibleFinancials: any,
     showPercentage?: any,
     toggleShowPercentage?: any,
+    showGraph?: any,
+    toggleShowGraph?: any
 }> = ({
     ticker,
     visibleFinancials,
     handleVisibleFinancials,
     showPercentage,
-    toggleShowPercentage
+    toggleShowPercentage,
+    showGraph,
+    toggleShowGraph,
 }) => {
 
         const { loading, error, data } = useQuery(GET_STOCK, {
@@ -59,7 +64,21 @@ export const Stock: FunctionComponent<{
                 <Box mt={2}>
 
                     <Grid container spacing={3}>
-                        <Grid item xs={8}>
+                        <Grid item xs={3} container>
+                            <Box flex={1}>
+                                <Paper style={{ height: '100%' }}>
+                                    <Box
+                                        display="flex"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        height="100%"
+                                    >
+                                        <Avatar variant="rounded" src={stock.logo} />
+                                    </Box>
+                                </Paper>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={9}>
                             <Paper>
                                 <Box display="flex" flexDirection="row" p={2}>
                                     <div>
@@ -75,7 +94,11 @@ export const Stock: FunctionComponent<{
                                         </Box>
                                         <div>
                                             {/* <p>Employees: {stock.employees}</p> */}
-                                            <Typography variant="body1">{stock.sectorAndIndustry.sector} ・ {stock.sectorAndIndustry.industry}</Typography>
+                                            <Typography
+                                                display="block"
+                                                noWrap={true}
+                                                variant="body1"
+                                            >{stock.sectorAndIndustry.sector} ・ {stock.sectorAndIndustry.industry}</Typography>
 
                                             {/* <Typography variant="body1">Share Classes: {
                                                                 stock.shareClasses.map((s: any, i: Number) =>
@@ -87,42 +110,31 @@ export const Stock: FunctionComponent<{
                                 </Box>
                             </Paper>
                         </Grid>
-                        <Grid item xs={4} container>
-                            <Box flex={1}>
-                                <Paper style={{ height: '100%' }}>
-                                    <Box
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        height="100%"
-                                    >
-                                        <Avatar variant="rounded" src={stock.logo} />
-                                    </Box>
-                                </Paper>
-                            </Box>
-                        </Grid>
                     </Grid>
 
                 </Box>
 
                 <Paper>
+                    <Table
+                        title={'Ratios'}
+                        years={stock.yearlyFinancials.years}
+                        data={calculationResults}
+                        allowNewCalc={true}
+                        showPercentage={showPercentage}
+                        toggleShowPercentage={toggleShowPercentage}
+                        showGraph={showGraph}
+                        toggleShowGraph={toggleShowGraph}
+                    />
+                </Paper>
+
+                {/* <Paper>
                     <Charts
                         yearlyFinancials={stock.yearlyFinancials}
                         calculations={calculationResults}
                         showPercentage={showPercentage}
                         toggleShowPercentage={toggleShowPercentage}
                     />
-                </Paper>
-
-                <Paper>
-
-                    <Table
-                        title={'Ratios'}
-                        years={stock.yearlyFinancials.years}
-                        data={calculationResults}
-                    />
-
-                </Paper>
+                </Paper> */}
 
                 <Paper>
 
@@ -136,6 +148,10 @@ export const Stock: FunctionComponent<{
                                 ...stock.yearlyFinancials.aggregatedShares
                             ]
                         }
+                        showPercentage={showPercentage}
+                        toggleShowPercentage={toggleShowPercentage}
+                        showGraph={showGraph}
+                        toggleShowGraph={toggleShowGraph}
                     />
 
                 </Paper>
@@ -149,11 +165,11 @@ export const Stock: FunctionComponent<{
                             alignItems="center"
                             justifyContent="space-between"
                         >
-                            <Typography variant="h5" gutterBottom>
-                                Financial Statements
-                        </Typography>
+                            <Typography variant="h5">
+                                Fin. Statements
+                            </Typography>
 
-                            <ToggleButtonGroup value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
+                            <ToggleButtonGroup size="small" exclusive value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
                                 <ToggleButton value="pl">Income Statement</ToggleButton>
                                 <ToggleButton value="bs">Balance Sheet</ToggleButton>
                                 <ToggleButton value="cf">Cash Flow</ToggleButton>
@@ -162,12 +178,14 @@ export const Stock: FunctionComponent<{
 
                         <Grid container spacing={3}>
                             {visibleFinancials.includes('pl') && (
-                                <Grid item xs={(12 / visibleFinancials.length) as any}>
+                                <Grid item xs={(12) as any}>
                                     <Paper elevation={5}>
                                         <Table
                                             title={'Income Statement'}
                                             showPercentage={showPercentage}
                                             toggleShowPercentage={toggleShowPercentage}
+                                            showGraph={showGraph}
+                                            toggleShowGraph={toggleShowGraph}
                                             years={stock.yearlyFinancials.years}
                                             data={[
                                                 ...stock.yearlyFinancials.pl,
@@ -178,12 +196,14 @@ export const Stock: FunctionComponent<{
                                 </Grid>
                             )}
                             {visibleFinancials.includes('bs') && (
-                                <Grid item xs={(12 / visibleFinancials.length) as any}>
+                                <Grid item xs={(12) as any}>
                                     <Paper elevation={5}>
                                         <Table
                                             title={'Balance Sheet'}
                                             showPercentage={showPercentage}
                                             toggleShowPercentage={toggleShowPercentage}
+                                            showGraph={showGraph}
+                                            toggleShowGraph={toggleShowGraph}
                                             years={stock.yearlyFinancials.years}
                                             data={stock.yearlyFinancials.bs}
                                         />
@@ -191,12 +211,14 @@ export const Stock: FunctionComponent<{
                                 </Grid>
                             )}
                             {visibleFinancials.includes('cf') && (
-                                <Grid item xs={(12 / visibleFinancials.length) as any}>
+                                <Grid item xs={(12) as any}>
                                     <Paper elevation={5}>
                                         <Table
                                             title={'Cash Flow'}
                                             showPercentage={showPercentage}
                                             toggleShowPercentage={toggleShowPercentage}
+                                            showGraph={showGraph}
+                                            toggleShowGraph={toggleShowGraph}
                                             years={stock.yearlyFinancials.years}
                                             data={stock.yearlyFinancials.cf}
                                         />

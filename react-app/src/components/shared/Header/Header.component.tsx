@@ -5,7 +5,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import { Grid, Box, Button, Menu, MenuItem, useMediaQuery, Badge } from '@material-ui/core';
 import { useTheme, makeStyles } from '@material-ui/core/styles';
 
-import logoImg from '@assets/penrose.png';
+import logoImg from '@assets/e-transparent.png';
 import StockSearcher from '@components/shared/StockSearcher';
 
 import './style.sass';

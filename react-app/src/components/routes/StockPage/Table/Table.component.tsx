@@ -21,7 +21,6 @@ import { ArrowDropDown, Equalizer } from '@material-ui/icons';
 
 import NewCalcRowButton from '../NewCalcRowButton';
 import GraphCard from './GraphCard';
-import PercentageIcon from '@assets/percentage.svg';
 
 import "./style.sass";
 
@@ -36,22 +35,24 @@ export default function Table(
         years,
         data,
         title = '',
-        allowNewCalc = true,
+        allowNewCalc = false,
         showPercentage,
-        toggleShowPercentage
+        toggleShowPercentage,
+        showGraph,
+        toggleShowGraph
     }: {
         years: number[],
         data: {}[],
         title?: string,
         allowNewCalc?: boolean,
-        showPercentage?: any,
-        toggleShowPercentage?: any
+        showPercentage?: boolean,
+        toggleShowPercentage?: any,
+        showGraph?: boolean,
+        toggleShowGraph?: any
     }
 ) {
 
     const { ticker, rowTitle } = useParams();
-
-    const [showGraph, setShowGraph] = useState(false);
 
     const columns = React.useMemo(() => [
         {
@@ -124,7 +125,7 @@ export default function Table(
 
     return (
 
-        <Box p={2} mt={2}>
+        <Box p={2} mt={2} position="relative">
 
             {title && (
                 <Box position="relative" mt={-1} display="flex" justifyContent="space-between" alignItems="center">
@@ -172,19 +173,19 @@ export default function Table(
                                 />
                             </SvgIcon>
                         </IconButton>
-                        {/* <IconButton color="primary" onClick={() => setShowGraph(!showGraph)}>
+                        <IconButton color={showGraph ? 'secondary' : 'primary'} onClick={toggleShowGraph}>
                             <Equalizer />
-                        </IconButton> */}
+                        </IconButton>
                     </Box>
 
 
-                    {showGraph && (
+                    {/* {showGraph && (
                         <ClickAwayListener onClickAway={() => setShowGraph(!showGraph)}>
                             <Box position="absolute" zIndex="2" right="0" top="0">
                                 <GraphCard />
                             </Box>
                         </ClickAwayListener>
-                    )}
+                    )} */}
 
                 </Box>
             )}
@@ -249,6 +250,22 @@ export default function Table(
                     </ScrollSyncPane>
                 </Box>
             </Paper>
+
+            {showGraph && (
+                <Box
+                    position="absolute"
+                    bottom="15px"
+                    width="calc(100% - 32px)"
+                    height="calc(100% - 72px)"
+                    zIndex="1"
+                    bgcolor="grey.800"
+                >
+                    <GraphCard
+                        years={years}
+                        data={data}
+                    />
+                </Box>
+            )}
 
             {allowNewCalc && <NewCalcRowButton title={title} />}
 

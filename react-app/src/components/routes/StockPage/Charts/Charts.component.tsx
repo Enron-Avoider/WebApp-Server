@@ -35,38 +35,11 @@ export const Charts: FunctionComponent<{
 
         const axes = React.useMemo(
             () => [
-                { primary: true, type: 'ordinal', position: 'bottom' },
-                { type: 'linear', position: 'left' },
+                { primary: true, type: 'ordinal', position: 'bottom', show: false },
+                { type: 'linear', position: 'left', show: false },
             ],
             []
         )
-
-        const [
-            { primaryCursorValue, secondaryCursorValue },
-            setState
-        ] = React.useState({
-            primaryCursorValue: null,
-            secondaryCursorValue: null
-        })
-
-        const primaryCursor = React.useMemo(
-            () => ({
-                value: primaryCursorValue
-            }),
-            [primaryCursorValue]
-        )
-        const secondaryCursor = React.useMemo(
-            () => ({
-                value: secondaryCursorValue
-            }),
-            [secondaryCursorValue]
-        )
-        const onFocus = React.useCallback(datum => {
-            setState({
-                primaryCursorValue: datum ? datum.primary : null,
-                secondaryCursorValue: datum ? datum.secondary : null
-            })
-        }, [])
 
         console.log({
             yearlyFinancials,
@@ -81,7 +54,7 @@ export const Charts: FunctionComponent<{
                         display="flex"
                         justifyContent="space-between"
                         alignItems="center"
-                        height="350px"
+                        height="250px"
                         paddingTop="50px"
                     >
                         <Box flex={1} height="100%">
@@ -102,7 +75,7 @@ export const Charts: FunctionComponent<{
                                 axes={axes}
                                 tooltip
                                 dark
-                                onFocus={onFocus}
+
                             // primaryCursor={primaryCursor}
                             // secondaryCursor={secondaryCursor}
                             />
@@ -110,7 +83,7 @@ export const Charts: FunctionComponent<{
 
                         <Box flex={1} marginX={4} height="100%">
                             <Typography variant="h5">
-                                Income
+                                Income & Loss
                             </Typography>
                             <Chart
                                 data={React.useMemo(
@@ -124,9 +97,8 @@ export const Charts: FunctionComponent<{
                                 axes={axes}
                                 tooltip
                                 dark
-                                onFocus={onFocus}
+
                                 primaryCursor
-                            // secondaryCursor
                             />
                         </Box>
 
@@ -146,7 +118,7 @@ export const Charts: FunctionComponent<{
                                 axes={axes}
                                 tooltip
                                 dark
-                                onFocus={onFocus}
+
                                 primaryCursor
                             // secondaryCursor
                             />
@@ -157,7 +129,7 @@ export const Charts: FunctionComponent<{
                         display="flex"
                         justifyContent="space-between"
                         alignItems="center"
-                        height="350px"
+                        height="250px"
                         paddingTop="50px"
                     >
                         <Box flex={1} height="100%">
@@ -176,7 +148,7 @@ export const Charts: FunctionComponent<{
                                 axes={axes}
                                 tooltip
                                 dark
-                                onFocus={onFocus}
+
                                 primaryCursor
                             // secondaryCursor
                             />
@@ -185,22 +157,23 @@ export const Charts: FunctionComponent<{
                             <Typography variant="h5">
                                 Aggregated Shares
                             </Typography>
-                            <Chart
-                                data={React.useMemo(
-                                    () => Object.entries(yearlyFinancials.aggregatedShares).map(([k, row]: any) => ({
-                                        label: row.title,
-                                        data: yearlyFinancials.years
-                                            .map((y: any) => ([y, row[y] || 0])),
-                                    })),
-                                    [yearlyFinancials]
-                                )}
-                                axes={axes}
-                                tooltip
-                                dark
-                                onFocus={onFocus}
-                                primaryCursor
-                            // secondaryCursor
-                            />
+                            <Box height="100%">
+                                <Chart
+                                    data={React.useMemo(
+                                        () => Object.entries(yearlyFinancials.aggregatedShares).map(([k, row]: any) => ({
+                                            label: row.title,
+                                            data: yearlyFinancials.years
+                                                .map((y: any) => ([y, row[y] || 0])),
+                                        })),
+                                        [yearlyFinancials]
+                                    )}
+                                    axes={axes}
+                                    tooltip
+                                    dark
+
+                                    primaryCursor
+                                />
+                            </Box>
                         </Box>
                         <Box flex={1} height="100%">
                             <Typography variant="h5">
@@ -218,7 +191,7 @@ export const Charts: FunctionComponent<{
                                 axes={axes}
                                 tooltip
                                 dark
-                                onFocus={onFocus}
+
                                 primaryCursor
                             />
                         </Box>
@@ -229,12 +202,12 @@ export const Charts: FunctionComponent<{
                             <FilterList />
                         </IconButton> */}
 
-                        <IconButton color="primary" onClick={() => setShowGraph(!showGraph)}>
+                        {/* <IconButton color="primary" onClick={() => setShowGraph(!showGraph)}>
                             <Equalizer />
-                        </IconButton>
+                        </IconButton> */}
 
                         {/* <Box> */}
-                            <IconButton color={showPercentage ? 'secondary' : 'primary'} onClick={toggleShowPercentage}>
+                        {/* <IconButton color={showPercentage ? 'secondary' : 'primary'} onClick={toggleShowPercentage}>
                                 <SvgIcon viewBox="0 0 344 344">
                                     <path
                                         d="M 99.00,57.23
@@ -272,17 +245,17 @@ export const Charts: FunctionComponent<{
                                             228.23,216.55 231.94,215.86 237.00,215.71 Z"
                                     />
                                 </SvgIcon>
-                            </IconButton>
+                            </IconButton> */}
                         {/* </Box> */}
                     </Box>
 
-                    {showGraph && (
+                    {/* {showGraph && (
                         <ClickAwayListener onClickAway={() => setShowGraph(!showGraph)}>
                             <Box position="absolute" zIndex="2" right="0" top="0">
                                 TODO!
-                                    </Box>
+                             </Box>
                         </ClickAwayListener>
-                    )}
+                    )} */}
                 </Box>
             </>
         );

@@ -35,45 +35,110 @@ import Stock from './Stock';
 
 export const StockPage: FunctionComponent = () => {
 
-    const { ticker, tickertwo } = useParams();
+    const { ticker, tickertwo, securityOne, securityTwo, securityThree, securityFour, securityFive, securitySix, securitySeven, securityEight } = useParams();
+
+    console.log({ ticker, tickertwo, securityOne, securityTwo, securityThree, securityFour, securityFive, securitySix, securitySeven, securityEight });
 
     const [showAddCard, setShowAddCard] = useState(false);
     const toggleShowAddCard = () => setShowAddCard(!showAddCard);
 
-    const [visibleFinancials, setVisibleFinancials] = useState(() => ['pl']);
-    const handleVisibleFinancials = (event: React.MouseEvent<HTMLElement>, newFormats: string[]) => {
+    const [visibleFinancials, setVisibleFinancials] = useState(() => 'pl');
+    const handleVisibleFinancials = (event: React.MouseEvent<HTMLElement>, newFormats: string) => {
         setVisibleFinancials(newFormats);
     };
 
     const [showPercentage, setShowPercentage] = useState(false);
     const toggleShowPercentage = () => setShowPercentage(!showPercentage);
 
+    const [showGraph, setShowGraph] = useState(true);
+    const toggleShowGraph = () => console.log('here') || setShowGraph(!showGraph);
+
     return <ScrollSync>
         <>
             <Box pb={2}>
-                <CalcRowModal />
+                {ticker ? (<CalcRowModal />) : null}
                 <Grid container spacing={3} direction="row" wrap="nowrap">
 
-                    { ticker && (
-                        <Grid item xs={tickertwo ? 7 : 11}>
+                    {(ticker || securityOne) && (
+                        <Grid item xs={(tickertwo || securityTwo) ? 6 : 11}>
                             <Stock
-                                ticker={ticker}
+                                ticker={ticker || (securityOne && securityOne.replace('stock-', ''))}
                                 visibleFinancials={visibleFinancials}
                                 handleVisibleFinancials={handleVisibleFinancials}
                                 showPercentage={showPercentage}
                                 toggleShowPercentage={toggleShowPercentage}
+                                showGraph={showGraph}
+                                toggleShowGraph={toggleShowGraph}
                             />
                         </Grid>
                     )}
 
-                    { tickertwo && (
-                        <Grid item xs={7}>
+                    {(tickertwo || securityTwo) && (
+                        <Grid item xs={6}>
                             <Stock
-                                ticker={tickertwo}
+                                ticker={tickertwo || (securityTwo && securityTwo.replace('stock-', ''))}
                                 visibleFinancials={visibleFinancials}
                                 handleVisibleFinancials={handleVisibleFinancials}
                                 showPercentage={showPercentage}
                                 toggleShowPercentage={toggleShowPercentage}
+                                showGraph={showGraph}
+                                toggleShowGraph={toggleShowGraph}
+                            />
+                        </Grid>
+                    )}
+
+                    {securityThree && (
+                        <Grid item xs={6}>
+                            <Stock
+                                ticker={securityThree.replace('stock-', '')}
+                                visibleFinancials={visibleFinancials}
+                                handleVisibleFinancials={handleVisibleFinancials}
+                                showPercentage={showPercentage}
+                                toggleShowPercentage={toggleShowPercentage}
+                                showGraph={showGraph}
+                                toggleShowGraph={toggleShowGraph}
+                            />
+                        </Grid>
+                    )}
+
+                    {securityFour && (
+                        <Grid item xs={6}>
+                            <Stock
+                                ticker={securityFour.replace('stock-', '')}
+                                visibleFinancials={visibleFinancials}
+                                handleVisibleFinancials={handleVisibleFinancials}
+                                showPercentage={showPercentage}
+                                toggleShowPercentage={toggleShowPercentage}
+                                showGraph={showGraph}
+                                toggleShowGraph={toggleShowGraph}
+                            />
+                        </Grid>
+                    )}
+
+                    {securityFive && (
+                        <Grid item xs={6}>
+                            <Stock
+                                ticker={securityFive.replace('stock-', '')}
+                                visibleFinancials={visibleFinancials}
+                                handleVisibleFinancials={handleVisibleFinancials}
+                                showPercentage={showPercentage}
+                                toggleShowPercentage={toggleShowPercentage}
+                                showGraph={showGraph}
+                                toggleShowGraph={toggleShowGraph}
+                            />
+                        </Grid>
+                    )}
+
+                    {securitySix && (
+                        <Grid item xs={6}>
+                            <Stock
+                                ticker={securitySix.replace('stock-', '')}
+                                visibleFinancials={visibleFinancials}
+                                handleVisibleFinancials={handleVisibleFinancials}
+                                showPercentage={showPercentage}
+                                toggleShowPercentage={toggleShowPercentage}
+                                showGraph={showGraph}
+                                toggleShowGraph={toggleShowGraph}
                             />
                         </Grid>
                     )}
@@ -98,7 +163,7 @@ export const StockPage: FunctionComponent = () => {
                                             <Card>
                                                 <CardContent>
                                                     <MenuList
-                                                        // id="simple-menuList-2"
+                                                    // id="simple-menuList-2"
                                                     // anchorEl={anchorEl}
                                                     // keepMounted
                                                     // open={Boolean(anchorEl)}

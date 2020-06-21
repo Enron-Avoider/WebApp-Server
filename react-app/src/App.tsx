@@ -23,6 +23,7 @@ export default function App() {
                             path="/todo"
                             component={loadable(() => import('./components/routes/TodoPage'))}
                         />
+
                         <Route
                             path="/stock/:ticker/calculations/:tableName/:rowTitle"
                             component={loadable(() => import('./components/routes/StockPage'))}
@@ -33,6 +34,26 @@ export default function App() {
                         />
                         <Route
                             path="/stock/:ticker"
+                            component={loadable(() => import('./components/routes/StockPage'))}
+                        />
+                        <Route
+                            path="/compare/:securityOne/:securityTwo/:securityThree/:securityFour/:securityFive/:securitySix"
+                            component={loadable(() => import('./components/routes/StockPage'))}
+                        />
+                        <Route
+                            path="/compare/:securityOne/:securityTwo/:securityThree/:securityFour/:securityFive"
+                            component={loadable(() => import('./components/routes/StockPage'))}
+                        />
+                        <Route
+                            path="/compare/:securityOne/:securityTwo/:securityThree/:securityFour"
+                            component={loadable(() => import('./components/routes/StockPage'))}
+                        />
+                        <Route
+                            path="/compare/:securityOne/:securityTwo/:securityThree"
+                            component={loadable(() => import('./components/routes/StockPage'))}
+                        />
+                        <Route
+                            path="/compare/:securityOne/:securityTwo"
                             component={loadable(() => import('./components/routes/StockPage'))}
                         />
                         <Route
@@ -55,7 +76,23 @@ export default function App() {
                             path="/sectors-and-industries"
                             component={loadable(() => import('./components/routes/SectorsAndIndustries'))}
                         />
+
+                        {/* {[...new Array(2)].map((route, i) => {
+                            const path = `${[...new Array(i)].reduce((a, c, j) => `${a}/s/:ticker${j}`, '/s/:ticker')}`;
+                            console.log({ path })
+                            return (
+                                <Route
+                                    path={path}
+                                    key={i}
+                                    component={() => <p>teeeest wtf {path}</p>}
+                                />
+                            )
+                        })} */}
+
                         <Redirect from="/" to="/stock/BRKA" />
+
+
+
                     </Switch>
                     <Footer />
                 </Container>
