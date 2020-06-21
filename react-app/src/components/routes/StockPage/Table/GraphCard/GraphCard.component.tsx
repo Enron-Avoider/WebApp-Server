@@ -15,21 +15,21 @@ import './style.sass';
 export default function GraphCard(
     {
         years,
-        data
+        data,
+        showPercentage
     }: {
         years: number[],
-        data: {}[]
+        data: {}[],
+        showPercentage?: boolean
     }
 ) {
-
-    console.log({ years, data });
 
     const axes = React.useMemo(
         () => [
             { primary: true, type: 'ordinal', position: 'bottom', show: true },
             { type: 'linear', position: 'left', show: true },
         ],
-        []
+        [data]
     )
 
     return (
@@ -38,7 +38,7 @@ export default function GraphCard(
                 data={React.useMemo(
                     () => Object.entries(data).map(([k, row]: any) => ({
                         label: row.title,
-                        data: years.map((y: any) => ([y, row[y] || 0])),
+                        data: years.map((y: any) => ([y, (showPercentage ? row.changePercentage : row)[y] || 0])),
                     })),
                     [data]
                 )}

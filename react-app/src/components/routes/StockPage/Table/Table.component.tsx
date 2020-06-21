@@ -18,6 +18,7 @@ import {
     SvgIcon
 } from '@material-ui/core';
 import { ArrowDropDown, Equalizer } from '@material-ui/icons';
+const math = require("mathjs");
 
 import NewCalcRowButton from '../NewCalcRowButton';
 import GraphCard from './GraphCard';
@@ -51,6 +52,33 @@ export default function Table(
         toggleShowGraph?: any
     }
 ) {
+
+    const dataWithPercentages = React.useMemo(
+        () => data.map((row: any) => ({
+            ...row,
+            changePercentage: years.map((y: any, i: number) => (
+                (i === 0 || !row[y] || !row[y - 1])
+                    ? 0
+                    : ((row[y] - row[y - 1]) / Math.abs(row[y - 1])) * 100
+            )).reduce(
+                (acc, value, i, array) => ({
+                    ...(i === 0
+                        ? {
+                            max: Math.max(...array.filter((v, i) => i > 0)).toFixed(0),
+                            min: Math.min(...array.filter((v, i) => i > 0)).toFixed(0),
+                            quartiles: math
+                                .quantileSeq(array, [1 / 4, 1 / 2, 3 / 4, 1])
+                                .map((x: any) => x.toFixed(1)),
+                        }
+                        : {}),
+                    ...acc,
+                    [`${years[i]}`]: value.toFixed(0),
+                }),
+                {}
+            )
+        })),
+        [data]
+    );
 
     const { ticker, rowTitle } = useParams();
 
@@ -105,7 +133,6 @@ export default function Table(
         }))
     ], []);
 
-
     const {
         getTableProps,
         getTableBodyProps,
@@ -116,7 +143,7 @@ export default function Table(
     } = useTable(
         {
             columns,
-            data: data,
+            data: dataWithPercentages,
         },
         useBlockLayout,
         useExpanded,
@@ -177,16 +204,6 @@ export default function Table(
                             <Equalizer />
                         </IconButton>
                     </Box>
-
-
-                    {/* {showGraph && (
-                        <ClickAwayListener onClickAway={() => setShowGraph(!showGraph)}>
-                            <Box position="absolute" zIndex="2" right="0" top="0">
-                                <GraphCard />
-                            </Box>
-                        </ClickAwayListener>
-                    )} */}
-
                 </Box>
             )}
 
@@ -262,7 +279,8 @@ export default function Table(
                 >
                     <GraphCard
                         years={years}
-                        data={data}
+                        data={dataWithPercentages}
+                        showPercentage={showPercentage}
                     />
                 </Box>
             )}
