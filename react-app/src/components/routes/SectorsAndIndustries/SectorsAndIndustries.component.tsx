@@ -15,13 +15,18 @@ import {
 
 import Industries from './Industries';
 import Sectors from './Sectors';
+import Link from './Link';
 import './style.sass';
 
 export default function SectorsAndIndustries() {
+
     return (
         <>
             <p>SectorsAndIndustries</p>
             <Box pb={2}>
+                <Box>
+                    <Link />
+                </Box>
                 <Grid container spacing={3} direction="row" wrap="nowrap">
                     <Grid item xs={6}>
                         <Industries />

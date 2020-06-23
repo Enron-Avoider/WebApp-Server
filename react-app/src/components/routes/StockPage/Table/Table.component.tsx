@@ -40,7 +40,8 @@ export default function Table(
         showPercentage,
         toggleShowPercentage,
         showGraph,
-        toggleShowGraph
+        toggleShowGraph,
+        isBiggerHACK
     }: {
         years: number[],
         data: {}[],
@@ -49,7 +50,8 @@ export default function Table(
         showPercentage?: boolean,
         toggleShowPercentage?: any,
         showGraph?: boolean,
-        toggleShowGraph?: any
+        toggleShowGraph?: any,
+        isBiggerHACK?: boolean
     }
 ) {
 
@@ -271,9 +273,9 @@ export default function Table(
             {showGraph && (
                 <Box
                     position="absolute"
-                    bottom="15px"
+                    top="56px"
                     width="calc(100% - 32px)"
-                    height="calc(100% - 72px)"
+                    height={`calc(100% - ${isBiggerHACK ? 72 : 81}px)`}
                     zIndex="1"
                     bgcolor="grey.800"
                 >

@@ -46,3 +46,9 @@ export const GET_ALL_SECTORS = gql`
         getAllSectors
     }
 `;
+
+export const GET_ALL_SECTOR_AND_INDUSTRY_LINKS = gql`
+    query {
+        getSectorAndIndustryLinks
+    }
+`;

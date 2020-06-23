@@ -31,8 +31,6 @@ export const Charts: FunctionComponent<{
     toggleShowPercentage
 }) => {
 
-        const [showGraph, setShowGraph] = useState(false);
-
         const axes = React.useMemo(
             () => [
                 { primary: true, type: 'ordinal', position: 'bottom', show: false },
@@ -62,16 +60,15 @@ export const Charts: FunctionComponent<{
                                 Price
                             </Typography>
                             <Chart
-                                data={React.useMemo(
-                                    () => [
-                                        {
-                                            label: 'Price',
-                                            data: yearlyFinancials.years
-                                                .map((y: any) => ([y, yearlyFinancials.price[0][y]])),
-                                        },
-                                    ],
-                                    [yearlyFinancials]
-                                )}
+                                data={[
+                                    {
+                                        label: 'Price',
+                                        data: yearlyFinancials.years
+                                            .map((y: any) => ([y, yearlyFinancials.price[0][y]])),
+                                    },
+                                ]
+
+                                }
                                 axes={axes}
                                 tooltip
                                 dark

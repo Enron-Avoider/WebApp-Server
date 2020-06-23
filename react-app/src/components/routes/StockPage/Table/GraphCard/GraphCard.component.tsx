@@ -40,7 +40,7 @@ export default function GraphCard(
                         label: row.title,
                         data: years.map((y: any) => ([y, (showPercentage ? row.changePercentage : row)[y] || 0])),
                     })),
-                    [data]
+                    [data, showPercentage]
                 )}
                 axes={axes}
                 tooltip

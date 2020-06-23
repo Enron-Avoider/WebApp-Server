@@ -27,6 +27,9 @@ module.exports = {
         (await dataSources.messySectorsAndIndustries.getStockToSectorAndIndustryData())
             .analysis,
 
+    getSectorAndIndustryLinks: async (_source, params, { dataSources }) =>
+        (await dataSources.messySectorsAndIndustries.getSectorAndIndustryLinks()),
+
     getSector: async (_source, params, { dataSources }) => {},
         //dataSources.messySectorsAndIndustries.getSector(params.name),
 

@@ -95,7 +95,7 @@ export default function Header() {
                                             <Button
                                                 startIcon={`👍`}
                                                 variant="contained"
-                                                color="secondary"
+                                                color="primary"
                                                 component={Link}
                                                 to="/stock/FB"
                                             >

@@ -29,7 +29,9 @@ module.exports = {
           } else {
             const r = await Fn().catch((r, e) => null);
             // console.log({ r });
-            if (save) { this.redisClient.set(cacheHash, JSON.stringify(r)); }
+            if (save) {
+              this.redisClient.set(cacheHash, JSON.stringify(r));
+            }
             res(r);
           }
         });
@@ -74,6 +76,46 @@ module.exports = {
         stocks,
         analysis: isolateAttributes(stocks),
       };
+    };
+
+    getSectorAndIndustryLinks = async () => {
+      const Fn = async () =>
+        (await this.getStockToSectorAndIndustryData()).stocks
+          .reduce((acc, curr, i) => {
+            const isExistingLink = (link, curr) =>
+              link.source === curr.FinVizSector &&
+              link.target === curr.FinVizIndustry;
+
+            const existingLink =
+              acc && acc.find((link) => isExistingLink(link, curr));
+
+            return [
+              ...(acc &&
+                acc.map((link) =>
+                  isExistingLink(link, curr)
+                    ? {
+                        ...link,
+                        value: link.value + 1,
+                      }
+                    : link
+                )),
+              ...(!!!existingLink
+                ? [
+                    {
+                      source: curr.FinVizSector,
+                      target: curr.FinVizIndustry,
+                      value: 1,
+                    },
+                  ]
+                : []),
+            ];
+          }, [])
+          .sort((a, b) => b.value - a.value);
+
+      return this.cached({
+        cacheHash: `/getSectorAndIndustryLinks`,
+        Fn,
+      });
     };
 
     getSectorAndIndustryForStock = async ({ ticker }) =>

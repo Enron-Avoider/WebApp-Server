@@ -191,6 +191,7 @@ export const Stock: FunctionComponent<{
                                                 ...stock.yearlyFinancials.pl,
                                                 ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
                                             ]}
+                                            isBiggerHACK={true}
                                         />
                                     </Paper>
                                 </Grid>
@@ -206,6 +207,7 @@ export const Stock: FunctionComponent<{
                                             toggleShowGraph={toggleShowGraph}
                                             years={stock.yearlyFinancials.years}
                                             data={stock.yearlyFinancials.bs}
+                                            isBiggerHACK={true}
                                         />
                                     </Paper>
                                 </Grid>
@@ -221,6 +223,7 @@ export const Stock: FunctionComponent<{
                                             toggleShowGraph={toggleShowGraph}
                                             years={stock.yearlyFinancials.years}
                                             data={stock.yearlyFinancials.cf}
+                                            isBiggerHACK={true}
                                         />
                                     </Paper>
                                 </Grid>

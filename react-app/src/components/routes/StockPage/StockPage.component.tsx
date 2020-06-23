@@ -37,7 +37,7 @@ export const StockPage: FunctionComponent = () => {
 
     const { ticker, tickertwo, securityOne, securityTwo, securityThree, securityFour, securityFive, securitySix, securitySeven, securityEight } = useParams();
 
-    console.log({ ticker, tickertwo, securityOne, securityTwo, securityThree, securityFour, securityFive, securitySix, securitySeven, securityEight });
+    // console.log({ ticker, tickertwo, securityOne, securityTwo, securityThree, securityFour, securityFive, securitySix, securitySeven, securityEight });
 
     const [showAddCard, setShowAddCard] = useState(false);
     const toggleShowAddCard = () => setShowAddCard(!showAddCard);
@@ -50,8 +50,8 @@ export const StockPage: FunctionComponent = () => {
     const [showPercentage, setShowPercentage] = useState(false);
     const toggleShowPercentage = () => setShowPercentage(!showPercentage);
 
-    const [showGraph, setShowGraph] = useState(true);
-    const toggleShowGraph = () => console.log('here') || setShowGraph(!showGraph);
+    const [showGraph, setShowGraph] = useState(false);
+    const toggleShowGraph = () => setShowGraph(!showGraph);
 
     return <ScrollSync>
         <>
