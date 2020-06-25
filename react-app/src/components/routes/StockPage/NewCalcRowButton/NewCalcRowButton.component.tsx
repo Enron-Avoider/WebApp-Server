@@ -1,15 +1,19 @@
 import React from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useHistory, useLocation } from "react-router-dom";
 import { Box, Fab } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 
 import "./style.sass";
 
-export default function NewCalcRowButton({ title }: { title: string }) {
+export default function NewCalcRowButton({ title, ticker }: { title: string, ticker: string }) {
 
-    const { ticker } = useParams();
+    const history = useHistory();
+    const location = useLocation();
 
-    const path = `/stock/${ticker}/calculations/${title}`;
+    const handleClickOpen = () => history.push({
+        pathname: location.pathname,
+        search: `?ratio=new&ticker=${ticker}`
+    });
 
     return (
         <>
@@ -24,9 +28,7 @@ export default function NewCalcRowButton({ title }: { title: string }) {
                     size="small"
                     color="primary"
                     aria-label="add"
-                    // onClick={handleClickOpen}
-                    component={Link}
-                    to={`${path}/new`}
+                    onClick={handleClickOpen}
                 >
                     <AddIcon />
                 </Fab>

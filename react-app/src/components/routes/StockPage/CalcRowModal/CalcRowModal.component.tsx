@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams, Link, useRouteMatch, useHistory } from "react-router-dom";
+import { useParams, Link, useRouteMatch, useHistory, useLocation } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import deepFind from 'deep-find';
 import {
@@ -33,7 +33,13 @@ import "./style.sass";
 
 export default function NewCalcRowModal() {
 
-    const { ticker, rowTitle, tableName } = useParams();
+    const location = useLocation();
+    const { rowTitle, ticker } = (q => ({
+        rowTitle: q.get('ratio') || '',
+        ticker: q.get('ticker') || '',
+    }))(new URLSearchParams(location.search));
+    console.log({ rowTitle, ticker, location});
+    // const { ticker, rowTitle, tableName } = useParams();
     const { loading, error, data } = useQuery(GET_STOCK, {
         variables: { ticker },
     });
@@ -45,11 +51,7 @@ export default function NewCalcRowModal() {
     const [saveCalculation] = useMutation(SAVE_CALCULATION);
     const [existing, setExistinging] = React.useState<Object>({});
 
-    const path = `/stock/${ticker}/calculations/`;
-
-    const routeMatchesOpen = !!(useRouteMatch({
-        path: `${path}`
-    }));
+    const isOpen = !!ticker;
 
     const stock = data && data.getSimfinCompanyByTicker;
 
@@ -72,7 +74,7 @@ export default function NewCalcRowModal() {
 
     const history = useHistory();
     const handleClose = () => {
-        history.push(`/stock/${ticker}`)
+        history.push(location.pathname)
     };
 
     const [titleValue, setTitleValue] = React.useState('');
@@ -172,11 +174,11 @@ export default function NewCalcRowModal() {
     }, [calculations, rowTitle]);
 
     return (
-        <Dialog open={routeMatchesOpen} onClose={handleClose}>
+        <Dialog open={isOpen} onClose={handleClose}>
             <Box
                 minWidth={450}
             >
-                <DialogTitle>Calculation Builder <span title="just kidding, copy this all you want">™️</span></DialogTitle>
+                <DialogTitle>Ratio Builder <span title="just kidding, copy this all you want">™️</span></DialogTitle>
                 <DialogContent>
 
                     <Box display="flex" justifyContent="space-around">

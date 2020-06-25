@@ -56,7 +56,7 @@ export const StockPage: FunctionComponent = () => {
     return <ScrollSync>
         <>
             <Box pb={2}>
-                {ticker ? (<CalcRowModal />) : null}
+                <CalcRowModal />
                 <Grid container spacing={3} direction="row" wrap="nowrap">
 
                     {(ticker || securityOne) && (

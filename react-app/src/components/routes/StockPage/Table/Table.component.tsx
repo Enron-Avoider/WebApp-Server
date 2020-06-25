@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTable, useBlockLayout, useExpanded, Column } from "react-table";
 import { useSticky } from 'react-table-sticky';
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
-import { useParams, Link as Link_ } from "react-router-dom";
+import { useParams, Link as Link_, useLocation } from "react-router-dom";
 import numeral from 'numeral';
 import {
     Paper,
@@ -33,6 +33,7 @@ const getQuartile = (v: number, quartiles: number[]) =>
 
 export default function Table(
     {
+        ticker,
         years,
         data,
         title = '',
@@ -43,6 +44,7 @@ export default function Table(
         toggleShowGraph,
         isBiggerHACK
     }: {
+        ticker: string,
         years: number[],
         data: {}[],
         title?: string,
@@ -55,6 +57,7 @@ export default function Table(
     }
 ) {
 
+    const  location = useLocation();
     const dataWithPercentages = React.useMemo(
         () => data.map((row: any) => ({
             ...row,
@@ -82,7 +85,7 @@ export default function Table(
         [data]
     );
 
-    const { ticker, rowTitle } = useParams();
+    // const { ticker, rowTitle } = useParams();
 
     const columns = React.useMemo(() => [
         {
@@ -108,7 +111,15 @@ export default function Table(
                         ''
                     }
                     {row.original.type === 'calc' ?
-                        <Link component={Link_} color="inherit" to={`/stock/${ticker}/calculations/${title}/${cell.value}`}>
+                        <Link
+                            component={Link_}
+                            color="inherit"
+                            to={{
+                                pathname: location.pathname,
+                                search: `?ratio=${cell.value}&ticker=${ticker}`
+                                //${title}/${cell.value}
+                            }}
+                        >
                             {cell.value || ''}
                         </Link> :
                         cell.value
@@ -287,7 +298,7 @@ export default function Table(
                 </Box>
             )}
 
-            {allowNewCalc && <NewCalcRowButton title={title} />}
+            {allowNewCalc && <NewCalcRowButton title={title} ticker={ticker} />}
 
         </Box>
 

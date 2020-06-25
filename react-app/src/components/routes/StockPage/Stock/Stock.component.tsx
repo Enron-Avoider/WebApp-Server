@@ -116,6 +116,7 @@ export const Stock: FunctionComponent<{
 
                 <Paper>
                     <Table
+                        ticker={ticker}
                         title={'Ratios'}
                         years={stock.yearlyFinancials.years}
                         data={calculationResults}
