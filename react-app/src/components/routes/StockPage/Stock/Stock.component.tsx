@@ -58,77 +58,78 @@ export const Stock: FunctionComponent<{
         const stock = data && data.getSimfinCompanyByTicker;
         const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
 
-        return !loading && !error ? (
-            <>
+        return <>{
+            !loading && !error ? (
+                <>
 
-                <Box mt={2}>
+                    <Box mt={2}>
 
-                    <Grid container spacing={3}>
-                        <Grid item xs={3} container>
-                            <Box flex={1}>
-                                <Paper style={{ height: '100%' }}>
-                                    <Box
-                                        display="flex"
-                                        alignItems="center"
-                                        justifyContent="center"
-                                        height="100%"
-                                    >
-                                        <Avatar variant="rounded" src={stock.logo} />
-                                    </Box>
-                                </Paper>
-                            </Box>
-                        </Grid>
-                        <Grid item xs={9}>
-                            <Paper>
-                                <Box display="flex" flexDirection="row" p={2}>
-                                    <div>
-                                        <Box display="flex" alignItems="center">
-                                            <Typography variant="h5">
-                                                {stock.name}
-                                            </Typography>
-                                            <Box ml={1}>
-                                                <Typography variant="h5">
-                                                    <b>({ticker})</b>
-                                                </Typography>
-                                            </Box>
+                        <Grid container spacing={3}>
+                            <Grid item xs={3} container>
+                                <Box flex={1}>
+                                    <Paper style={{ height: '100%' }}>
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="center"
+                                            height="100%"
+                                        >
+                                            <Avatar variant="rounded" src={stock.logo} />
                                         </Box>
+                                    </Paper>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={9}>
+                                <Paper>
+                                    <Box display="flex" flexDirection="row" p={2}>
                                         <div>
-                                            {/* <p>Employees: {stock.employees}</p> */}
-                                            <Typography
-                                                display="block"
-                                                noWrap={true}
-                                                variant="body1"
-                                            >{stock.sectorAndIndustry.sector} ・ {stock.sectorAndIndustry.industry}</Typography>
+                                            <Box display="flex" alignItems="center">
+                                                <Typography variant="h5">
+                                                    {stock.name}
+                                                </Typography>
+                                                <Box ml={1}>
+                                                    <Typography variant="h5">
+                                                        <b>({ticker})</b>
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                            <div>
+                                                {/* <p>Employees: {stock.employees}</p> */}
+                                                <Typography
+                                                    display="block"
+                                                    noWrap={true}
+                                                    variant="body1"
+                                                >{stock.sectorAndIndustry.sector} ・ {stock.sectorAndIndustry.industry}</Typography>
 
-                                            {/* <Typography variant="body1">Share Classes: {
+                                                {/* <Typography variant="body1">Share Classes: {
                                                                 stock.shareClasses.map((s: any, i: Number) =>
                                                                     s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
                                                                 )}
                                                             </Typography> */}
+                                            </div>
                                         </div>
-                                    </div>
-                                </Box>
-                            </Paper>
+                                    </Box>
+                                </Paper>
+                            </Grid>
                         </Grid>
-                    </Grid>
 
-                </Box>
+                    </Box>
 
-                <Paper>
-                    <Table
-                        ticker={ticker}
-                        title={'Ratios'}
-                        years={stock.yearlyFinancials.years}
-                        data={calculationResults}
-                        allowNewCalc={true}
-                        showPercentage={showPercentage}
-                        toggleShowPercentage={toggleShowPercentage}
-                        showGraph={showGraph}
-                        toggleShowGraph={toggleShowGraph}
-                    />
-                </Paper>
+                    <Paper>
+                        <Table
+                            ticker={ticker}
+                            title={'Ratios'}
+                            years={stock.yearlyFinancials.years}
+                            data={calculationResults}
+                            allowNewCalc={true}
+                            showPercentage={showPercentage}
+                            toggleShowPercentage={toggleShowPercentage}
+                            showGraph={showGraph}
+                            toggleShowGraph={toggleShowGraph}
+                        />
+                    </Paper>
 
-                {/* <Paper>
+                    {/* <Paper>
                     <Charts
                         yearlyFinancials={stock.yearlyFinancials}
                         calculations={calculationResults}
@@ -137,106 +138,106 @@ export const Stock: FunctionComponent<{
                     />
                 </Paper> */}
 
-                <Paper>
+                    <Paper>
 
-                    <Table
-                        title={'Shares'}
-                        years={stock.yearlyFinancials.years}
-                        data={
-                            [
-                                ...stock.yearlyFinancials.price,
-                                // ...stock.shareClasses,
-                                ...stock.yearlyFinancials.aggregatedShares
-                            ]
-                        }
-                        showPercentage={showPercentage}
-                        toggleShowPercentage={toggleShowPercentage}
-                        showGraph={showGraph}
-                        toggleShowGraph={toggleShowGraph}
-                    />
+                        <Table
+                            title={'Shares'}
+                            years={stock.yearlyFinancials.years}
+                            data={
+                                [
+                                    ...stock.yearlyFinancials.price,
+                                    // ...stock.shareClasses,
+                                    ...stock.yearlyFinancials.aggregatedShares
+                                ]
+                            }
+                            showPercentage={showPercentage}
+                            toggleShowPercentage={toggleShowPercentage}
+                            showGraph={showGraph}
+                            toggleShowGraph={toggleShowGraph}
+                        />
 
-                </Paper>
+                    </Paper>
 
-                <Paper>
+                    <Paper>
 
-                    <Box p={2} mt={2}>
+                        <Box p={2} mt={2}>
 
-                        <Box
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="space-between"
-                        >
-                            <Typography variant="h5">
-                                Fin. Statements
+                            <Box
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="space-between"
+                            >
+                                <Typography variant="h5">
+                                    Fin. Statements
                             </Typography>
 
-                            <ToggleButtonGroup size="small" exclusive value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
-                                <ToggleButton value="pl">Income Statement</ToggleButton>
-                                <ToggleButton value="bs">Balance Sheet</ToggleButton>
-                                <ToggleButton value="cf">Cash Flow</ToggleButton>
-                            </ToggleButtonGroup>
+                                <ToggleButtonGroup size="small" exclusive value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
+                                    <ToggleButton value="pl">Income Statement</ToggleButton>
+                                    <ToggleButton value="bs">Balance Sheet</ToggleButton>
+                                    <ToggleButton value="cf">Cash Flow</ToggleButton>
+                                </ToggleButtonGroup>
+                            </Box>
+
+                            <Grid container spacing={3}>
+                                {visibleFinancials.includes('pl') && (
+                                    <Grid item xs={(12) as any}>
+                                        <Paper elevation={5}>
+                                            <Table
+                                                title={'Income Statement'}
+                                                showPercentage={showPercentage}
+                                                toggleShowPercentage={toggleShowPercentage}
+                                                showGraph={showGraph}
+                                                toggleShowGraph={toggleShowGraph}
+                                                years={stock.yearlyFinancials.years}
+                                                data={[
+                                                    ...stock.yearlyFinancials.pl,
+                                                    ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
+                                                ]}
+                                                isBiggerHACK={true}
+                                            />
+                                        </Paper>
+                                    </Grid>
+                                )}
+                                {visibleFinancials.includes('bs') && (
+                                    <Grid item xs={(12) as any}>
+                                        <Paper elevation={5}>
+                                            <Table
+                                                title={'Balance Sheet'}
+                                                showPercentage={showPercentage}
+                                                toggleShowPercentage={toggleShowPercentage}
+                                                showGraph={showGraph}
+                                                toggleShowGraph={toggleShowGraph}
+                                                years={stock.yearlyFinancials.years}
+                                                data={stock.yearlyFinancials.bs}
+                                                isBiggerHACK={true}
+                                            />
+                                        </Paper>
+                                    </Grid>
+                                )}
+                                {visibleFinancials.includes('cf') && (
+                                    <Grid item xs={(12) as any}>
+                                        <Paper elevation={5}>
+                                            <Table
+                                                title={'Cash Flow'}
+                                                showPercentage={showPercentage}
+                                                toggleShowPercentage={toggleShowPercentage}
+                                                showGraph={showGraph}
+                                                toggleShowGraph={toggleShowGraph}
+                                                years={stock.yearlyFinancials.years}
+                                                data={stock.yearlyFinancials.cf}
+                                                isBiggerHACK={true}
+                                            />
+                                        </Paper>
+                                    </Grid>
+                                )}
+                            </Grid>
                         </Box>
 
-                        <Grid container spacing={3}>
-                            {visibleFinancials.includes('pl') && (
-                                <Grid item xs={(12) as any}>
-                                    <Paper elevation={5}>
-                                        <Table
-                                            title={'Income Statement'}
-                                            showPercentage={showPercentage}
-                                            toggleShowPercentage={toggleShowPercentage}
-                                            showGraph={showGraph}
-                                            toggleShowGraph={toggleShowGraph}
-                                            years={stock.yearlyFinancials.years}
-                                            data={[
-                                                ...stock.yearlyFinancials.pl,
-                                                ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
-                                            ]}
-                                            isBiggerHACK={true}
-                                        />
-                                    </Paper>
-                                </Grid>
-                            )}
-                            {visibleFinancials.includes('bs') && (
-                                <Grid item xs={(12) as any}>
-                                    <Paper elevation={5}>
-                                        <Table
-                                            title={'Balance Sheet'}
-                                            showPercentage={showPercentage}
-                                            toggleShowPercentage={toggleShowPercentage}
-                                            showGraph={showGraph}
-                                            toggleShowGraph={toggleShowGraph}
-                                            years={stock.yearlyFinancials.years}
-                                            data={stock.yearlyFinancials.bs}
-                                            isBiggerHACK={true}
-                                        />
-                                    </Paper>
-                                </Grid>
-                            )}
-                            {visibleFinancials.includes('cf') && (
-                                <Grid item xs={(12) as any}>
-                                    <Paper elevation={5}>
-                                        <Table
-                                            title={'Cash Flow'}
-                                            showPercentage={showPercentage}
-                                            toggleShowPercentage={toggleShowPercentage}
-                                            showGraph={showGraph}
-                                            toggleShowGraph={toggleShowGraph}
-                                            years={stock.yearlyFinancials.years}
-                                            data={stock.yearlyFinancials.cf}
-                                            isBiggerHACK={true}
-                                        />
-                                    </Paper>
-                                </Grid>
-                            )}
-                        </Grid>
+                    </Paper>
+                </>
+            ) : (
+                    <Box p={5} m={5} height="100vh" display="flex" alignItems="center" justifyContent="center">
+                        <CircularProgress size={100} />
                     </Box>
-
-                </Paper>
-            </>
-        ) : (
-                <Box p={5} m={5} height="100vh" display="flex" alignItems="center" justifyContent="center">
-                    <CircularProgress size={100} />
-                </Box>
-            );
+                )}</>;
     }

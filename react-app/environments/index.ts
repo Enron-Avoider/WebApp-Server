@@ -13,4 +13,4 @@ const environments: any = {
 export default Object.assign(
     local,
     environments[process.env.NODE_ENV || 'local']
-) as Object
+) as any

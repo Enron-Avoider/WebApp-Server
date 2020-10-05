@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { ApolloProvider } from 'react-apollo';
 import ApolloClient from "apollo-boost";
 import { ThemeProvider } from '@material-ui/styles';
-import { createMuiTheme } from '@material-ui/core/styles';
+import { createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import purple from '@material-ui/core/colors/purple';
 import { InMemoryCache } from "apollo-cache-inmemory";
@@ -27,7 +27,7 @@ console.log({ env, todoResolvers, calculationsResolvers });
         storage: (window as any).localStorage,
     });
     const client = new ApolloClient({
-        uri: 'http://localhost:4000/',
+        uri: env.graphql,
         cache,
         resolvers: { Mutation: {
             ...calculationsResolvers.Mutation,
@@ -47,7 +47,7 @@ console.log({ env, todoResolvers, calculationsResolvers });
         });
     }
 
-    const darkTheme = createMuiTheme({
+    const darkTheme = responsiveFontSizes(createMuiTheme({
         palette: {
             type: 'dark',
             primary: purple,
@@ -58,7 +58,7 @@ console.log({ env, todoResolvers, calculationsResolvers });
                 // grey1: theme.palette.grey['800']
             }
         },
-    });
+    }), { factor:  15 });
 
     ReactDOM.render(
         <ApolloProvider client={client}>

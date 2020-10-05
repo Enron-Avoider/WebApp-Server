@@ -38,7 +38,7 @@ export default function NewCalcRowModal() {
         rowTitle: q.get('ratio') || '',
         ticker: q.get('ticker') || '',
     }))(new URLSearchParams(location.search));
-    console.log({ rowTitle, ticker, location});
+    console.log({ rowTitle, ticker, location });
     // const { ticker, rowTitle, tableName } = useParams();
     const { loading, error, data } = useQuery(GET_STOCK, {
         variables: { ticker },
@@ -152,7 +152,10 @@ export default function NewCalcRowModal() {
         handleClose();
     }
 
-    const calcRow = doCalculations(calc, stock.yearlyFinancials.years, stock, titleValue);
+    const calcRow =
+        stock?.yearlyFinancials?.years ?
+            doCalculations(calc, stock?.yearlyFinancials.years, stock, titleValue) :
+            [];
 
     const scopeRows = scopeToRows(calc[0].scope, stock);
 
@@ -259,7 +262,7 @@ export default function NewCalcRowModal() {
                     <Box m={-2} mt={2}>
                         <Table
                             // title={'Income Statement'}
-                            years={stock.yearlyFinancials.years}
+                            years={stock?.yearlyFinancials?.years}
                             data={[
                                 ...Object.values(scopeRows),
                                 ...calcRow

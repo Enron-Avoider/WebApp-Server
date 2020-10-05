@@ -35,7 +35,18 @@ import Stock from './Stock';
 
 export const StockPage: FunctionComponent = () => {
 
-    const { ticker, tickertwo, securityOne, securityTwo, securityThree, securityFour, securityFive, securitySix, securitySeven, securityEight } = useParams();
+    const {
+        ticker,
+        tickertwo,
+        securityOne,
+        securityTwo,
+        securityThree,
+        securityFour,
+        securityFive,
+        securitySix,
+        securitySeven,
+        securityEight
+    } = useParams();
 
     // console.log({ ticker, tickertwo, securityOne, securityTwo, securityThree, securityFour, securityFive, securitySix, securitySeven, securityEight });
 
@@ -56,7 +67,9 @@ export const StockPage: FunctionComponent = () => {
     return <ScrollSync>
         <>
             <Box pb={2}>
-                <CalcRowModal />
+                {(ticker || securityOne) && (
+                    <CalcRowModal />
+                )}
                 <Grid container spacing={3} direction="row" wrap="nowrap">
 
                     {(ticker || securityOne) && (

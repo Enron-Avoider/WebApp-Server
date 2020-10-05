@@ -44,7 +44,7 @@ export default function Table(
         toggleShowGraph,
         isBiggerHACK
     }: {
-        ticker: string,
+        ticker?: string,
         years: number[],
         data: {}[],
         title?: string,
@@ -124,14 +124,14 @@ export default function Table(
                         </Link> :
                         cell.value
                     }
-                    <span
+                    {/* <span
                         title={`quartiles of change`}
                         className="quartiles"
                     >
                         {row.original.changePercentage?.quartiles.map((q: any, i: number) => (
                             <span key={`q${i + 1}`} className={`quartile q${i + 1}`}>{q}%</span>
                         )).reverse()}
-                    </span>
+                    </span> */}
                     {/* 10% 20% 70% 90% */}
                     {/* {row.canExpand ? (row.isExpanded ? <ArrowDropUp /> : <ArrowDropDown />) : null} */}
                 </span>,
