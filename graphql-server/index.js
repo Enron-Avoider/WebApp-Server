@@ -1,26 +1,14 @@
 const { ApolloServer } = require("apollo-server");
 const redis = require("redis");
-const { Pool, Client } = require("pg");
+const S3 = require('aws-sdk/clients/s3');
 
 const { typeDefs } = require("./state/types");
 const {
   MessyFinanceDataAPI,
   MessySectorsAndIndustries,
+  EODDataAPI,
 } = require("./state/data-sources");
 const { stocks, query, mutation } = require("./state/resolvers");
-
-// const pgClient = new Client({
-//   user: "enron",
-//   host: "enron.cunygjbp6jr0.us-east-1.rds.amazonaws.com",
-//   database: "enron",
-//   password: "enronenron",
-//   port: 5432,
-// });
-// pgClient.connect();
-// pgClient.query("SELECT NOW()", (err, res) => {
-//   console.log(err, res);
-//   pgClient.end();
-// });
 
 const redisClient = redis.createClient({
   port: 13082,
@@ -38,6 +26,7 @@ const server = new ApolloServer({
   dataSources: () => ({
     messyFinanceDataAPI: new MessyFinanceDataAPI(redisClient),
     messySectorsAndIndustries: new MessySectorsAndIndustries(redisClient),
+    EODDataAPI: new EODDataAPI(),
   }),
   context: async ({ req }) => ({
     redisClient,

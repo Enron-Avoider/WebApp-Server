@@ -4,6 +4,7 @@ import { useLazyQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
 import SearchIcon from '@material-ui/icons/Search';
 import { MenuItem, MenuList, Paper, InputBase, Typography } from '@material-ui/core';
+import numeral from 'numeral';
 
 import { useStyles } from './styles';
 
@@ -11,10 +12,20 @@ import "./style.sass";
 
 const SEARCH_QUERY = gql`
     query($name: String!) {
-        findSimfinStockByName(name: $name) {
-            name
-            simId
-            ticker
+        # findSimfinStockByName(name: $name) {
+        #     name
+        #     simId
+        #     ticker
+        # }
+        findStock(name: $name) {
+            name,
+            code,
+            exchange,
+            adjusted_close,
+            currency_symbol,
+            market_capitalization,
+            sector,
+            industry
         }
     }
 `;
@@ -66,15 +77,15 @@ export default function StockSearcher() {
                                 loading
                             </MenuItem>
                         )}
-                        {data && data.findSimfinStockByName.map((d: any, i: number) => (
+                        {data && data.findStock.map((d: any, i: number) => (
                             <MenuItem
                                 // className="list-group-item"
-                                key={d.ticker+" "+i}
+                                key={d.code + d.exchange + " " + i}
                                 component={Link}
-                                to={`/stock/${d.ticker}`}
+                                to={`/stock/${d.code}.${d.exchange}`}
                             >
                                 <Typography noWrap={true}>
-                                    {d.name}
+                                    {d.name} ({d.exchange})・ {d.currency_symbol}{numeral(d.market_capitalization).format('(0.00a)')} ・{d.sector} ・{d.industry}
                                 </Typography>
                             </MenuItem>
                         ))}

@@ -19,6 +19,20 @@ const typeDefs = gql`
     # yearlyPrices: [JSON]
   }
 
+  type EODStock {
+    code: String
+    name: String
+    adjusted_close: String
+    exchange: String
+    currency_symbol: String
+    currency_code: String
+    market_capitalization: String
+    sector: String
+    industry: String
+    description: String
+    yearlyFinancials: YearlyFinancials
+  }
+
   type YearlyFinancials {
     years: [Int]
     aggregatedShares: [JSON]
@@ -52,6 +66,9 @@ const typeDefs = gql`
   }
 
   type Query {
+    findStock(name: String): [EODStock]
+    getStockByCode(code: String): EODStock
+
     findSimfinStockByName(name: String): [SimfinStock]
     getSimfinCompanyById(id: String): SimfinStock
     getSimfinCompanyByTicker(name: String): SimfinStock

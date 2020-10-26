@@ -1,10 +1,13 @@
 const { RESTDataSource } = require("apollo-datasource-rest");
-const {
-  financialTableMap,
-  outstandingSharesTableMap,
-  priceTableMap,
-  isolateShares,
-} = require("../dataMaps");
+
+const { SimFinDataMaps } = require("../data-maps");
+
+// const {
+//   financialTableMap,
+//   outstandingSharesTableMap,
+//   priceTableMap,
+//   isolateShares,
+// } = SimFinDataMaps;
 
 module.exports = {
   MessyFinanceDataAPI: class extends RESTDataSource {
@@ -72,7 +75,7 @@ module.exports = {
       this.cachedCall({
         url: `https://simfin.com/api/v1/info/find-id/ticker/${name}?api-key=${this.keys.simfin}`,
         httpCall: "get",
-        save
+        save,
       });
 
     getSimfinCompanyById = async ({ id }) => ({
@@ -196,7 +199,7 @@ module.exports = {
                                 &stype=${statement}
                             `.replace(/\s/g, ""),
                       httpCall: "get",
-                      save
+                      save,
                     }).then((r, e) => r && r.values)
                 )
               )
@@ -211,7 +214,7 @@ module.exports = {
       await this.cachedCall({
         url: `https://simfin.com/api/v1/companies/id/${simId}/shares/aggregated?api-key=${this.keys.simfin}`,
         httpCall: "get",
-        save
+        save,
       }).then((r) => {
         // return r.sort((a, b) => a.date - b.date)
         return r;
@@ -229,11 +232,16 @@ module.exports = {
         ...c,
       }));
 
-    pricesForShareClasses = async ({ simId, shareClassId, years, save = false }) =>
+    pricesForShareClasses = async ({
+      simId,
+      shareClassId,
+      years,
+      save = false,
+    }) =>
       this.cachedCall({
         url: `https://simfin.com/api/v1/companies/id/${simId}/shares/classes/${shareClassId}/prices?api-key=${this.keys.simfin}`,
         httpCall: "get",
-        save
+        save,
       }).then((r) => ({
         ...r,
         priceData: years.map(
@@ -253,17 +261,17 @@ module.exports = {
     allYearlyFinancials = async ({ years, simId }) => {
       const Fn = async () => ({
         years: years,
-        ...financialTableMap(
+        ...SimFinDataMaps.financialTableMap(
           years,
           await this.yearlyFinancials({ years, simId })
         ),
-        aggregatedShares: outstandingSharesTableMap(
+        aggregatedShares: SimFinDataMaps.outstandingSharesTableMap(
           years,
           await this.aggregatedShares({ years, simId })
         ),
         price: await (async (shareClasses) =>
           await [
-            priceTableMap(
+            SimFinDataMaps.priceTableMap(
               years,
               "price",
               await this.pricesForShareClasses({

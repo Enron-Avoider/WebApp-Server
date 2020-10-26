@@ -1,9 +1,6 @@
 const {
-  financialTableMap,
-  outstandingSharesTableMap,
-  priceTableMap,
-  isolateShares,
-} = require("../dataMaps");
+    SimFinDataMaps
+} = require('../data-maps');
 
 module.exports = {
   SimfinStock: {      
@@ -16,7 +13,7 @@ module.exports = {
       return await Promise.all(
         shareClasses.map(
           async (s) =>
-            await priceTableMap(
+            await SimFinDataMaps.priceTableMap(
               _source.years,
               `price ${s.shareClassName}`,
               await dataSources.messyFinanceDataAPI.pricesForShareClasses({

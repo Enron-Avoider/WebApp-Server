@@ -12,9 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "apollo-datasource-rest": "^0.8.1",
-    "apollo-server": "^2.12.0",
+    "apollo-server": "^2.18.2",
     "apollo-server-cache-redis": "^1.1.6",
     "apollo-server-plugin-response-cache": "^0.4.1",
+    "aws-sdk": "^2.767.0",
     "dataloader": "^2.0.0",
     "graphql": "^15.0.0",
     "graphql-type-json": "^0.3.1",
