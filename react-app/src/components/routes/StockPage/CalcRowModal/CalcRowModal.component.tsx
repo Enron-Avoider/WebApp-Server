@@ -53,7 +53,7 @@ export default function NewCalcRowModal() {
 
     const isOpen = !!ticker;
 
-    const stock = data && data.getSimfinCompanyByTicker;
+    const stock = data && data.getStockByCode;
 
     const calcRowOptions = stock ? [
         { path: 'yearlyFinancials.price', tableName: 'Price' },
@@ -70,7 +70,9 @@ export default function NewCalcRowModal() {
                 type: table.tableName
             }))
         ];
-    }, []) : [];
+    }, []).filter(i => i.title) : [];
+
+    console.log({ calcRowOptions });
 
     const history = useHistory();
     const handleClose = () => {

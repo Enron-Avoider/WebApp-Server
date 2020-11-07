@@ -59,13 +59,17 @@ if (isProd) {
   };
 } else {
   config.devServer = {
+    publicPath: "/",
     port: 8080,
     open: true,
     hot: true,
     compress: true,
     stats: "errors-only",
     overlay: true,
-    historyApiFallback: true,
+    // historyApiFallback: true,
+    historyApiFallback: {
+      disableDotRule: true,
+    },
   };
 }
 

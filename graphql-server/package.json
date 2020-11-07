@@ -6,7 +6,8 @@
     "start": "nodemon index.js",
     "dev": "now dev --listen 3000",
     "stage": "now",
-    "prod": "now --prod"
+    "prod": "now --prod",
+    "saveIndustries": "node -e 'require(\"./state/data-sources\").EODDataAPI.saveIndustriesToDB()'"
   },
   "author": "",
   "license": "ISC",
@@ -16,10 +17,12 @@
     "apollo-server-cache-redis": "^1.1.6",
     "apollo-server-plugin-response-cache": "^0.4.1",
     "aws-sdk": "^2.767.0",
+    "csv-parse": "^4.12.0",
     "dataloader": "^2.0.0",
     "graphql": "^15.0.0",
     "graphql-type-json": "^0.3.1",
     "mathjs": "^7.0.0",
+    "mongodb": "^3.6.2",
     "nodemon": "^1.17.5",
     "numeral": "^2.0.6",
     "pg": "^8.3.2",

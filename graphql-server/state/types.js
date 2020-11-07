@@ -24,12 +24,14 @@ const typeDefs = gql`
     name: String
     adjusted_close: String
     exchange: String
+    EDOExchange: String
     currency_symbol: String
     currency_code: String
     market_capitalization: String
     sector: String
     industry: String
     description: String
+    logo: String
     yearlyFinancials: YearlyFinancials
   }
 
@@ -68,6 +70,11 @@ const typeDefs = gql`
   type Query {
     findStock(name: String): [EODStock]
     getStockByCode(code: String): EODStock
+    getSectorStocks(name: String): JSON
+    getIndustryStocks(name: String): JSON
+    saveAllStocksToDB: JSON
+    getAllIndustries: JSON
+    saveIndustriesToDB: JSON
 
     findSimfinStockByName(name: String): [SimfinStock]
     getSimfinCompanyById(id: String): SimfinStock
@@ -78,7 +85,7 @@ const typeDefs = gql`
     getSector(name: String): Sector
     getAllSectors: JSON
     getIndustry(name: String): Industry
-    getAllIndustries: JSON
+    # getAllIndustries: JSON
   }
 
   type Mutation {

@@ -85,6 +85,7 @@ export default function Table(
         [data]
     );
 
+    // console.log({ years });
     // const { ticker, rowTitle } = useParams();
 
     const columns = React.useMemo(() => [

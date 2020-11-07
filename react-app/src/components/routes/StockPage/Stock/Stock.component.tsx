@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
 import { Link } from 'react-router-dom';
+import numeral from 'numeral';
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
@@ -55,8 +56,10 @@ export const Stock: FunctionComponent<{
             variables: { ticker },
         });
 
-        const stock = data && data.getSimfinCompanyByTicker;
+        const stock = data && data.getStockByCode;
         const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
+
+        console.log({ stock });
 
         return <>{
             !loading && !error ? (
@@ -94,18 +97,18 @@ export const Stock: FunctionComponent<{
                                                 </Box>
                                             </Box>
                                             <div>
-                                                {/* <p>Employees: {stock.employees}</p> */}
                                                 <Typography
                                                     display="block"
                                                     noWrap={true}
                                                     variant="body1"
-                                                >{stock.sectorAndIndustry.sector} ・ {stock.sectorAndIndustry.industry}</Typography>
-
-                                                {/* <Typography variant="body1">Share Classes: {
-                                                                stock.shareClasses.map((s: any, i: Number) =>
-                                                                    s.shareClassName + (stock.shareClasses.length - 1 > i ? ', ' : '.')
-                                                                )}
-                                                            </Typography> */}
+                                                >{stock.sector} ・ {stock.industry}</Typography>
+                                            </div>
+                                            <div>
+                                                <Typography
+                                                    display="block"
+                                                    noWrap={true}
+                                                    variant="body1"
+                                                >{(stock.currency_symbol === 'p' ? '£' : stock.currency_symbol) + ' ' + numeral(stock.market_capitalization).format('(0.00a)')}</Typography>
                                             </div>
                                         </div>
                                     </Box>
@@ -129,17 +132,7 @@ export const Stock: FunctionComponent<{
                         />
                     </Paper>
 
-                    {/* <Paper>
-                    <Charts
-                        yearlyFinancials={stock.yearlyFinancials}
-                        calculations={calculationResults}
-                        showPercentage={showPercentage}
-                        toggleShowPercentage={toggleShowPercentage}
-                    />
-                </Paper> */}
-
                     <Paper>
-
                         <Table
                             title={'Shares'}
                             years={stock.yearlyFinancials.years}
@@ -155,11 +148,9 @@ export const Stock: FunctionComponent<{
                             showGraph={showGraph}
                             toggleShowGraph={toggleShowGraph}
                         />
-
                     </Paper>
 
                     <Paper>
-
                         <Box p={2} mt={2}>
 
                             <Box
@@ -169,7 +160,7 @@ export const Stock: FunctionComponent<{
                             >
                                 <Typography variant="h5">
                                     Fin. Statements
-                            </Typography>
+                                </Typography>
 
                                 <ToggleButtonGroup size="small" exclusive value={visibleFinancials} onChange={handleVisibleFinancials} color="primary">
                                     <ToggleButton value="pl">Income Statement</ToggleButton>
@@ -232,7 +223,20 @@ export const Stock: FunctionComponent<{
                                 )}
                             </Grid>
                         </Box>
+                    </Paper>
 
+                    <Paper>
+                        <Box display="flex" flexDirection="row" p={2} mt={2}>
+                            <div>
+                                <Typography variant="h5">
+                                    About
+                                </Typography>
+                                <Typography
+                                    display="block"
+                                    variant="body1"
+                                >{stock.description}</Typography>
+                            </div>
+                        </Box>
                     </Paper>
                 </>
             ) : (
