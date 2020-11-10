@@ -17,12 +17,15 @@ module.exports = {
       dataSources.EODDataAPI.getSectorStocks(params),
     getIndustryStocks: async (_source, params, { dataSources }) =>
       dataSources.EODDataAPI.getIndustryStocks(params),
-    saveAllStocksToDB: async (_source, params, { dataSources }) =>
-      dataSources.EODDataAPI.saveAllStocksToDB(params),
-    getAllIndustries: async (_source, params, { dataSources }) =>
-      dataSources.EODDataAPI.getAllIndustries(params),
-    saveIndustriesToDB: async (_source, params, { dataSources }) =>
-      dataSources.EODDataAPI.saveIndustriesToDB(params),
+
+    // saveAllStocksToDB: async (_source, params, { dataSources }) =>
+    //   dataSources.EODDataAPI.saveAllStocksToDB(params),
+    // getAllIndustries: async (_source, params, { dataSources }) =>
+    //   dataSources.EODDataAPI.getAllIndustries(params),
+    // saveIndustriesToDB: async (_source, params, { dataSources }) =>
+    //   dataSources.EODDataAPI.saveIndustriesToDB(params),
+    // updateStocksInDB: async (_source, params, { dataSources }) =>
+    //   dataSources.EODDataAPI.updateStocksInDB(params),
 
     // simFin
     findSimfinStockByName: async (_source, params, { dataSources }) => [

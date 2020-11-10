@@ -23,6 +23,7 @@ const typeDefs = gql`
     code: String
     name: String
     adjusted_close: String
+    country: String
     exchange: String
     EDOExchange: String
     currency_symbol: String
@@ -75,6 +76,7 @@ const typeDefs = gql`
     saveAllStocksToDB: JSON
     getAllIndustries: JSON
     saveIndustriesToDB: JSON
+    updateStocksInDB: JSON
 
     findSimfinStockByName(name: String): [SimfinStock]
     getSimfinCompanyById(id: String): SimfinStock

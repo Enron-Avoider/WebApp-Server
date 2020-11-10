@@ -62,12 +62,11 @@ module.exports = {
         `
       );
 
-      console.log({ fundamentalData });
-
-      return (Object.keys(fundamentalData).length && fundamentalData.Highlights)
+      return Object.keys(fundamentalData).length && fundamentalData.Highlights
         ? {
             code: fundamentalData.General.Code,
             name: fundamentalData.General.Name,
+            country: fundamentalData.General.CountryName,
             exchange: fundamentalData.General.Exchange,
             EDOExchange:
               fundamentalData.General.CountryISO === "US"
@@ -96,69 +95,44 @@ module.exports = {
     };
 
     getSectorStocks = async ({ name }) => {
-      const insert = await this.mongoDBStocksTable.insertMany([{ a: 1 }]);
-      const getAll = await this.mongoDBStocksTable.find({}).toArray();
-      const deleteAll = await Promise.all(
-        getAll.map(async (obj) => this.mongoDBStocksTable.deleteOne(obj))
-      );
-      console.log({ insert, getAll, deleteAll });
+        const stocks = await this.mongoDBStocksTable.find({
+            sector: name
+        }).toArray();
 
-      const recurse = async (res, offset) => {
-        const call = await this.get(
-          "".concat(
-            "https://eodhistoricaldata.com/api/screener?",
-            `filters=[["sector", "=", "${name}"], ["exchange", "=", "US"]]&`,
-            `api_token=${this.keys.eodhistoricaldata}&`,
-            `sort=market_capitalization.desc&`,
-            `&offset=${offset}`
-          )
-        );
-
-        const r = [...res, ...call.data];
-
-        console.log({ offset, l: r.length });
-
-        if (call.data.length === 0) {
-          return r;
-        } else {
-          return await recurse(r, offset + 50);
+        return {
+            stocks
         }
-      };
-      //   const res = await this.get(
-      //     "".concat(
-      //       "https://eodhistoricaldata.com/api/screener?",
-      //       `filters=[["sector", "=", "${name}"]]&`,
-      //       `api_token=${this.keys.eodhistoricaldata}&`,
-      //       `sort=market_capitalization.desc&`,
-      //       `&offset=50`
-      //     )
-      //   );
-      //   console.log({ l: res.data.length });
-      return await recurse([], 0);
     };
 
-    getIndustryStocks = async ({ name }) => {
-      const recurse = async (res, offset) => {
-        const call = await this.get(
-          "".concat(
-            "https://eodhistoricaldata.com/api/screener?",
-            `filters=[["industry", "=", "${name}"]]&`,
-            `api_token=${this.keys.eodhistoricaldata}&`,
-            `sort=market_capitalization.desc&`,
-            `&offset=${offset}&limit=100`
-          )
-        );
+    getIndustryStocks = async ({ sector, industry, country, exchange  }) => {
+        const stocks = await this.mongoDBStocksTable.find({
+            ...(sector && { sector }),
+            ...(industry && { industry }),
+            ...(country && { country }),
+            ...(exchange && { exchange }),
+        }).toArray();
 
-        const r = [...res, ...call.data];
+        // for every row/calc
+        //  - avg
+        //  - median
+        //  - max
+        //  - min
+        //  - normal distribution
+        //  - percentils
 
-        if (call.data.length < 100 || offset === 900) {
-          return r;
-        } else {
-          return await recurse(r, offset + 100);
+        // countries | exchanges | sectors > industries || rows&calcs | period
+        //    -- percentils/normal distribution --      ||
+        //           stock value | history?             ||
+
+        return {
+            name,
+            stocks,
+            exchanges,
+            countries,
+            sectors,
+            industries,
+            yearlyFinancials
         }
-      };
-
-      return await recurse([], 0);
     };
 
     getAllExchanges = async () => {
@@ -260,11 +234,14 @@ module.exports = {
       const getAllIndustries = await this.mongoDBIndustriesTable
         .find({})
         .toArray();
+      // .splice(100);
 
-    //   const getAllStocks = await this.mongoDBStocksTable.find({}).toArray();
-    //   console.log({
-    //     getAllStocksCount: getAllStocks.length,
-    //   });
+      console.log({ getAllIndustries, l: getAllIndustries.length });
+
+      //   const getAllStocks = await this.mongoDBStocksTable.find({}).toArray();
+      //   console.log({
+      //     getAllStocksCount: getAllStocks.length,
+      //   });
       //   const deleteAllStocks = await Promise.all(
       //     getAllStocks.map(async (obj) =>
       //       this.mongoDBStocksTable.deleteOne({
@@ -278,39 +255,74 @@ module.exports = {
         async (accUnresolved, { sector, industry, stocks }, i) => {
           const accResolved = await accUnresolved;
 
-          const savedIndustryStocks = await stocks.reduce(
-            async (accUnresolved, { code, exchange, industry }, i) => {
+          console.log(`INDUSTRY: ${industry} | ${stocks.length}`);
+
+          const chunkUp = (array, size) => {
+            const chunked_arr = [];
+            let index = 0;
+            while (index < array.length) {
+              chunked_arr.push(array.slice(index, size + index));
+              index += size;
+            }
+            return chunked_arr;
+          };
+
+          const stockBatches = chunkUp(stocks, 150);
+
+          //   console.log(stockBatches.length);
+
+          const savedIndustryStocks = await stockBatches.reduce(
+            async (accUnresolved, stockBatch, i) => {
               const accResolved = await accUnresolved;
 
-              await new Promise((t) => setTimeout(t, 5));
+              await new Promise((t) => setTimeout(t, 500));
 
-              const getThisOne = await this.mongoDBStocksTable
-                .find({
-                  code,
-                  EDOExchange: exchange,
+              //   console.log("stockBatch.length: "+stockBatch.length);
+
+              const workingBatch = await Promise.all(
+                stockBatch.map(async ({ code, exchange, industry }, i) => {
+                  //
+
+                  const getThisOne = await this.mongoDBStocksTable
+                    .find({
+                      code,
+                      EDOExchange: exchange,
+                    })
+                    .toArray();
+
+                  if (getThisOne.length !== 0) {
+                    console.log("EXISTING: " + code + "." + exchange);
+                    return;
+                  } else {
+                    console.log("ADDING: " + code + "." + exchange);
+
+                    const stock = await this.getStockByCode({
+                      code: code + "." + exchange,
+                    });
+
+                    if (Object.keys(stock).length && stock.code !== null) {
+                      const insertOne = await this.mongoDBStocksTable
+                        .insertOne(stock)
+                        .catch((err) => {
+                          console.log({ err });
+                        });
+
+                      console.log(
+                        "ADDED: " +
+                          code +
+                          "." +
+                          exchange +
+                          " | " +
+                          stock.exchange
+                      );
+                    } else {
+                      console.log("NOPE: " + code + "." + exchange);
+                    }
+
+                    return code + "." + exchange;
+                  }
                 })
-                .toArray();
-
-              if (getThisOne.length !== 0) {
-                console.log("EXISTING: " + code + "." + exchange);
-                return [...accResolved];
-              } else {
-                console.log("ADDING: " + code + "." + exchange);
-
-                const stock = await this.getStockByCode({
-                  code: code + "." + exchange,
-                });
-
-                const insertOne = await this.mongoDBStocksTable.insertOne(
-                  stock
-                );
-
-                console.log(
-                  "ADDED: " + code + "." + exchange + " | " + stock.exchange
-                );
-
-                return [...accResolved, code + "." + exchange];
-              }
+              );
             },
             []
           );
@@ -319,7 +331,6 @@ module.exports = {
             ...accResolved,
             {
               industry,
-              stocks: stocks.length,
             },
           ];
         },
@@ -327,6 +338,102 @@ module.exports = {
       );
 
       return saved;
+    };
+
+    updateStocksInDB = async () => {
+      const getAllStocks = await this.mongoDBStocksTable
+        .find({ "yearlyFinancials.pl": null })
+        .toArray();
+      console.log({
+        getAllStocksCount: getAllStocks.length,
+      });
+
+      const chunkUp = (array, size) => {
+        const chunked_arr = [];
+        let index = 0;
+        while (index < array.length) {
+          chunked_arr.push(array.slice(index, size + index));
+          index += size;
+        }
+        return chunked_arr;
+      };
+
+      const stockBatches = chunkUp(getAllStocks, 15);
+
+      console.log("stockBatches.length", stockBatches.length);
+
+      const updatesIndustryStocks = await stockBatches.reduce(
+        async (accUnresolved, stockBatch, i) => {
+          const accResolved = await accUnresolved;
+
+          await new Promise((t) => setTimeout(t, 500));
+
+          console.log("stockBatch.length: " + stockBatch.length);
+
+          const workingBatch = await Promise.all(
+            stockBatch.map(async ({ code, exchange, EDOExchange, _id }, i) => {
+              const getThisOne = await this.mongoDBStocksTable
+                .find({
+                  _id
+                })
+                .toArray();
+
+              if (getThisOne.length !== 0) {
+                console.log(
+                  "EXISTING: " + code + "." + exchange + " - " + EDOExchange
+                );
+
+                if (getThisOne[0].code) {
+                  const stock = await this.getStockByCode({
+                    code: code + "." + EDOExchange,
+                  });
+
+                  const updated = await this.mongoDBStocksTable.updateOne(
+                    {
+                        _id
+                    },
+                    { $set: { ...stock } }
+                  );
+
+                  console.log("updated");
+                } else {
+                  const deleted = await this.mongoDBStocksTable.deleteOne({
+                    _id: getThisOne[0]._id,
+                  });
+                  console.log("_id: " + getThisOne[0]._id);
+                }
+
+                return;
+              } else {
+                console.log("NOT PRESENT!! WAT??: " + code + "." + exchange);
+
+                // const stock = await this.getStockByCode({
+                //   code: code + "." + exchange,
+                // });
+
+                // if (Object.keys(stock).length && stock.code !== null) {
+                //   const insertOne = await this.mongoDBStocksTable
+                //     .insertOne(stock)
+                //     .catch((err) => {
+                //       console.log({ err });
+                //     });
+
+                //   console.log(
+                //     "ADDED: " + code + "." + exchange + " | " + stock.exchange
+                //   );
+                // } else {
+                //   console.log("NOPE: " + code + "." + exchange);
+                // }
+
+                return code + "." + exchange;
+              }
+            })
+          );
+        },
+        []
+      );
+
+      return;
     };
   },
 };

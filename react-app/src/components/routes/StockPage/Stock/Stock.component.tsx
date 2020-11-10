@@ -8,6 +8,7 @@ import numeral from 'numeral';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import PercentagePath from "@assets/icon-paths/percentage";
 import {
     Paper,
     Grid,
@@ -20,8 +21,9 @@ import {
     Button,
     Card,
     CardContent,
+    SvgIcon,
 } from '@material-ui/core';
-import { Equalizer, FilterList } from '@material-ui/icons';
+import { FilterList, Equalizer } from '@material-ui/icons';
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import { GET_CALCULATIONS } from '@state/byModel/calculations/calculations.queries';
@@ -85,32 +87,98 @@ export const Stock: FunctionComponent<{
                             <Grid item xs={9}>
                                 <Paper>
                                     <Box display="flex" flexDirection="row" p={2}>
-                                        <div>
-                                            <Box display="flex" alignItems="center">
-                                                <Typography variant="h5">
-                                                    {stock.name}
-                                                </Typography>
-                                                <Box ml={1}>
+                                        <Box flex="1">
+                                            <Box display="flex" flexDirection="row">
+                                                <Box display="flex" alignItems="center" flex="auto">
                                                     <Typography variant="h5">
-                                                        <b>({ticker})</b>
+                                                        {stock.name}
                                                     </Typography>
+                                                    <Box ml={1}>
+                                                        <Typography variant="h5">
+                                                            <b>({ticker})</b>
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                                <Box>
+                                                    <Typography
+                                                        display="block"
+                                                        noWrap={true}
+                                                    >{(stock.currency_symbol === 'p' ? '£' : stock.currency_symbol) + ' ' + numeral(stock.market_capitalization).format('(0.00a)')}</Typography>
                                                 </Box>
                                             </Box>
-                                            <div>
+                                            <Box mt={1}>
                                                 <Typography
                                                     display="block"
                                                     noWrap={true}
                                                     variant="body1"
-                                                >{stock.sector} ・ {stock.industry}</Typography>
-                                            </div>
-                                            <div>
+                                                >
+                                                    {stock.sector}
+                                                    <IconButton color="primary">
+                                                        <FilterList fontSize="small" />
+                                                    </IconButton>
+                                                    <IconButton color="primary">
+                                                        <SvgIcon fontSize="small" viewBox="0 0 344 344">
+                                                            <path d={PercentagePath} />
+                                                        </SvgIcon>
+                                                    </IconButton>
+                                                    {"   "}
+                                                    {stock.industry}
+                                                    <IconButton color="secondary">
+                                                        <FilterList fontSize="small" />
+                                                    </IconButton>
+                                                    <IconButton color="secondary">
+                                                        <SvgIcon fontSize="small" viewBox="0 0 344 344">
+                                                            <path d={PercentagePath} />
+                                                        </SvgIcon>
+                                                    </IconButton>
+                                                    {/* ・{" "} */}
+                                                </Typography>
+                                            </Box>
+                                            <Box mt={-1} mb={-1}>
                                                 <Typography
                                                     display="block"
                                                     noWrap={true}
                                                     variant="body1"
-                                                >{(stock.currency_symbol === 'p' ? '£' : stock.currency_symbol) + ' ' + numeral(stock.market_capitalization).format('(0.00a)')}</Typography>
-                                            </div>
-                                        </div>
+                                                >
+                                                    {stock.exchange}
+                                                    <IconButton>
+                                                        <FilterList fontSize="small" />
+                                                    </IconButton>
+                                                    <IconButton >
+                                                        <SvgIcon fontSize="small" viewBox="0 0 344 344">
+                                                            <path d={PercentagePath} />
+                                                        </SvgIcon>
+                                                    </IconButton>
+                                                    {"   "}
+                                                    {stock.country}
+                                                    <IconButton>
+                                                        <FilterList fontSize="small" />
+                                                    </IconButton>
+                                                    <IconButton >
+                                                        <SvgIcon fontSize="small" viewBox="0 0 344 344">
+                                                            <path d={PercentagePath} />
+                                                        </SvgIcon>
+                                                    </IconButton>
+                                                </Typography>
+                                            </Box>
+                                            <Box>
+                                                <Typography
+                                                    display="block"
+                                                    noWrap={true}
+                                                    variant="body1"
+                                                >
+                                                    previous year
+                                                    <IconButton color={showPercentage ? 'secondary' : 'primary'} onClick={toggleShowPercentage}>
+                                                        <SvgIcon fontSize="small" viewBox="0 0 344 344">
+                                                            <path d={PercentagePath} />
+                                                        </SvgIcon>
+                                                    </IconButton>
+                                                </Typography>
+                                                {/* <IconButton color={showGraph ? 'secondary' : 'primary'} onClick={toggleShowGraph}>
+                                                    <Equalizer />
+                                                </IconButton> */}
+                                            </Box>
+                                        </Box>
                                     </Box>
                                 </Paper>
                             </Grid>
@@ -182,7 +250,7 @@ export const Stock: FunctionComponent<{
                                                 years={stock.yearlyFinancials.years}
                                                 data={[
                                                     ...stock.yearlyFinancials.pl,
-                                                    ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
+                                                    // ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
                                                 ]}
                                                 isBiggerHACK={true}
                                             />

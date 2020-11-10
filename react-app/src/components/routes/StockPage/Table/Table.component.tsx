@@ -57,7 +57,7 @@ export default function Table(
     }
 ) {
 
-    const  location = useLocation();
+    const location = useLocation();
     const dataWithPercentages = React.useMemo(
         () => data.map((row: any) => ({
             ...row,
@@ -111,6 +111,7 @@ export default function Table(
                         <span className="arrow"><ArrowDropDown /></span> :
                         ''
                     }
+
                     {row.original.type === 'calc' ?
                         <Link
                             component={Link_}
@@ -133,52 +134,52 @@ export default function Table(
                             <span key={`q${i + 1}`} className={`quartile q${i + 1}`}>{q}%</span>
                         )).reverse()}
                     </span> */}
-                    {/* 10% 20% 70% 90% */}
-                    {/* {row.canExpand ? (row.isExpanded ? <ArrowDropUp /> : <ArrowDropDown />) : null} */}
-                </span>,
-            accessor: 'title',
+                    {/* 10% 20% 70% 90% */ }
+                    {/* {row.canExpand ? (row.isExpanded ? <ArrowDropUp /> : <ArrowDropDown />) : null} */ }
+                </span >,
+        accessor: 'title',
             sticky: 'left',
-            width: 170
-        },
+                width: 170
+},
         ...years.map((y: number) => ({
-            Header: y,
-            accessor: `${y}`,
-            width: 90
-        }))
+    Header: y,
+    accessor: `${y}`,
+    width: 90
+}))
     ], []);
 
-    const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        rows,
-        prepareRow,
-        // state: { expanded },
-    } = useTable(
-        {
-            columns,
-            data: dataWithPercentages,
-        },
-        useBlockLayout,
-        useExpanded,
-        useSticky,
-    );
+const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    // state: { expanded },
+} = useTable(
+    {
+        columns,
+        data: dataWithPercentages,
+    },
+    useBlockLayout,
+    useExpanded,
+    useSticky,
+);
 
-    return (
+return (
 
-        <Box p={2} mt={2} position="relative">
+    <Box p={2} mt={2} position="relative">
 
-            {title && (
-                <Box position="relative" mt={-1} display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h5">
-                        {title}
-                    </Typography>
+        {title && (
+            <Box position="relative" mt={-1} display="flex" justifyContent="space-between" alignItems="center">
+                <Typography variant="h5">
+                    {title}
+                </Typography>
 
-                    <Box>
-                        <IconButton color={showPercentage ? 'secondary' : 'primary'} onClick={toggleShowPercentage}>
-                            <SvgIcon viewBox="0 0 344 344">
-                                <path
-                                    d="M 99.00,57.23
+                <Box>
+                    <IconButton color={showPercentage ? 'secondary' : 'primary'} onClick={toggleShowPercentage}>
+                        <SvgIcon viewBox="0 0 344 344">
+                            <path
+                                d="M 99.00,57.23
                                         C 81.98,61.14 68.86,69.77 61.32,86.00
                                             46.16,118.63 69.68,157.58 106.00,158.00
                                             114.15,158.09 122.63,156.87 130.00,153.19
@@ -211,97 +212,111 @@ export default function Table(
                                             262.88,237.01 254.02,256.21 238.00,257.24
                                             217.32,258.57 207.43,231.78 224.02,219.64
                                             228.23,216.55 231.94,215.86 237.00,215.71 Z"
-                                />
-                            </SvgIcon>
-                        </IconButton>
-                        <IconButton color={showGraph ? 'secondary' : 'primary'} onClick={toggleShowGraph}>
-                            <Equalizer />
-                        </IconButton>
-                    </Box>
+                            />
+                        </SvgIcon>
+                    </IconButton>
+                    <IconButton color={showGraph ? 'secondary' : 'primary'} onClick={toggleShowGraph}>
+                        <Equalizer />
+                    </IconButton>
                 </Box>
-            )}
+            </Box>
+        )}
 
-            <Paper elevation={3}>
-                <Box bgcolor="grey.800">
-                    <ScrollSyncPane>
-                        <div {...getTableProps()} className="table sticky">
-                            <div className="header">
-                                {headerGroups.map((headerGroup: any) => (
-                                    <div {...headerGroup.getHeaderGroupProps()} className="tr">
-                                        {headerGroup.headers.map((column: any) => (
-                                            <div {...column.getHeaderProps()} className="th">
-                                                {column.render('Header')}
-                                            </div>
-                                        ))}
-                                    </div>
-                                ))}
-                            </div>
-                            <div {...getTableBodyProps()} className="body">
-                                {rows.map((row: any) => {
-                                    prepareRow(row);
-                                    return (
-                                        <div {...row.getRowProps()} className={`
+        <Paper elevation={3}>
+            <Box bgcolor="grey.800">
+                <ScrollSyncPane>
+                    <div {...getTableProps()} className="table sticky">
+                        <div className="header">
+                            {headerGroups.map((headerGroup: any) => (
+                                <div {...headerGroup.getHeaderGroupProps()} className="tr">
+                                    {headerGroup.headers.map((column: any) => (
+                                        <div {...column.getHeaderProps()} className="th">
+                                            {column.render('Header')}
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                        <div {...getTableBodyProps()} className="body">
+                            {rows.map((row: any) => {
+                                prepareRow(row);
+                                return (
+                                    <div {...row.getRowProps()} className={`
                                             tr
                                             ${row.original.type === 'total' ? 'total' : ''}
                                         `}>
-                                            {row.cells.map((cell: any) => (
-                                                <div
-                                                    {...cell.getCellProps()}
-                                                    className={`
+                                        {row.cells.map((cell: any) => (
+                                            <div
+                                                {...cell.getCellProps()}
+                                                className={`
                                                         td
                                                         ${row.subRows.length ? 'relevant' : ''}
                                                         ${row.original.type === 'calc' ? 'calc' : ''}
-                                                        ${
-                                                        row.original.changePercentage && getQuartile(
-                                                            Number(row.original.changePercentage[cell.column.id]),
-                                                            row.original.changePercentage.quartiles
-                                                        )
-                                                        }
+                                                        ${row.original.changePercentage && getQuartile(
+                                                    Number(row.original.changePercentage[cell.column.id]),
+                                                    row.original.changePercentage.quartiles
+                                                )
+                                                    }
                                                     `}
-                                                    title={
-                                                        cell.column.id !== 'expander' && row.original.changePercentage ? (
-                                                            showPercentage && row.original.changePercentage ?
-                                                                cell.value : `${row.original?.changePercentage[cell?.column?.id]}%`
-                                                        ) : ''
-                                                    }
-                                                >
-                                                    {showPercentage && row.original.changePercentage && cell.column.id !== 'expander' ?
-                                                        `${row.original.changePercentage[cell.column.id]}%` :
-                                                        cell.column.id !== 'expander' ?
-                                                            numeral(cell.value).format('(0.00a)') :
-                                                            cell.render('Cell')
-                                                    }
+                                                title={
+                                                    cell.column.id !== 'expander' && row.original.changePercentage ? (
+                                                        showPercentage && row.original.changePercentage ?
+                                                            cell.value : `${row.original?.changePercentage[cell?.column?.id]}%`
+                                                    ) : ''
+                                                }
+                                            >   <div>
+                                                    <div>
+                                                        {showPercentage && row.original.changePercentage && cell.column.id !== 'expander' ?
+                                                            `${row.original.changePercentage[cell.column.id]}%` :
+                                                            cell.column.id !== 'expander' ?
+                                                                numeral(cell.value).format('(0.00a)') :
+                                                                cell.render('Cell') // 1st col
+                                                        }
+                                                    </div>
+                                                    <div>
+                                                        <small>test</small>
+                                                    </div>
+                                                    <div>
+                                                        <small>test</small>
+                                                    </div>
+                                                    <div>
+                                                        <small>test</small>
+                                                    </div>
+                                                    <div>
+                                                        <small>test</small>
+                                                    </div>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                );
+                            })}
                         </div>
-                    </ScrollSyncPane>
-                </Box>
-            </Paper>
+                    </div>
+                </ScrollSyncPane>
+            </Box>
+        </Paper>
 
-            {showGraph && (
-                <Box
-                    position="absolute"
-                    top="56px"
-                    width="calc(100% - 32px)"
-                    height={`calc(100% - ${isBiggerHACK ? 72 : 81}px)`}
-                    zIndex="1"
-                    bgcolor="grey.800"
-                >
-                    <GraphCard
-                        years={years}
-                        data={dataWithPercentages}
-                        showPercentage={showPercentage}
-                    />
-                </Box>
-            )}
+        {showGraph && (
+            <Box
+                position="absolute"
+                top="56px"
+                width="calc(100% - 32px)"
+                height={`calc(100% - ${isBiggerHACK ? 72 : 81}px)`}
+                zIndex="1"
+                bgcolor="grey.800"
+            >
+                <GraphCard
+                    years={years}
+                    data={dataWithPercentages}
+                    showPercentage={showPercentage}
+                />
+            </Box>
+        )}
 
-            {allowNewCalc && <NewCalcRowButton title={title} ticker={ticker} />}
+        {allowNewCalc && <NewCalcRowButton title={title} ticker={ticker} />}
 
-        </Box>
+    </Box>
 
-    );
+);
 }

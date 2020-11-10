@@ -5,6 +5,7 @@ export const GET_STOCK = gql`
         getStockByCode(code: $ticker) {
             code
             name
+            country
             exchange
             currency_symbol
             currency_code

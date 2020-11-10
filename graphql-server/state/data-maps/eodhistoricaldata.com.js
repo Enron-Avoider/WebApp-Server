@@ -25,12 +25,15 @@ const convertEODFundamentalsToEarlyFinancials = (
       {}
     );
 
+    const lastYearInStatement = Object.keys(yearFormat)[
+      Object.keys(yearFormat).length - 1
+    ];
+
     const rows =
       Object.entries(yearFormat).length &&
-      Object.entries(
-        yearFormat[yearRange[yearRange.length - 1]] ||
-          yearFormat[yearRange[yearRange.length - 2]]
-      ).map(([key, value]) => key);
+      Object.entries(yearFormat[lastYearInStatement]).map(
+        ([key, value]) => key
+      );
 
     const tableFormat = rows
       ? rows.map((r) => ({
@@ -46,6 +49,153 @@ const convertEODFundamentalsToEarlyFinancials = (
       : [];
 
     return tableFormat;
+  };
+
+  const convertToUSD = () => {
+    // TODO!!
+    // get currency - USD convertion for the period
+    // convert
+  };
+
+  const organizeTable = (statement, statementKey) => {
+    const maps = {
+      pl: [
+        {
+          title: "Total Revenue",
+          oldTitle: "totalRevenue",
+          // subRows: []
+        },
+        {
+          title: "Cost of Revenue",
+          oldTitle: "costOfRevenue",
+        },
+        {
+          title: "Gross Profit",
+          oldTitle: "grossProfit",
+        },
+        {
+          title: "Operating Expenses",
+          oldTitle: "totalOperatingExpenses",
+        },
+        {
+          title: "Operating Income",
+          oldTitle: "operatingIncome",
+        },
+        {
+          title: "Net Non Operating Interest",
+          oldTitle: "netInterestIncome",
+        },
+        {
+          title: "Other Income Expense",
+          oldTitle: "totalOtherIncomeExpenseNet",
+        },
+        {
+          title: "Pretax Income",
+          oldTitle: "incomeBeforeTax",
+        },
+        {
+          title: "Tax Provision",
+          oldTitle: "taxProvision",
+        },
+        {
+          title: "Net Income Common Stockholders",
+          oldTitle: "netIncomeApplicableToCommonShares",
+        },
+        {
+          title: "EBIT",
+          oldTitle: "ebit",
+        },
+      ],
+      bs: [
+        {
+          title: "Assets",
+          oldTitle: "totalAssets",
+          subRows: [
+            {
+              title: "Current Assets",
+              oldTitle: "totalCurrentAssets",
+            },
+            {
+              title: "Non-current assets",
+              oldTitle: "nonCurrentAssetsTotal",
+            },
+          ],
+        },
+        {
+          title: "Liabilities",
+          oldTitle: "totalLiab",
+          subRows: [
+            {
+              title: "Current Assets",
+              oldTitle: "totalCurrentLiabilities",
+            },
+            {
+              title: "Non-current Liabilities",
+              oldTitle: "nonCurrentLiabilitiesTotal",
+            },
+          ],
+        },
+        {
+          title: "Equity",
+          oldTitle: "totalStockholderEquity",
+        },
+      ],
+      cf: [
+        {
+          title: "Operating Cash Flow",
+          oldTitle: "totalCashFromOperatingActivities",
+        },
+        {
+          title: "Investing Cash Flow",
+          oldTitle: "totalCashflowsFromInvestingActivities",
+        },
+        {
+          title: "Financing Cash Flow",
+          oldTitle: "totalCashFromFinancingActivities",
+        },
+      ],
+    };
+
+    return [
+      ...maps[statementKey].map((row) => ({
+        ...statement.find((row2) => row2.title === row.oldTitle),
+        title: row.title,
+        EODTitle: row.oldTitle,
+        ...(row.type && { type: row.type }),
+        ...(row.subRows && {
+          subRows: row.subRows.map((row3) => ({
+            ...statement.find((row2) => row2.title === row3.oldTitle),
+            title: row3.title,
+            EODTitle: row3.oldTitle,
+          })),
+        }),
+      })),
+      {
+        title: "Not Organized Yet",
+        ...yearRange.reduce(
+          (acc, y) => ({
+            ...acc,
+            [y]: null,
+          }),
+          {}
+        ),
+        subRows: [
+          ...statement.filter(
+            (row) =>
+              !maps[statementKey]
+                .reduce(
+                  (acc, row2) => [
+                    ...acc,
+                    { ...row2 },
+                    ...(row2.subRows ? row2.subRows : []),
+                  ],
+                  []
+                )
+                .find((row2) => row2.oldTitle === row.tile)
+          ),
+        ],
+      },
+    ];
   };
 
   const pricesByYear = yearRange.reduce(
@@ -113,17 +263,23 @@ const convertEODFundamentalsToEarlyFinancials = (
   return {
     years: yearRange,
     ...(yearRange.length && {
-      pl: convertStatementToTable(
-        fundamentalData.Financials.Income_Statement.yearly,
-        yearRange
+      pl: ((table) => organizeTable(table, "pl"))(
+        convertStatementToTable(
+          fundamentalData.Financials.Income_Statement.yearly,
+          yearRange
+        )
       ),
-      bs: convertStatementToTable(
-        fundamentalData.Financials.Balance_Sheet.yearly,
-        yearRange
+      bs: ((table) => organizeTable(table, "bs"))(
+        convertStatementToTable(
+          fundamentalData.Financials.Balance_Sheet.yearly,
+          yearRange
+        )
       ),
-      cf: convertStatementToTable(
-        fundamentalData.Financials.Cash_Flow.yearly,
-        yearRange
+      cf: ((table) => organizeTable(table, "cf"))(
+        convertStatementToTable(
+          fundamentalData.Financials.Cash_Flow.yearly,
+          yearRange
+        )
       ),
     }),
     price: [pricesByYear],
