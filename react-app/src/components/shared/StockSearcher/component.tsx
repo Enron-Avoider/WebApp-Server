@@ -12,11 +12,6 @@ import "./style.sass";
 
 const SEARCH_QUERY = gql`
     query($name: String!) {
-        # findSimfinStockByName(name: $name) {
-        #     name
-        #     simId
-        #     ticker
-        # }
         findStock(name: $name) {
             name,
             code,
@@ -79,7 +74,7 @@ export default function StockSearcher() {
                         )}
                         {data && data.findStock.map((d: any, i: number) => (
                             <MenuItem
-                                // className="list-group-item"
+                                className="list-group-item"
                                 key={d.code + d.exchange + " " + i}
                                 component={Link}
                                 to={`/stock/${d.code}.${d.exchange}`}

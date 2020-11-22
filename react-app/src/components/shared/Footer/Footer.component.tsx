@@ -1,5 +1,7 @@
 import React from 'react';
 import { Box, Link } from '@material-ui/core';
+import { Twitter } from '@material-ui/icons';
+// import { Grid, Box, Button, Menu, MenuItem, useMediaQuery, Badge } from '@material-ui/core';
 
 import './style.sass';
 
@@ -12,7 +14,16 @@ export default function Footer() {
                 <Box>
                     <b>Why</b>: The less boring Data is, the easiest it is to look deeper.
                 </Box>
-                <Box>
+                <Box display="flex">
+                    <b>Who</b>: 
+                        <Link href="https://twitter.com/esperancaJS" color="primary" target="_blank">
+                            <Box display="flex" alignItems="center">
+                                <Twitter fontSize="small" />
+                                @esperancaJS
+                            </Box>
+                        </Link>
+                </Box>
+                {/* <Box>
                     <b>Data from</b>:
                     {' '}
                     <Link href="https://simfin.com/" color="primary" target="_blank">
@@ -38,7 +49,7 @@ export default function Footer() {
                         Join
                     </Link>{' '}
                     our next Video Call to discuss new features!
-                </Box>
+                </Box> */}
             </Box>
         </>
     );

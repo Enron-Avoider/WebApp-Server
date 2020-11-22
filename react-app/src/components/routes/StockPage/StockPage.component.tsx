@@ -73,7 +73,7 @@ export const StockPage: FunctionComponent = () => {
                 <Grid container spacing={3} direction="row" wrap="nowrap">
 
                     {(ticker || securityOne) && (
-                        <Grid item xs={(tickertwo || securityTwo) ? 6 : 11}>
+                        <Grid item xs={(tickertwo || securityTwo) ? 6 : 12}>
                             <Stock
                                 ticker={ticker || (securityOne && securityOne.replace('stock-', ''))}
                                 visibleFinancials={visibleFinancials}
@@ -86,7 +86,7 @@ export const StockPage: FunctionComponent = () => {
                         </Grid>
                     )}
 
-                    {(tickertwo || securityTwo) && (
+                    {/* {(tickertwo || securityTwo) && (
                         <Grid item xs={6}>
                             <Stock
                                 ticker={tickertwo || (securityTwo && securityTwo.replace('stock-', ''))}
@@ -154,9 +154,9 @@ export const StockPage: FunctionComponent = () => {
                                 toggleShowGraph={toggleShowGraph}
                             />
                         </Grid>
-                    )}
+                    )} */}
 
-                    <Grid item xs={1}>
+                    {/* <Grid item xs={1}>
                         <Box
                             position="sticky"
                             top="88px"
@@ -175,13 +175,7 @@ export const StockPage: FunctionComponent = () => {
                                         <Box position="absolute" right="0" top="0">
                                             <Card>
                                                 <CardContent>
-                                                    <MenuList
-                                                    // id="simple-menuList-2"
-                                                    // anchorEl={anchorEl}
-                                                    // keepMounted
-                                                    // open={Boolean(anchorEl)}
-                                                    // onClose={handleClose}
-                                                    >
+                                                    <MenuList>
                                                         <Box display="flex" flexDirection="column" justifyContent="center" alignContent="center">
                                                             <Box my={1} mx={2}>
                                                                 <Button
@@ -252,45 +246,7 @@ export const StockPage: FunctionComponent = () => {
                                 )}
                             </Box>
                         </Box>
-
-                        {/* {showAddCard && (
-                            <>
-                                <Box mt={2}>
-                                    <Grid container spacing={3}>
-                                        <Grid item xs={8}>
-                                            <Paper>
-                                                <Box p={2} height={88}>
-                                                </Box>
-                                            </Paper>
-                                        </Grid>
-                                        <Grid item xs={4} container>
-                                            <Box flex={1}>
-                                                <Paper style={{ height: '100%' }}>
-                                                    <Box
-                                                        height={88}
-                                                    ></Box>
-                                                </Paper>
-                                            </Box>
-                                        </Grid>
-                                    </Grid>
-                                </Box>
-
-                                <Paper>
-                                    <Box m="16px" height={153}>
-                                        <Box width="1000px" />
-                                    </Box>
-                                </Paper>
-
-                                <Paper>
-                                    <Box m="16px" height={227} />
-                                </Paper>
-
-                                <Paper>
-                                    <Box m="16px" height={676} />
-                                </Paper>
-                            </>
-                        )} */}
-                    </Grid>
+                    </Grid> */}
                 </Grid>
             </Box>
         </>

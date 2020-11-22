@@ -279,12 +279,6 @@ return (
                                                     <div>
                                                         <small>test</small>
                                                     </div>
-                                                    <div>
-                                                        <small>test</small>
-                                                    </div>
-                                                    <div>
-                                                        <small>test</small>
-                                                    </div>
                                                 </div>
                                             </div>
                                         ))}

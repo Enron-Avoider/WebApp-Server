@@ -72,7 +72,7 @@ export default function NewCalcRowModal() {
         ];
     }, []).filter(i => i.title) : [];
 
-    console.log({ calcRowOptions });
+    // console.log({ calcRowOptions });
 
     const history = useHistory();
     const handleClose = () => {

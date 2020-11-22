@@ -1,8 +1,5 @@
 import React, { useState, FunctionComponent } from 'react';
-import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/react-hooks";
-import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
-import { Link } from 'react-router-dom';
 import numeral from 'numeral';
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
@@ -32,6 +29,7 @@ import { doCalculations } from '../calculations'
 import Table from '../Table';
 import Charts from '../Charts';
 import './style.sass';
+import Comparer from '../Comparer';
 
 export const Stock: FunctionComponent<{
     ticker: string,
@@ -69,8 +67,8 @@ export const Stock: FunctionComponent<{
 
                     <Box mt={2}>
 
-                        <Grid container spacing={3}>
-                            <Grid item xs={3} container>
+                        <Grid container spacing={2}>
+                            {/* <Grid item xs={2} container>
                                 <Box flex={1}>
                                     <Paper style={{ height: '100%' }}>
                                         <Box
@@ -83,103 +81,66 @@ export const Stock: FunctionComponent<{
                                         </Box>
                                     </Paper>
                                 </Box>
-                            </Grid>
-                            <Grid item xs={9}>
-                                <Paper>
+                            </Grid> */}
+                            <Grid item xs={5}>
+                                <Paper style={{ height: '100%' }}>
                                     <Box display="flex" flexDirection="row" p={2}>
-                                        <Box flex="1">
-                                            <Box display="flex" flexDirection="row">
-                                                <Box display="flex" alignItems="center" flex="auto">
-                                                    <Typography variant="h5">
-                                                        {stock.name}
-                                                    </Typography>
-                                                    <Box ml={1}>
+                                        <Box flex="1" maxWidth="100%">
+                                            <Box display="flex" flexDirection="column" justifyContent="space-between">
+                                                <Box display="flex" flexDirection="row">
+                                                    <Box display="flex" alignItems="center" flex="auto">
                                                         <Typography variant="h5">
-                                                            <b>({ticker})</b>
+                                                            {stock.name}
                                                         </Typography>
+                                                        <Box ml={1}>
+                                                            <Typography variant="h5">
+                                                                <b>({ticker})</b>
+                                                            </Typography>
+                                                        </Box>
+                                                    </Box>
+                                                    <Box
+                                                        display="flex"
+                                                        alignItems="center"
+                                                        justifyContent="center"
+                                                    // height="100%"
+                                                    >
+                                                        <Avatar variant="rounded" src={`//${stock.logo}`} />
                                                     </Box>
                                                 </Box>
-                                                <Box>
+                                                <Box my={2}>
+                                                    <Typography
+                                                        display="block"
+                                                        noWrap={true}
+                                                        variant="body1"
+                                                    >
+                                                        {stock.sector}
+                                                        {" "}・{" "}
+                                                        {stock.industry}
+                                                    </Typography>
+                                                    <Typography
+                                                        display="block"
+                                                        noWrap={true}
+                                                        variant="body1"
+                                                    >
+                                                        {stock.exchange}
+                                                        {" "}・{" "}
+                                                        {stock.country}
+                                                    </Typography>
+                                                </Box>
+                                                <Box mt={2}>
                                                     <Typography
                                                         display="block"
                                                         noWrap={true}
                                                     >{(stock.currency_symbol === 'p' ? '£' : stock.currency_symbol) + ' ' + numeral(stock.market_capitalization).format('(0.00a)')}</Typography>
                                                 </Box>
                                             </Box>
-                                            <Box mt={1}>
-                                                <Typography
-                                                    display="block"
-                                                    noWrap={true}
-                                                    variant="body1"
-                                                >
-                                                    {stock.sector}
-                                                    <IconButton color="primary">
-                                                        <FilterList fontSize="small" />
-                                                    </IconButton>
-                                                    <IconButton color="primary">
-                                                        <SvgIcon fontSize="small" viewBox="0 0 344 344">
-                                                            <path d={PercentagePath} />
-                                                        </SvgIcon>
-                                                    </IconButton>
-                                                    {"   "}
-                                                    {stock.industry}
-                                                    <IconButton color="secondary">
-                                                        <FilterList fontSize="small" />
-                                                    </IconButton>
-                                                    <IconButton color="secondary">
-                                                        <SvgIcon fontSize="small" viewBox="0 0 344 344">
-                                                            <path d={PercentagePath} />
-                                                        </SvgIcon>
-                                                    </IconButton>
-                                                    {/* ・{" "} */}
-                                                </Typography>
-                                            </Box>
-                                            <Box mt={-1} mb={-1}>
-                                                <Typography
-                                                    display="block"
-                                                    noWrap={true}
-                                                    variant="body1"
-                                                >
-                                                    {stock.exchange}
-                                                    <IconButton>
-                                                        <FilterList fontSize="small" />
-                                                    </IconButton>
-                                                    <IconButton >
-                                                        <SvgIcon fontSize="small" viewBox="0 0 344 344">
-                                                            <path d={PercentagePath} />
-                                                        </SvgIcon>
-                                                    </IconButton>
-                                                    {"   "}
-                                                    {stock.country}
-                                                    <IconButton>
-                                                        <FilterList fontSize="small" />
-                                                    </IconButton>
-                                                    <IconButton >
-                                                        <SvgIcon fontSize="small" viewBox="0 0 344 344">
-                                                            <path d={PercentagePath} />
-                                                        </SvgIcon>
-                                                    </IconButton>
-                                                </Typography>
-                                            </Box>
-                                            <Box>
-                                                <Typography
-                                                    display="block"
-                                                    noWrap={true}
-                                                    variant="body1"
-                                                >
-                                                    previous year
-                                                    <IconButton color={showPercentage ? 'secondary' : 'primary'} onClick={toggleShowPercentage}>
-                                                        <SvgIcon fontSize="small" viewBox="0 0 344 344">
-                                                            <path d={PercentagePath} />
-                                                        </SvgIcon>
-                                                    </IconButton>
-                                                </Typography>
-                                                {/* <IconButton color={showGraph ? 'secondary' : 'primary'} onClick={toggleShowGraph}>
-                                                    <Equalizer />
-                                                </IconButton> */}
-                                            </Box>
                                         </Box>
                                     </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={7}>
+                                <Paper style={{ height: '100%' }}>
+                                    <Comparer stock={stock} />
                                 </Paper>
                             </Grid>
                         </Grid>

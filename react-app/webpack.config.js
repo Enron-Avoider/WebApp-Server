@@ -9,9 +9,7 @@ console.log({ e: process.env.NODE_ENV, __dirname });
 
 const config = {
   mode: isProd ? "production" : "development",
-  entry: {
-    index: "./src/index.tsx",
-  },
+  entry: ['react-hot-loader/patch', "./src/index.tsx"],
   output: {
     path: `${__dirname}/dist`,
     publicPath: "/",
@@ -66,10 +64,14 @@ if (isProd) {
     compress: true,
     stats: "errors-only",
     overlay: true,
-    // historyApiFallback: true,
     historyApiFallback: {
       disableDotRule: true,
     },
+    watchOptions: {
+        aggregateTimeout: 500,
+        poll: 3000,
+        ignored: 'node_modules/**'
+    }
   };
 }
 

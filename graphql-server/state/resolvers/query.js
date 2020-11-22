@@ -13,10 +13,8 @@ module.exports = {
 
     getStockByCode: async (_source, params, { dataSources }) =>
       dataSources.EODDataAPI.getStockByCode(params),
-    getSectorStocks: async (_source, params, { dataSources }) =>
-      dataSources.EODDataAPI.getSectorStocks(params),
-    getIndustryStocks: async (_source, params, { dataSources }) =>
-      dataSources.EODDataAPI.getIndustryStocks(params),
+    getAggregate: async (_source, params, { dataSources }) =>
+      dataSources.EODDataAPI.getAggregate(params),
 
     // saveAllStocksToDB: async (_source, params, { dataSources }) =>
     //   dataSources.EODDataAPI.saveAllStocksToDB(params),

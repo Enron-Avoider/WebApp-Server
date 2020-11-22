@@ -228,37 +228,41 @@ const convertEODFundamentalsToEarlyFinancials = (
         {}
       );
 
-      return [
-        {
-          title: "outstandingShares",
-          ...yearRange.reduce(
-            (acc, y) => ({
-              ...acc,
-              [y]: yearSharesFormat[y],
-            }),
-            {}
-          ),
-        },
-      ];
+      return {
+        title: "outstandingShares",
+        ...yearRange.reduce(
+          (acc, y) => ({
+            ...acc,
+            [y]: yearSharesFormat[y],
+          }),
+          {}
+        ),
+      };
     } else {
-      return [
-        {
-          title: "outstandingShares",
-          warning: "value for last year only, past years are incorrect",
-          ...yearRange.reduce(
-            (acc, y) => ({
-              ...acc,
-              [y]: fundamentalData.SharesStats.SharesOutstanding,
-            }),
-            {}
-          ),
-        },
-      ];
+      return {
+        title: "outstandingShares",
+        warning: "value for last year only, past years are incorrect",
+        ...yearRange.reduce(
+          (acc, y) => ({
+            ...acc,
+            [y]: fundamentalData.SharesStats.SharesOutstanding,
+          }),
+          {}
+        ),
+      };
     }
     // .outstandingShares
     // Financials.commonStockSharesOutstanding
     // Financials.commonStockSharesOutstanding
   })();
+
+  const marketCap = yearRange.reduce(
+    (acc, y) => ({
+      ...acc,
+      [y]: (() => pricesByYear[y] * aggregatedShares[y])(),
+    }),
+    { title: "Market Cap" }
+  );
 
   return {
     years: yearRange,
@@ -283,10 +287,37 @@ const convertEODFundamentalsToEarlyFinancials = (
       ),
     }),
     price: [pricesByYear],
-    aggregatedShares,
+    aggregatedShares: [aggregatedShares],
+    marketCap: [marketCap]
   };
 };
 
+const yearlyFinancialsWithKeys = (yearlyFinancials) => Object.entries(yearlyFinancials).reduce(
+    (p, [k, v]) => ({
+      ...p,
+      [k]:
+        k === "years"
+          ? v
+          : v.reduce(
+              (p, c) => ({
+                ...p,
+                [c.title]: {
+                  ...c,
+                  ...(c.subRows && {
+                    subRows: c.subRows.reduce((p_, c_) => ({
+                      ...p_,
+                      [c_.title]: c_,
+                    })),
+                  }),
+                },
+              }),
+              {}
+            ),
+    }),
+    {}
+  );
+
 module.exports = {
   convertEODFundamentalsToEarlyFinancials,
+  yearlyFinancialsWithKeys
 };

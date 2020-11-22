@@ -1,3 +1,4 @@
+import { hot } from 'react-hot-loader/root';
 import React from 'react';
 import {
     BrowserRouter as Router,
@@ -11,7 +12,7 @@ import { Container, Box } from '@material-ui/core';
 import Header from '@components/shared/Header';
 import Footer from '@components/shared/Footer';
 
-export default function App() {
+function App() {
     return (
         <>
             <Router>
@@ -23,39 +24,11 @@ export default function App() {
                             path="/todo"
                             component={loadable(() => import('./components/routes/TodoPage'))}
                         />
-
-                        <Route
-                            path="/stock/:ticker/calculations/:tableName/:rowTitle"
-                            component={loadable(() => import('./components/routes/StockPage'))}
-                        />
-                        <Route
-                            path="/stock/:ticker/stock/:tickertwo"
-                            component={loadable(() => import('./components/routes/StockPage'))}
-                        />
                         <Route
                             path="/stock/:ticker"
                             component={loadable(() => import('./components/routes/StockPage'))}
                         />
-                        <Route
-                            path="/compare/:securityOne/:securityTwo/:securityThree/:securityFour/:securityFive/:securitySix"
-                            component={loadable(() => import('./components/routes/StockPage'))}
-                        />
-                        <Route
-                            path="/compare/:securityOne/:securityTwo/:securityThree/:securityFour/:securityFive"
-                            component={loadable(() => import('./components/routes/StockPage'))}
-                        />
-                        <Route
-                            path="/compare/:securityOne/:securityTwo/:securityThree/:securityFour"
-                            component={loadable(() => import('./components/routes/StockPage'))}
-                        />
-                        <Route
-                            path="/compare/:securityOne/:securityTwo/:securityThree"
-                            component={loadable(() => import('./components/routes/StockPage'))}
-                        />
-                        <Route
-                            path="/compare/:securityOne/:securityTwo"
-                            component={loadable(() => import('./components/routes/StockPage'))}
-                        />
+                        
                         <Route
                             path="/sector/:sector"
                             component={loadable(() => import('./components/routes/SectorsAndIndustries'))}
@@ -89,7 +62,7 @@ export default function App() {
                             )
                         })} */}
 
-                        <Redirect from="/" to="/stock/BRKA" />
+                        <Redirect from="/" to="/stock/BRK-B" />
 
 
 
@@ -100,3 +73,4 @@ export default function App() {
         </>
     );
 }
+export default hot(App);

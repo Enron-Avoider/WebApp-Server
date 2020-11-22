@@ -34,12 +34,14 @@ const typeDefs = gql`
     description: String
     logo: String
     yearlyFinancials: YearlyFinancials
+    yearlyFinancialsWithKeys: JSON
   }
 
   type YearlyFinancials {
     years: [Int]
     aggregatedShares: [JSON]
     price: [JSON]
+    marketCap: [JSON]
     pl: [JSON]
     bs: [JSON]
     cf: [JSON]
@@ -71,8 +73,13 @@ const typeDefs = gql`
   type Query {
     findStock(name: String): [EODStock]
     getStockByCode(code: String): EODStock
-    getSectorStocks(name: String): JSON
-    getIndustryStocks(name: String): JSON
+    getAggregate(
+      sector: String
+      industry: String
+      country: String
+      exchange: String
+    ): JSON
+
     saveAllStocksToDB: JSON
     getAllIndustries: JSON
     saveIndustriesToDB: JSON

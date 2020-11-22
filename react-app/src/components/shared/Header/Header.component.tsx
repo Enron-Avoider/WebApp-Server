@@ -53,13 +53,13 @@ export default function Header() {
                                     <Grid item >
                                         <Typography variant="h6">
                                             Enron Avoider
-                                    </Typography>
+                                        </Typography>
                                     </Grid>
                                     <Grid item>
                                         <Box mt={-1}>
                                             <Typography variant="subtitle1">
                                                 ask why.
-                                        </Typography>
+                                            </Typography>
                                         </Box>
                                     </Grid>
                                 </Grid>
@@ -68,71 +68,40 @@ export default function Header() {
 
 
                         <Box display="flex" overflow="visible" alignItems="center">
-                            {!sm && (
-                                <>
-                                    <Box display="flex" flexDirection="row">
-                                        <Box m={1}>
-                                            <Button
-                                                startIcon={`🏦`}
-                                                variant="contained"
-                                                color="secondary"
-                                                component={Link}
-                                                to="/stock/BRKA"
-                                            >
-                                                Berkshire
-                                </Button>
-                                        </Box>
-                                        <Box m={1}>
-                                            <Button
-                                                startIcon={`👍`}
-                                                variant="contained"
-                                                color="primary"
-                                                component={Link}
-                                                to="/stock/FB"
-                                            >
-                                                Facebook
-                                </Button>
-                                        </Box>
-                                        <Box m={1}>
-                                            <Button
-                                                startIcon={`🛰`}
-                                                variant="contained"
-                                                color="secondary"
-                                                component={Link}
-                                                to="/stock/GOOG"
-                                            >
-                                                Google
-                                </Button>
-                                        </Box>
-                                        <Box m={1}>
-                                            <Button
-                                                startIcon={`🚛`}
-                                                variant="contained"
-                                                color="secondary"
-                                                component={Link}
-                                                to="/stock/AMZN"
-                                            >
-                                                Amazon
-                                </Button>
-                                        </Box>
-                                        <Box m={1}>
-                                            <Button
-                                                startIcon={`🚘`}
-                                                variant="contained"
-                                                color="secondary"
-                                                component={Link}
-                                                to="/stock/TSLA"
-                                            >
-                                                Tesla
-                                </Button>
-                                        </Box>
+
+                            {/* <>
+                                <Box display="flex" flexDirection="row">
+                                    <Box m={1}>
+                                        <Button
+                                            // startIcon={`🏦`}
+                                            variant="contained"
+                                            color="secondary"
+                                            component={Link}
+                                            to="/stock/BRK-B"
+                                        >
+                                            Berkshire
+                                        </Button>
                                     </Box>
-                                </>
-                            )}
 
-                            <StockSearcher />
+                                    <Box m={1}>
+                                        <Button
+                                            // startIcon={`👍`}
+                                            variant="contained"
+                                            color="secondary"
+                                            component={Link}
+                                            to="/stock/FB"
+                                        >
+                                            Facebook
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            </> */}
 
-                            {sm && (
+                            {/* {!sm && ( */}
+                                <StockSearcher />
+                            {/* )} */}
+
+                            {/* {sm && (
                                 <Box ml={2}>
                                     <IconButton aria-label="menu" onClick={handleClick}>
                                         <MenuIcon />
@@ -147,69 +116,12 @@ export default function Header() {
                                     >
                                         <Box display="flex" flexDirection="column" justifyContent="center" alignContent="center">
                                             <Box my={1} mx={2}>
-                                                <Button
-                                                    startIcon={`🏦`}
-                                                    variant="contained"
-                                                    color="secondary"
-                                                    component={Link}
-                                                    to="/stock/BRKA"
-                                                    fullWidth
-                                                >
-                                                    Berkshire
-                                    </Button>
-                                            </Box>
-                                            <Box my={1} mx={2}>
-                                                <Button
-                                                    startIcon={`👍`}
-                                                    variant="contained"
-                                                    color="secondary"
-                                                    component={Link}
-                                                    to="/stock/FB"
-                                                    fullWidth
-                                                >
-                                                    Facebook
-                                    </Button>
-                                            </Box>
-                                            <Box my={1} mx={2}>
-                                                <Button
-                                                    startIcon={`🛰`}
-                                                    variant="contained"
-                                                    color="secondary"
-                                                    component={Link}
-                                                    to="/stock/GOOG"
-                                                    fullWidth
-                                                >
-                                                    Google
-                                    </Button>
-                                            </Box>
-                                            <Box my={1} mx={2}>
-                                                <Button
-                                                    startIcon={`🚛`}
-                                                    variant="contained"
-                                                    color="secondary"
-                                                    component={Link}
-                                                    to="/stock/AMZN"
-                                                    fullWidth
-                                                >
-                                                    Amazon
-                                    </Button>
-                                            </Box>
-                                            <Box my={1} mx={2}>
-                                                <Button
-                                                    startIcon={`🚘`}
-                                                    variant="contained"
-                                                    color="secondary"
-                                                    component={Link}
-                                                    to="/stock/TSLA"
-                                                    fullWidth
-                                                >
-                                                    Tesla
-                                    </Button>
+                                                <StockSearcher />
                                             </Box>
                                         </Box>
                                     </Menu>
                                 </Box>
-                            )}
+                            )} */}
                         </Box>
                     </Box>
                 </Toolbar>

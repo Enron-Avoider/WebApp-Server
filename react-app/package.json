@@ -4,7 +4,7 @@
     "start": "npm run serve:dev",
     "build": "cross-env NODE_ENV=production webpack --color --progress",
     "serve:dist": "serve dist",
-    "serve:dev": "cross-env NODE_ENV=development webpack-dev-server --color --progress",
+    "serve:dev": "cross-env NODE_ENV=development webpack-dev-server",
     "serve:staging": "cross-env NODE_ENV=staging webpack-dev-server --color --progress",
     "serve:production": "cross-env NODE_ENV=production webpack-dev-server --color --progress",
     "update": "aws s3 sync ./dist s3://www.enron.monster --profile pedro"
@@ -38,6 +38,7 @@
     "react-charts": "^2.0.2-next.6",
     "react-d3-radar": "^1.0.0-rc6",
     "react-dom": "^16.12.0",
+    "react-hot-loader": "^4.13.0",
     "react-resize-detector": "^4.2.3",
     "react-router-dom": "^5.1.2",
     "react-scroll-sync": "^0.7.1",
@@ -74,5 +75,6 @@
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.11.0"
-  }
+  },
+  "name": "react-app"
 }
