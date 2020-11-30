@@ -11,17 +11,21 @@ export default function Footer() {
             <Box pt={4}></Box>
             <hr />
             <Box pb={4}>
-                <Box>
-                    <b>Why</b>: The less boring Data is, the easiest it is to look deeper.
+                <Box display="flex">
+                    <b>Why</b>:
+                    <Box ml={1}>
+                        The less boring Data is, the easiest it is to look deeper.
+                    </Box>
                 </Box>
                 <Box display="flex">
-                    <b>Who</b>: 
+                    <b>Who</b>:
+                    <Box ml={1}>
                         <Link href="https://twitter.com/esperancaJS" color="primary" target="_blank">
                             <Box display="flex" alignItems="center">
-                                <Twitter fontSize="small" />
-                                @esperancaJS
+                                <Twitter fontSize="inherit" /> @esperancaJS
                             </Box>
                         </Link>
+                    </Box>
                 </Box>
                 {/* <Box>
                     <b>Data from</b>:

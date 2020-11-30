@@ -28,6 +28,10 @@ function App() {
                             path="/stock/:ticker"
                             component={loadable(() => import('./components/routes/StockPage'))}
                         />
+                        <Route
+                            path="/screener"
+                            component={loadable(() => import('./components/routes/AggregatePage'))}
+                        />
                         
                         <Route
                             path="/sector/:sector"

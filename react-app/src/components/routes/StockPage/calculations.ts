@@ -17,25 +17,18 @@ export const calculations: CalculationType[] = [
         onTable: 'Income Statement',
         title: 'Income per Share',
         scope: {
-            a: 'yearlyFinancials.pl[Net Income Available to Common Shareholders]',
-            b: 'yearlyFinancials.aggregatedShares[common-outstanding-basic]',
+            a: 'yearlyFinancials.pl.Net Income Available to Common Shareholders',
+            b: 'yearlyFinancials.aggregatedShares.common-outstanding-basic',
         },
         calc: 'a/b',
     },
 ];
 
 export const scopeToRows = (scope: { [key: string]: string }, stock: any,) => Object.entries(scope)
-    .filter(([key, value]: any) => !!value && key !== '__typename')
-    .reduce((acc: any, [key, value]: any, i: number) => ({
+    .filter(([k, v]: any) => !!v && k !== '__typename')
+    .reduce((acc: any, [k, v]: any, i: number) => ({
         ...acc,
-        [key]: (([table, row]) => {
-            if (row) {
-                return deepFind(stock, table)
-                    .find((row_: any) => row_.title === row)
-            } else {
-                return deepFind(stock, table)
-            }
-        })(value.replace(']', '').split('[')),
+        [k]: deepFind(stock, 'yearlyFinancialsWithKeys.'+v),
     }), {});
 
 export const doCalculations = (

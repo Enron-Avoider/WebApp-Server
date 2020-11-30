@@ -56,6 +56,8 @@ export const Stock: FunctionComponent<{
             variables: { ticker },
         });
 
+        console.log({ calculations });
+
         const stock = data && data.getStockByCode;
         const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
 

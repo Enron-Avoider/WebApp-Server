@@ -273,12 +273,12 @@ return (
                                                                 cell.render('Cell') // 1st col
                                                         }
                                                     </div>
-                                                    <div>
+                                                    {/* <div>
                                                         <small>test</small>
                                                     </div>
                                                     <div>
                                                         <small>test</small>
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                             </div>
                                         ))}

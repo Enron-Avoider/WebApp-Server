@@ -288,11 +288,12 @@ const convertEODFundamentalsToEarlyFinancials = (
     }),
     price: [pricesByYear],
     aggregatedShares: [aggregatedShares],
-    marketCap: [marketCap]
+    marketCap: [marketCap],
   };
 };
 
-const yearlyFinancialsWithKeys = (yearlyFinancials) => Object.entries(yearlyFinancials).reduce(
+const yearlyFinancialsWithKeys = (yearlyFinancials) =>
+  Object.entries(yearlyFinancials).reduce(
     (p, [k, v]) => ({
       ...p,
       [k]:
@@ -304,10 +305,13 @@ const yearlyFinancialsWithKeys = (yearlyFinancials) => Object.entries(yearlyFina
                 [c.title]: {
                   ...c,
                   ...(c.subRows && {
-                    subRows: c.subRows.reduce((p_, c_) => ({
-                      ...p_,
-                      [c_.title]: c_,
-                    })),
+                    subRows: c.subRows.reduce(
+                      (p_, c_) => ({
+                        ...p_,
+                        [c_.title]: c_,
+                      }),
+                      {}
+                    ),
                   }),
                 },
               }),
@@ -317,7 +321,151 @@ const yearlyFinancialsWithKeys = (yearlyFinancials) => Object.entries(yearlyFina
     {}
   );
 
+const yearlyFinancialsForTable = (yearlyFinancialsWithKeys) =>
+  Object.entries(yearlyFinancialsWithKeys).reduce(
+    (p, [k, v]) => ({
+      ...p,
+      [k]:
+        k === "years"
+          ? v
+          : v.reduce(
+              (p, c) => [
+                ...p,
+                {
+                  ...c,
+                  ...(c.subRows && {
+                    subRows: c.subRows.reduce(
+                      (p_, c_) => [...p_, { ...c_ }],
+                      []
+                    ),
+                  }),
+                },
+              ],
+              []
+            ),
+    }),
+    {}
+  );
+
+const yearlyFinancialsFlatByYear = (yearlyFinancialsWithKeys) => {
+  //   const keys = Object.entries(yearlyFinancials).reduce(
+  //     (p, [k, v]) => [
+  //       ...p,
+  //       ...(k === "years"
+  //         ? []
+  //         : v.reduce(
+  //             (p, c) => [
+  //               ...p,
+  //               [k, c.title],
+  //               ...(c.subRows
+  //                 ? c.subRows.reduce(
+  //                     (p_, c_) => [...p_, [k, c.title, c_.title]],
+  //                     []
+  //                   )
+  //                 : []),
+  //             ],
+  //             []
+  //           )),
+  //     ],
+  //     //   [k]:
+  //     //     k === "years"
+  //     //       ? v
+  //     //       : v.reduce(
+  //     //           (p, c) => [
+  //     //             ...p,
+  //     //             {
+  //     //               ...c,
+  //     //               ...(c.subRows && {
+  //     //                 subRows: c.subRows.reduce(
+  //     //                   (p_, c_) => [
+  //     //                     ...p_,
+  //     //                     { ...c_ },
+  //     //                   ],
+  //     //                   []
+  //     //                 ),
+  //     //               }),
+  //     //             },
+  //     //           ],
+  //     //           []
+  //     //         ),
+  //     // }),
+  //     []
+  //   );
+
+  //   const res = yearlyFinancials.years.map((year) => ({
+  //     year,
+  //     ...keys.reduce(
+  //       (p, k) => ({
+  //         ...p,
+  //         [k.reduce(
+  //           (p, c, i) => `${p}${i > 0 ? "." : ""}${i === 2 ? "subRows." : ""}${c}`
+  //         )]:
+  //           k.length === 2
+  //             ? yearlyFinancialsWithKeys[k[0]][k[1]][year] || 0
+  //             : k.length === 3
+  //             ? yearlyFinancialsWithKeys[k[0]][k[1]].subRows[k[2]][year] || 0
+  //             : null,
+  //       }),
+  //       {}
+  //     ),
+  //   }));
+
+  const res2 = yearlyFinancialsWithKeys.years.map((year) => ({
+    year,
+    ...Object.entries(yearlyFinancialsWithKeys).reduce(
+      (p, [k, v]) => ({
+        ...p,
+        ...(k !== "years" && {
+          [k]: Object.entries(v).reduce(
+            (p_, [k_, v_]) => ({
+              ...p_,
+              [k_]: {
+                v: yearlyFinancialsWithKeys[k][k_][year] || 0,
+                ...(v_.subRows && {
+                  subRows: Object.entries(v_.subRows).reduce(
+                    (p__, [k__, v__]) => ({
+                      ...p__,
+                      [k__]: {
+                        v: yearlyFinancialsWithKeys[k][k_].subRows[k__][year] || 0,
+                      }
+                    }),
+                    {}
+                  ),
+                }),
+              },
+            }),
+            {}
+          ),
+        }),
+
+        // k === "years"
+        //   ? {}
+        //   : v.reduce(
+        //       (p, c) => [
+        //         ...p,
+        //         {
+        //           ...c,
+        //           ...(c.subRows && {
+        //             subRows: c.subRows.reduce(
+        //               (p_, c_) => [...p_, { ...c_ }],
+        //               []
+        //             ),
+        //           }),
+        //         },
+        //       ],
+        //       {}
+        //     ),
+      }),
+      {}
+    ),
+  }));
+
+  return res2;
+};
+
 module.exports = {
   convertEODFundamentalsToEarlyFinancials,
-  yearlyFinancialsWithKeys
+  yearlyFinancialsWithKeys,
+  yearlyFinancialsForTable,
+  yearlyFinancialsFlatByYear,
 };

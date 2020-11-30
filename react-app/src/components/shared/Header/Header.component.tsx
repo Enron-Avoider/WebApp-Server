@@ -49,7 +49,7 @@ export default function Header() {
                                 <Box mr={2}>
                                     <img className={classes.logo} src={logoImg} />
                                 </Box>
-                                <Grid container direction="column">
+                                <Grid container direction="column" justify="center">
                                     <Grid item >
                                         <Typography variant="h6">
                                             Enron Avoider

@@ -1,29 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import { useLazyQuery } from "@apollo/react-hooks";
-import { gql } from "apollo-boost";
 import SearchIcon from '@material-ui/icons/Search';
 import { MenuItem, MenuList, Paper, InputBase, Typography } from '@material-ui/core';
 import numeral from 'numeral';
 
+import { SEARCH_QUERY } from '@state/byModel/Stocks/stocks.queries';
+
 import { useStyles } from './styles';
 
 import "./style.sass";
-
-const SEARCH_QUERY = gql`
-    query($name: String!) {
-        findStock(name: $name) {
-            name,
-            code,
-            exchange,
-            adjusted_close,
-            currency_symbol,
-            market_capitalization,
-            sector,
-            industry
-        }
-    }
-`;
 
 export default function StockSearcher() {
 

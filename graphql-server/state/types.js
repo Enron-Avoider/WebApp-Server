@@ -35,6 +35,8 @@ const typeDefs = gql`
     logo: String
     yearlyFinancials: YearlyFinancials
     yearlyFinancialsWithKeys: JSON
+    yearlyFinancialsForTable: JSON
+    yearlyFinancialsByYear: JSON
   }
 
   type YearlyFinancials {
@@ -78,6 +80,8 @@ const typeDefs = gql`
       industry: String
       country: String
       exchange: String
+      calcs: String
+      wtv: String
     ): JSON
 
     saveAllStocksToDB: JSON

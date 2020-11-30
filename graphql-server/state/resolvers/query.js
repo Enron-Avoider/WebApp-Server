@@ -22,8 +22,8 @@ module.exports = {
     //   dataSources.EODDataAPI.getAllIndustries(params),
     // saveIndustriesToDB: async (_source, params, { dataSources }) =>
     //   dataSources.EODDataAPI.saveIndustriesToDB(params),
-    // updateStocksInDB: async (_source, params, { dataSources }) =>
-    //   dataSources.EODDataAPI.updateStocksInDB(params),
+    updateStocksInDB: async (_source, params, { dataSources }) =>
+      dataSources.EODDataAPI.updateStocksInDB(params),
 
     // simFin
     findSimfinStockByName: async (_source, params, { dataSources }) => [

@@ -60,19 +60,38 @@ export default function NewCalcRowModal() {
         { path: 'yearlyFinancials.aggregatedShares', tableName: 'Aggregated Shares' },
         { path: 'yearlyFinancials.bs', tableName: 'Balance Sheet' },
         { path: 'yearlyFinancials.cf', tableName: 'Cash Flow' },
-        { path: 'yearlyFinancials.pl', tableName: 'Income Statement' }
+        { path: 'yearlyFinancials.pl', tableName: 'Income Statement' },
+        { path: 'yearlyFinancials.marketCap', tableName: 'Market Cap' }
     ].reduce((acc: any, table: any) => {
         return [
             ...acc,
-            ...deepFind(stock, table.path).map((row: any) => ({
-                value: `${table.path}[${row.title}]`,
-                title: row.title,
-                type: table.tableName
-            }))
+            ...deepFind(stock, table.path).reduce((p: any, row: any) => [
+                ...p,
+                {
+                    value: `${table.path}.${row.title}`.replace('yearlyFinancials.', ''),
+                    title: row.title,
+                    type: table.tableName
+                },
+                ...row.subRows ?
+                    row.subRows.reduce((p_: any, row_: any) => [
+                        ...p_,
+                        {
+                            value: `${table.path}.${row.title}.subRows.${row_.title}`.replace('yearlyFinancials.', ''),
+                            title: row.title + ' - ' + row_.title,
+                            type: table.tableName
+                        }
+                    ], []) :
+                    []
+            ], []),
+            // ...(deepFind(stock, table.path).subRows) ? deepFind(stock, table.path).subRows.map((row: any) => ({
+            //     value: `${table.path}.subRows[${row.title}]`,
+            //     title: row.title,
+            //     type: table.tableName
+            // })): []
         ];
     }, []).filter(i => i.title) : [];
 
-    // console.log({ calcRowOptions });
+    console.log({ calcRowOptions, df: deepFind(stock, 'yearlyFinancials.bs') });
 
     const history = useHistory();
     const handleClose = () => {
