@@ -38,7 +38,7 @@ export default function NewCalcRowModal() {
         rowTitle: q.get('ratio') || '',
         ticker: q.get('ticker') || '',
     }))(new URLSearchParams(location.search));
-    console.log({ rowTitle, ticker, location });
+    // console.log({ rowTitle, ticker, location });
     // const { ticker, rowTitle, tableName } = useParams();
     const { loading, error, data } = useQuery(GET_STOCK, {
         variables: { ticker },
@@ -91,7 +91,7 @@ export default function NewCalcRowModal() {
         ];
     }, []).filter(i => i.title) : [];
 
-    console.log({ calcRowOptions, df: deepFind(stock, 'yearlyFinancials.bs') });
+    // console.log({ calcRowOptions, df: deepFind(stock, 'yearlyFinancials.bs') });
 
     const history = useHistory();
     const handleClose = () => {

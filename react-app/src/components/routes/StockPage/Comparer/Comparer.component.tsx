@@ -98,6 +98,22 @@ export const Comparer: FunctionComponent<{
                             </Box>
                         ))}
                     </Box>
+                    <Box pb={2}>
+                        <Typography variant="h5">
+                            By:
+                        </Typography>
+                    </Box>
+                    <Box flex="1" display="flex">
+                        <Box marginRight="10px">
+                            <Chip clickable={true} label="Mean" />
+                        </Box>
+                        <Box marginRight="10px">
+                            <Chip color="primary" clickable={true} label="Median" />
+                        </Box>
+                        <Box marginRight="10px">
+                            <Chip clickable={true} label="Ranking" />
+                        </Box>
+                    </Box>
                 </Box>
             </>
         );

@@ -24,6 +24,7 @@ import { FilterList, Equalizer } from '@material-ui/icons';
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import { GET_CALCULATIONS } from '@state/byModel/calculations/calculations.queries';
+import { GET_AGGREGATE_FOR_STOCK } from '@state/byModel/Aggregate/aggregate.queries';
 
 import { doCalculations } from '../calculations'
 import Table from '../Table';
@@ -59,9 +60,20 @@ export const Stock: FunctionComponent<{
         console.log({ calculations });
 
         const stock = data && data.getStockByCode;
+
+        const { loading: loading__, error: error__, data: aggregate_for_stock } = !loading && !error ? useQuery(GET_AGGREGATE_FOR_STOCK, {
+            variables: {
+                sector: stock.sector,
+                industry: stock.industry,
+                country: stock.country,
+                exchange: stock.exchange,
+                // calcs: stock.sector,
+            },
+        }): {};
+
         const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
 
-        console.log({ stock });
+        console.log({ stock, aggregate_for_stock });
 
         return <>{
             !loading && !error ? (
@@ -170,7 +182,6 @@ export const Stock: FunctionComponent<{
                             data={
                                 [
                                     ...stock.yearlyFinancials.price,
-                                    // ...stock.shareClasses,
                                     ...stock.yearlyFinancials.aggregatedShares
                                 ]
                             }

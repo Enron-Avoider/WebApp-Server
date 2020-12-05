@@ -41,7 +41,6 @@ export const doCalculations = (
             const calc = years.reduce((acc: any, year: any, i: number) => ({
                 ...acc,
                 [`${year}`]:
-
                     (() => {
                         try {
                             return math.evaluate(
@@ -55,7 +54,7 @@ export const doCalculations = (
                             )
                         }
                         catch (e) {
-                            return 0;
+                            return null;
                         }
                     })()
 

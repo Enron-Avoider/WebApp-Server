@@ -2,6 +2,7 @@ const { RESTDataSource } = require("apollo-datasource-rest");
 const parse = require("csv-parse");
 
 const { EODDataMaps } = require("../data-maps");
+const mathToMongo = require("../utils/mathToMongo");
 
 module.exports = {
   EODDataAPI: class extends RESTDataSource {
@@ -108,7 +109,7 @@ module.exports = {
               : null,
             yearlyFinancials,
             yearlyFinancialsWithKeys,
-            yearlyFinancialsByYear
+            // yearlyFinancialsByYear
           }
         : {};
     };
@@ -329,6 +330,198 @@ module.exports = {
       };
     };
 
+    getAggregateForStock = async ({ sector, industry, country, exchange, calcs }) => {
+      const defaultRows = async () =>
+        await this.mongoDBStocksTable
+          .aggregate([
+            {
+              $match: {
+                ...(sector && { sector }),
+                ...(industry && { industry }),
+                ...(country && { country }),
+                ...(exchange && { exchange }),
+              },
+            },
+            {
+              $unwind: {
+                path: "$yearlyFinancialsByYear",
+              },
+            },
+            {
+              $facet: {
+                ...EODDataMaps.rowKeysPaths
+                  .map((k) => ({
+                    fieldName: k.replace(/\./g, "_"),
+                    path: `yearlyFinancialsByYear.${k}.v`,
+                  }))
+                  .reduce(
+                    (p, { fieldName, path }) => ({
+                      ...p,
+                      [fieldName]: [
+                        {
+                          $project: {
+                            name: 1,
+                            "yearlyFinancialsByYear.year": 1,
+                            [path]: { $toDecimal: `$${path}` },
+                          },
+                        },
+                        {
+                          $sort: {
+                            [path]: -1,
+                          },
+                        },
+                        {
+                          $group: {
+                            _id: {
+                              year: "$yearlyFinancialsByYear.year",
+                            },
+                            [`count`]: {
+                              $sum: 1,
+                            },
+                            [`sum`]: {
+                              $sum: `$${path}`,
+                            },
+                            [`avg`]: {
+                              $avg: `$${path}`,
+                            },
+                            [`companies`]: {
+                              $push: {
+                                company: "$name",
+                                [fieldName]: `$${path}`,
+                              },
+                            },
+                          },
+                        },
+                        {
+                          $sort: {
+                            "_id.year": -1,
+                          },
+                        },
+                      ],
+                    }),
+                    {}
+                  ),
+              },
+            },
+          ])
+          .toArray();
+
+      const calcRows = async () => {
+        // const calcs_ = [
+        //   {
+        //     title: "Market Cap",
+        //     scope: {
+        //       a: "aggregatedShares.outstandingShares",
+        //       b: "price.price",
+        //     },
+        //     calc: "a*b",
+        //   },
+        // ];
+
+        const calcs_ = calcs.map((c) => {
+          const paths = Object.values(c.scope).map(
+            (v) => `yearlyFinancialsByYear.${v}.v`
+          );
+
+          return {
+            fieldName: c.title.replace(/\./g, "_"),
+            calc: mathToMongo(
+              c.calc,
+              paths.map((p) => `$${p}`)
+            ),
+            paths,
+          };
+        });
+
+        return await this.mongoDBStocksTable
+          .aggregate([
+            {
+              $match: {
+                ...(sector && { sector }),
+                ...(industry && { industry }),
+                ...(country && { country }),
+                ...(exchange && { exchange }),
+              },
+            },
+            {
+              $unwind: {
+                path: "$yearlyFinancialsByYear",
+              },
+            },
+            {
+              $addFields: {
+                ...calcs_.reduce(
+                  (p, { fieldName, calc, paths }) => ({
+                    ...p,
+                    [`calc_${fieldName}`]: calc,
+                  }),
+                  {}
+                ),
+              },
+            },
+            {
+              $facet: {
+                ...calcs_
+                  .reduce(
+                    (p, { fieldName, calc, paths }) => ({
+                      ...p,
+                      [`calc_${fieldName}`]: [
+                        {
+                          $project: {
+                            name: 1,
+                            "yearlyFinancialsByYear.year": 1,
+                            [`calc_${fieldName}`]: 1
+                          },
+                        },
+                        {
+                          $sort: {
+                            [`calc_${fieldName}`]: -1,
+                          },
+                        },
+                        {
+                          $group: {
+                            _id: {
+                              year: "$yearlyFinancialsByYear.year",
+                            },
+                            [`count`]: {
+                              $sum: 1,
+                            },
+                            [`sum`]: {
+                              $sum: `$${`calc_${fieldName}`}`,
+                            },
+                            [`avg`]: {
+                              $avg: `$${`calc_${fieldName}`}`,
+                            },
+                            [`companies`]: {
+                              $push: {
+                                company: "$name",
+                                [`calc_${fieldName}`]: `$${`calc_${fieldName}`}`,
+                              },
+                            },
+                          },
+                        },
+                        {
+                          $sort: {
+                            "_id.year": -1,
+                          },
+                        },
+                      ],
+                    }),
+                    {}
+                  ),
+              },
+            },
+          ])
+          .toArray();
+      };
+
+      return {
+        query: { sector, industry, country, exchange },
+        ...calcs && { calcRows: (await calcRows())[0] },
+        defaultRows: (await defaultRows())[0],
+      };
+    };
+
     getAllExchanges = async () => {
       return await this.get(`
         https://eodhistoricaldata.com/api/exchanges-list/?api_token=${this.keys.eodhistoricaldata}
@@ -536,9 +729,9 @@ module.exports = {
 
     updateStocksInDB = async () => {
       const getAllStocks = await this.mongoDBStocksTable
-        .find({})
-        .skip(200)
-        .limit(2000)
+        .find({ yearlyFinancialsByYear: { $exists: false } })
+        .skip(0)
+        .limit(1000)
         .toArray();
 
       console.log({

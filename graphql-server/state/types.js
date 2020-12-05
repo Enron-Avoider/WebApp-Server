@@ -80,7 +80,16 @@ const typeDefs = gql`
       industry: String
       country: String
       exchange: String
-      calcs: String
+      calcs: [JSON]
+      wtv: String
+    ): JSON
+
+    getAggregateForStock(
+      sector: String
+      industry: String
+      country: String
+      exchange: String
+      calcs: [JSON]
       wtv: String
     ): JSON
 
