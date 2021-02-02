@@ -23,8 +23,9 @@ import {
 import { FilterList, Equalizer } from '@material-ui/icons';
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
-import { GET_CALCULATIONS } from '@state/byModel/calculations/calculations.queries';
+import { GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
 import { GET_AGGREGATE_FOR_STOCK } from '@state/byModel/Aggregate/aggregate.queries';
+// import getStock from '@state/effects/getStock.effect';
 
 import { doCalculations } from '../calculations'
 import Table from '../Table';
@@ -59,24 +60,44 @@ export const Stock: FunctionComponent<{
 
         console.log({ calculations });
 
+        // const { stock } = getStock({ ticker });
+        // console.log({ stock });
+
         const stock = data && data.getStockByCode;
 
         const { loading: loading__, error: error__, data: aggregate_for_stock } = !loading && !error ? useQuery(GET_AGGREGATE_FOR_STOCK, {
             variables: {
-                sector: stock.sector,
+                // sector: stock.sector,
                 industry: stock.industry,
-                country: stock.country,
-                exchange: stock.exchange,
+                // country: stock.country,
+                // exchange: stock.exchange,
                 // calcs: stock.sector,
             },
-        }): {};
+        }) : {};
 
         const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
 
-        console.log({ stock, aggregate_for_stock });
+        // const mergedStockAndAggregateYearlyFinancials = stock && aggregate_for_stock && (Object.entries(stock.yearlyFinancials) as any)
+        //     .filter(([key, value]: any) => !!value && key !== '__typename')
+        //     .reduce(
+        //         (p: any, [k, v]: any) => ({
+        //             ...p,
+        //             [k]: (k === "years") ? v : v.map((v_: any) => ({
+        //                 ...v_,
+        //                 aggregate: aggregate_for_stock.getAggregateForStock.defaultRows[`${k}_${v_.title}`],
+        //                 ...v_.subRows ? v_.subRows.map((v__: any) => ({
+        //                     ...v__,
+        //                     aggregate: aggregate_for_stock.getAggregateForStock.defaultRows[`${k}_${v_.title}_${v__.title}`],
+        //                 })) : []
+        //             }))
+        //         }),
+        //         {}
+        //     );
+
+        // console.log({ stock, aggregate_for_stock, mergedStockAndAggregateYearlyFinancials });
 
         return <>{
-            !loading && !error ? (
+            stock ? (
                 <>
 
                     <Box mt={2}>
@@ -192,7 +213,7 @@ export const Stock: FunctionComponent<{
                         />
                     </Paper>
 
-                    <Paper>
+                    {/* <Paper>
                         <Box p={2} mt={2}>
 
                             <Box
@@ -223,7 +244,7 @@ export const Stock: FunctionComponent<{
                                                 toggleShowGraph={toggleShowGraph}
                                                 years={stock.yearlyFinancials.years}
                                                 data={[
-                                                    ...stock.yearlyFinancials.pl,
+                                                    ...mergedStockAndAggregateYearlyFinancials.pl,
                                                     // ...calculationResults.filter((c: any) => c.onTable === 'Income Statement')
                                                 ]}
                                                 isBiggerHACK={true}
@@ -265,7 +286,7 @@ export const Stock: FunctionComponent<{
                                 )}
                             </Grid>
                         </Box>
-                    </Paper>
+                    </Paper> */}
 
                     <Paper>
                         <Box display="flex" flexDirection="row" p={2} mt={2}>

@@ -15,7 +15,10 @@ import {
     CardContent,
     Button,
     ClickAwayListener,
-    SvgIcon
+    SvgIcon,
+    Popper,
+    MenuList,
+    MenuItem,
 } from '@material-ui/core';
 import { ArrowDropDown, Equalizer } from '@material-ui/icons';
 const math = require("mathjs");
@@ -80,6 +83,24 @@ export default function Table(
         isBiggerHACK?: boolean
     }
 ) {
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [companyList, setCompanyList] = React.useState([]);
+    const handleClick = (event: any, companies: any) => {
+        console.log({
+            t: event.currentTarget
+        });
+        setAnchorEl(event.currentTarget === anchorEl ? null : event.currentTarget);
+        setCompanyList(companies);
+
+    };
+    const open = Boolean(anchorEl);
+    const handleClickAway = (e: any) => {
+        if (!Object.assign({}, e.target.dataset).clicker) {
+            setAnchorEl(null);
+            setCompanyList([]);
+        }
+    }
 
     const location = useLocation();
 
@@ -164,19 +185,19 @@ export default function Table(
                                             tr
                                             ${row.original.type === 'total' ? 'total' : ''}
                                         `}>
-                                            {row.cells.map((cell: any) => (
+                                            {row.cells.map((cell: any, i: number) => (
                                                 <div
                                                     {...cell.getCellProps()}
                                                     className={`
                                                         td
                                                         ${row.subRows.length ? 'relevant' : ''}
                                                     `}
-                                                    // title={
-                                                    //     cell.column.id !== 'expander' && changePercentage ? (
-                                                    //         showPercentage && changePercentage ?
-                                                    //             cell.value : `${changePercentage[cell?.column?.id]}%`
-                                                    //     ) : ''
-                                                    // }
+                                                // title={
+                                                //     cell.column.id !== 'expander' && changePercentage ? (
+                                                //         showPercentage && changePercentage ?
+                                                //             cell.value : `${changePercentage[cell?.column?.id]}%`
+                                                //     ) : ''
+                                                // }
                                                 >
                                                     <div className={`
                                                         ${cell.column.id === 'expander' && `pl-${row.depth}`}
@@ -185,10 +206,9 @@ export default function Table(
                                                             ${cell.column.id === 'expander' ?
                                                                 `${row.original.type === 'calc' ? 'calc' : ''}` :
                                                                 `
-                                                                    quartile ${changePercentage && getQuartile(
-                                                                        Number(changePercentage[cell.column.id]),
-                                                                        changePercentage.quartiles
-                                                                    )}
+                                                                    quartile ${changePercentage &&
+                                                                getQuartile(Number(changePercentage[cell.column.id]), changePercentage.quartiles)
+                                                                }
                                                                 `
                                                             }
                                                         `}>
@@ -224,10 +244,21 @@ export default function Table(
                                                             }
                                                         </div>
                                                         <div>
-                                                            <small>{cell.column.id}</small>
+                                                            <small>{
+                                                                cell.column.id === 'expander' ?
+                                                                    'industry > Internet Content & Information'
+                                                                    : `${cell.column.id} - ${i}`
+                                                            }</small>
                                                         </div>
                                                         <div>
-                                                            <small>{row.original.title}</small>
+                                                            <small>{
+                                                                cell.column.id === 'expander' ? 'Title' :
+                                                                    row.original.aggregate && row.original.aggregate[i] &&
+                                                                    <span data-clicker="true" onClick={e => handleClick(e, row.original.aggregate[i].companies)}>
+                                                                        {/* {numeral(row.original.aggregate[i].avg?.$numberDecimal).format('(0.00a)')} */}
+                                                                        🙏
+                                                                    </span>
+                                                            }</small>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -241,7 +272,26 @@ export default function Table(
                 </Box>
             </Paper>
 
-            {showGraph && (
+            <Popper open={open} anchorEl={anchorEl} style={{ zIndex: 1 }}>
+                <ClickAwayListener onClickAway={handleClickAway}>
+                    <Paper>
+                        <Box overflow="auto" height="300px">
+                            <MenuList>
+                                {companyList.map((c: any) =>
+                                    <MenuItem>
+                                        <Box display="flex" justifyContent="space-between" width="100%">
+                                            <span>{c.company}</span>
+                                            <span>{numeral(c.v.$numberDecimal).format('(0.00a)')}</span>
+                                        </Box>
+                                    </MenuItem>
+                                )}
+                            </MenuList>
+                        </Box>
+                    </Paper>
+                </ClickAwayListener>
+            </Popper>
+
+            {/* {showGraph && (
                 <Box
                     position="absolute"
                     top="56px"
@@ -256,7 +306,7 @@ export default function Table(
                         showPercentage={showPercentage}
                     />
                 </Box>
-            )}
+            )} */}
 
             {allowNewCalc && <NewCalcRowButton title={title} ticker={ticker} />}
 

@@ -54,21 +54,7 @@ function App() {
                             component={loadable(() => import('./components/routes/SectorsAndIndustries'))}
                         />
 
-                        {/* {[...new Array(2)].map((route, i) => {
-                            const path = `${[...new Array(i)].reduce((a, c, j) => `${a}/s/:ticker${j}`, '/s/:ticker')}`;
-                            console.log({ path })
-                            return (
-                                <Route
-                                    path={path}
-                                    key={i}
-                                    component={() => <p>teeeest wtf {path}</p>}
-                                />
-                            )
-                        })} */}
-
                         <Redirect from="/" to="/stock/BRK-B" />
-
-
 
                     </Switch>
                     <Footer />

@@ -42,7 +42,9 @@ console.log({ env, todoResolvers, calculationsResolvers });
         cache.writeData({
             data: {
                 todos: [],
-                calculations: []
+                calculations: [],
+                searchedStocks: [], // TODO
+                compareWith: {},    // TODO
             }
         });
     }

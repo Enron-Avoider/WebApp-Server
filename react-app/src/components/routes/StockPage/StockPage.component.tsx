@@ -25,7 +25,7 @@ import AddIcon from '@material-ui/icons/Add';
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import { GET_INDUSTRY, GET_SECTOR } from '@state/byModel/IndustriesAndSectors/industriesAndSectors.queries';
-import { GET_CALCULATIONS } from '@state/byModel/calculations/calculations.queries';
+import { GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
 
 import { doCalculations } from './calculations'
 import Table from './Table';
@@ -67,186 +67,21 @@ export const StockPage: FunctionComponent = () => {
     return <ScrollSync>
         <>
             <Box pb={2}>
-                {(ticker || securityOne) && (
+                {(ticker) && (
                     <CalcRowModal />
                 )}
                 <Grid container spacing={3} direction="row" wrap="nowrap">
-
-                    {(ticker || securityOne) && (
-                        <Grid item xs={(tickertwo || securityTwo) ? 6 : 12}>
-                            <Stock
-                                ticker={ticker || (securityOne && securityOne.replace('stock-', ''))}
-                                visibleFinancials={visibleFinancials}
-                                handleVisibleFinancials={handleVisibleFinancials}
-                                showPercentage={showPercentage}
-                                toggleShowPercentage={toggleShowPercentage}
-                                showGraph={showGraph}
-                                toggleShowGraph={toggleShowGraph}
-                            />
-                        </Grid>
-                    )}
-
-                    {/* {(tickertwo || securityTwo) && (
-                        <Grid item xs={6}>
-                            <Stock
-                                ticker={tickertwo || (securityTwo && securityTwo.replace('stock-', ''))}
-                                visibleFinancials={visibleFinancials}
-                                handleVisibleFinancials={handleVisibleFinancials}
-                                showPercentage={showPercentage}
-                                toggleShowPercentage={toggleShowPercentage}
-                                showGraph={showGraph}
-                                toggleShowGraph={toggleShowGraph}
-                            />
-                        </Grid>
-                    )}
-
-                    {securityThree && (
-                        <Grid item xs={6}>
-                            <Stock
-                                ticker={securityThree.replace('stock-', '')}
-                                visibleFinancials={visibleFinancials}
-                                handleVisibleFinancials={handleVisibleFinancials}
-                                showPercentage={showPercentage}
-                                toggleShowPercentage={toggleShowPercentage}
-                                showGraph={showGraph}
-                                toggleShowGraph={toggleShowGraph}
-                            />
-                        </Grid>
-                    )}
-
-                    {securityFour && (
-                        <Grid item xs={6}>
-                            <Stock
-                                ticker={securityFour.replace('stock-', '')}
-                                visibleFinancials={visibleFinancials}
-                                handleVisibleFinancials={handleVisibleFinancials}
-                                showPercentage={showPercentage}
-                                toggleShowPercentage={toggleShowPercentage}
-                                showGraph={showGraph}
-                                toggleShowGraph={toggleShowGraph}
-                            />
-                        </Grid>
-                    )}
-
-                    {securityFive && (
-                        <Grid item xs={6}>
-                            <Stock
-                                ticker={securityFive.replace('stock-', '')}
-                                visibleFinancials={visibleFinancials}
-                                handleVisibleFinancials={handleVisibleFinancials}
-                                showPercentage={showPercentage}
-                                toggleShowPercentage={toggleShowPercentage}
-                                showGraph={showGraph}
-                                toggleShowGraph={toggleShowGraph}
-                            />
-                        </Grid>
-                    )}
-
-                    {securitySix && (
-                        <Grid item xs={6}>
-                            <Stock
-                                ticker={securitySix.replace('stock-', '')}
-                                visibleFinancials={visibleFinancials}
-                                handleVisibleFinancials={handleVisibleFinancials}
-                                showPercentage={showPercentage}
-                                toggleShowPercentage={toggleShowPercentage}
-                                showGraph={showGraph}
-                                toggleShowGraph={toggleShowGraph}
-                            />
-                        </Grid>
-                    )} */}
-
-                    {/* <Grid item xs={1}>
-                        <Box
-                            position="sticky"
-                            top="88px"
-                            display="flex"
-                            mt={3}
-                            zIndex={2}
-                        >
-                            <Box position="relative">
-                                <IconButton color="primary" onClick={toggleShowAddCard}>
-                                    <AddIcon />
-                                </IconButton>
-                                {showAddCard && (
-                                    <ClickAwayListener
-                                        onClickAway={toggleShowAddCard}
-                                    >
-                                        <Box position="absolute" right="0" top="0">
-                                            <Card>
-                                                <CardContent>
-                                                    <MenuList>
-                                                        <Box display="flex" flexDirection="column" justifyContent="center" alignContent="center">
-                                                            <Box my={1} mx={2}>
-                                                                <Button
-                                                                    startIcon={`🏦`}
-                                                                    variant="contained"
-                                                                    color="secondary"
-                                                                    component={Link}
-                                                                    to={`/stock/${ticker}/stock/BRKA`}
-                                                                    fullWidth
-                                                                >
-                                                                    Berkshire
-                                                            </Button>
-                                                            </Box>
-                                                            <Box my={1} mx={2}>
-                                                                <Button
-                                                                    startIcon={`👍`}
-                                                                    variant="contained"
-                                                                    color="secondary"
-                                                                    component={Link}
-                                                                    to={`/stock/${ticker}/stock/FB`}
-                                                                    fullWidth
-                                                                >
-                                                                    Facebook
-                                                            </Button>
-                                                            </Box>
-                                                            <Box my={1} mx={2}>
-                                                                <Button
-                                                                    startIcon={`🛰`}
-                                                                    variant="contained"
-                                                                    color="secondary"
-                                                                    component={Link}
-                                                                    to={`/stock/${ticker}/GOOG`}
-                                                                    fullWidth
-                                                                >
-                                                                    Google
-                                                            </Button>
-                                                            </Box>
-                                                            <Box my={1} mx={2}>
-                                                                <Button
-                                                                    startIcon={`🚛`}
-                                                                    variant="contained"
-                                                                    color="secondary"
-                                                                    component={Link}
-                                                                    to={`/stock/${ticker}/stock/AMZN`}
-                                                                    fullWidth
-                                                                >
-                                                                    Amazon
-                                                            </Button>
-                                                            </Box>
-                                                            <Box my={1} mx={2}>
-                                                                <Button
-                                                                    startIcon={`🚘`}
-                                                                    variant="contained"
-                                                                    color="secondary"
-                                                                    component={Link}
-                                                                    to={`/stock/${ticker}/TSLA`}
-                                                                    fullWidth
-                                                                >
-                                                                    Tesla
-                                                            </Button>
-                                                            </Box>
-                                                        </Box>
-                                                    </MenuList>
-                                                </CardContent>
-                                            </Card>
-                                        </Box>
-                                    </ClickAwayListener>
-                                )}
-                            </Box>
-                        </Box>
-                    </Grid> */}
+                    <Grid item>
+                        <Stock
+                            ticker={ticker}
+                            visibleFinancials={visibleFinancials}
+                            handleVisibleFinancials={handleVisibleFinancials}
+                            showPercentage={showPercentage}
+                            toggleShowPercentage={toggleShowPercentage}
+                            showGraph={showGraph}
+                            toggleShowGraph={toggleShowGraph}
+                        />
+                    </Grid>
                 </Grid>
             </Box>
         </>

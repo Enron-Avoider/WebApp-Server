@@ -387,7 +387,7 @@ module.exports = {
                             [`companies`]: {
                               $push: {
                                 company: "$name",
-                                [fieldName]: `$${path}`,
+                                v: `$${path}`,
                               },
                             },
                           },

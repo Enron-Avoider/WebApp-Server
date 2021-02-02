@@ -15,9 +15,13 @@ const config = {
     publicPath: "/",
     filename: "[name].js",
   },
+  devtool: "source-map",
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
-    alias: resolveTsAliases(__dirname + "/tsconfig.json"),
+    alias: {
+        'react-dom': '@hot-loader/react-dom',
+        ...resolveTsAliases(__dirname + "/tsconfig.json")
+    },
   },
   module: {
     rules: [
@@ -71,7 +75,7 @@ if (isProd) {
         aggregateTimeout: 500,
         poll: 3000,
         ignored: 'node_modules/**'
-    }
+    },
   };
 }
 
