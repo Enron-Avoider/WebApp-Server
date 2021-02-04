@@ -37,6 +37,8 @@ const typeDefs = gql`
     yearlyFinancialsWithKeys: JSON
     yearlyFinancialsForTable: JSON
     yearlyFinancialsByYear: JSON
+    retrieved_at: String
+    is_in_exchange_country: Boolean
   }
 
   type YearlyFinancials {

@@ -35,23 +35,7 @@ import Stock from './Stock';
 
 export const StockPage: FunctionComponent = () => {
 
-    const {
-        ticker,
-        tickertwo,
-        securityOne,
-        securityTwo,
-        securityThree,
-        securityFour,
-        securityFive,
-        securitySix,
-        securitySeven,
-        securityEight
-    } = useParams();
-
-    // console.log({ ticker, tickertwo, securityOne, securityTwo, securityThree, securityFour, securityFive, securitySix, securitySeven, securityEight });
-
-    const [showAddCard, setShowAddCard] = useState(false);
-    const toggleShowAddCard = () => setShowAddCard(!showAddCard);
+    const { ticker } = useParams<{ ticker: string }>();
 
     const [visibleFinancials, setVisibleFinancials] = useState(() => 'pl');
     const handleVisibleFinancials = (event: React.MouseEvent<HTMLElement>, newFormats: string) => {
@@ -70,8 +54,8 @@ export const StockPage: FunctionComponent = () => {
                 {(ticker) && (
                     <CalcRowModal />
                 )}
-                <Grid container spacing={3} direction="row" wrap="nowrap">
-                    <Grid item>
+                <Grid container direction="row" wrap="nowrap">
+                    <Grid item xs={12}>
                         <Stock
                             ticker={ticker}
                             visibleFinancials={visibleFinancials}

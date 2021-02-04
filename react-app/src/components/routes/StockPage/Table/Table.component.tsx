@@ -85,20 +85,29 @@ export default function Table(
 ) {
 
     const [anchorEl, setAnchorEl] = React.useState(null);
-    const [companyList, setCompanyList] = React.useState([]);
-    const handleClick = (event: any, companies: any) => {
+    const [companyList, setCompanyList] = React.useState({
+        title: '',
+        companies: []
+    });
+    const handleClick = (event: any, { title, companies }: { title: string, companies: any }) => {
         console.log({
-            t: event.currentTarget
+            companies
         });
         setAnchorEl(event.currentTarget === anchorEl ? null : event.currentTarget);
-        setCompanyList(companies);
+        setCompanyList({
+            title,
+            companies
+        });
 
     };
     const open = Boolean(anchorEl);
     const handleClickAway = (e: any) => {
         if (!Object.assign({}, e.target.dataset).clicker) {
             setAnchorEl(null);
-            setCompanyList([]);
+            setCompanyList({
+                title: '',
+                companies: []
+            });
         }
     }
 
@@ -243,23 +252,34 @@ export default function Table(
                                                                         </span >)
                                                             }
                                                         </div>
-                                                        <div>
-                                                            <small>{
-                                                                cell.column.id === 'expander' ?
-                                                                    'industry > Internet Content & Information'
-                                                                    : `${cell.column.id} - ${i}`
-                                                            }</small>
-                                                        </div>
-                                                        <div>
-                                                            <small>{
-                                                                cell.column.id === 'expander' ? 'Title' :
-                                                                    row.original.aggregate && row.original.aggregate[i] &&
-                                                                    <span data-clicker="true" onClick={e => handleClick(e, row.original.aggregate[i].companies)}>
-                                                                        {/* {numeral(row.original.aggregate[i].avg?.$numberDecimal).format('(0.00a)')} */}
-                                                                        🙏
-                                                                    </span>
-                                                            }</small>
-                                                        </div>
+                                                        {/* {row.original.aggregate && (
+                                                            <div>
+                                                                <small>{
+                                                                    cell.column.id === 'expander' ?
+                                                                        'industry > Internet Content & Information'
+                                                                        : `${row.original.aggregate ? numeral(row.original.aggregate[i].avg.$numberDecimal).format('(0.00a)') : '-'}`
+                                                                }</small>
+                                                            </div>
+                                                        )} */}
+                                                        {row.original.aggregate && (
+                                                            <div>
+                                                                <small>{
+                                                                    cell.column.id === 'expander' ?
+                                                                        'industry > Internet Content & Information' :
+                                                                        row.original.aggregate[cell.column.id] ?
+                                                                            <span data-clicker="true" onClick={e => handleClick(e, {
+                                                                                title: `industry > Internet Content & Information | ${row.cells[0].value} | ${cell.column.id}`,
+                                                                                companies: row.original.aggregate[cell.column.id].companies
+                                                                            })}>
+                                                                                avg: {numeral(row.original.aggregate[cell.column.id].avg?.$numberDecimal).format('(0.00a)')} |
+                                                                                sum: {numeral(row.original.aggregate[cell.column.id].sum?.$numberDecimal).format('(0.00a)')} |
+                                                                                count: {row.original.aggregate[cell.column.id].count} |
+                                                                                year: {row.original.aggregate[cell.column.id]._id.year}
+                                                                            </span> :
+                                                                            '-'
+                                                                }</small>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             ))}
@@ -276,9 +296,14 @@ export default function Table(
                 <ClickAwayListener onClickAway={handleClickAway}>
                     <Paper>
                         <Box overflow="auto" height="300px">
+                            <Box paddingX={2} pt={2}>
+                                <Typography variant="h5">
+                                    {companyList.title}
+                                </Typography>
+                            </Box>
                             <MenuList>
-                                {companyList.map((c: any) =>
-                                    <MenuItem>
+                                {companyList.companies.map((c: any, i: number) =>
+                                    <MenuItem key={i}>
                                         <Box display="flex" justifyContent="space-between" width="100%">
                                             <span>{c.company}</span>
                                             <span>{numeral(c.v.$numberDecimal).format('(0.00a)')}</span>
@@ -291,22 +316,6 @@ export default function Table(
                 </ClickAwayListener>
             </Popper>
 
-            {/* {showGraph && (
-                <Box
-                    position="absolute"
-                    top="56px"
-                    width="calc(100% - 32px)"
-                    height={`calc(100% - ${isBiggerHACK ? 72 : 81}px)`}
-                    zIndex="1"
-                    bgcolor="grey.800"
-                >
-                    <GraphCard
-                        years={years}
-                        data={data}
-                        showPercentage={showPercentage}
-                    />
-                </Box>
-            )} */}
 
             {allowNewCalc && <NewCalcRowButton title={title} ticker={ticker} />}
 

@@ -5,7 +5,7 @@ import AddIcon from '@material-ui/icons/Add';
 
 import "./style.sass";
 
-export default function NewCalcRowButton({ title, ticker }: { title: string, ticker: string }) {
+export default function NewCalcRowButton({ title, ticker }: { title: string, ticker?: string }) {
 
     const history = useHistory();
     const location = useLocation();

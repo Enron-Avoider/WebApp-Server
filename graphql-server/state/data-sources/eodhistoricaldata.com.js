@@ -63,6 +63,7 @@ module.exports = {
         `
       );
 
+      // EODFundamentals > yearlyFinancials
       const yearlyFinancials =
         Object.keys(fundamentalData).length &&
         fundamentalData.Highlights &&
@@ -71,13 +72,19 @@ module.exports = {
           priceData
         );
 
+      // yearlyFinancials > yearlyFinancialsWithKeys
       const yearlyFinancialsWithKeys = EODDataMaps.yearlyFinancialsWithKeys(
         yearlyFinancials
       );
 
+      // yearlyFinancialsWithKeys > yearlyFinancialsByYear
       const yearlyFinancialsByYear = EODDataMaps.yearlyFinancialsFlatByYear(
         yearlyFinancialsWithKeys
       );
+
+      // EODFundamentals > yearlyFinancialsByYear
+
+      // yearlyFinancialsByYear > yearlyFinancialsWithKeys
 
       //   const yearlyFinancialsForTable = EODDataMaps.yearlyFinancialsForTable(
       //     yearlyFinancials
@@ -109,7 +116,9 @@ module.exports = {
               : null,
             yearlyFinancials,
             yearlyFinancialsWithKeys,
-            // yearlyFinancialsByYear
+            yearlyFinancialsByYear,
+            retrieved_at: Date.now(),
+            is_in_exchange_country: false, // TODO
           }
         : {};
     };
@@ -330,7 +339,13 @@ module.exports = {
       };
     };
 
-    getAggregateForStock = async ({ sector, industry, country, exchange, calcs }) => {
+    getAggregateForStock = async ({
+      sector,
+      industry,
+      country,
+      exchange,
+      calcs,
+    }) => {
       const defaultRows = async () =>
         await this.mongoDBStocksTable
           .aggregate([
@@ -461,54 +476,53 @@ module.exports = {
             },
             {
               $facet: {
-                ...calcs_
-                  .reduce(
-                    (p, { fieldName, calc, paths }) => ({
-                      ...p,
-                      [`calc_${fieldName}`]: [
-                        {
-                          $project: {
-                            name: 1,
-                            "yearlyFinancialsByYear.year": 1,
-                            [`calc_${fieldName}`]: 1
+                ...calcs_.reduce(
+                  (p, { fieldName, calc, paths }) => ({
+                    ...p,
+                    [`calc_${fieldName}`]: [
+                      {
+                        $project: {
+                          name: 1,
+                          "yearlyFinancialsByYear.year": 1,
+                          [`calc_${fieldName}`]: 1,
+                        },
+                      },
+                      {
+                        $sort: {
+                          [`calc_${fieldName}`]: -1,
+                        },
+                      },
+                      {
+                        $group: {
+                          _id: {
+                            year: "$yearlyFinancialsByYear.year",
+                          },
+                          [`count`]: {
+                            $sum: 1,
+                          },
+                          [`sum`]: {
+                            $sum: `$${`calc_${fieldName}`}`,
+                          },
+                          [`avg`]: {
+                            $avg: `$${`calc_${fieldName}`}`,
+                          },
+                          [`companies`]: {
+                            $push: {
+                              company: "$name",
+                              [`calc_${fieldName}`]: `$${`calc_${fieldName}`}`,
+                            },
                           },
                         },
-                        {
-                          $sort: {
-                            [`calc_${fieldName}`]: -1,
-                          },
+                      },
+                      {
+                        $sort: {
+                          "_id.year": -1,
                         },
-                        {
-                          $group: {
-                            _id: {
-                              year: "$yearlyFinancialsByYear.year",
-                            },
-                            [`count`]: {
-                              $sum: 1,
-                            },
-                            [`sum`]: {
-                              $sum: `$${`calc_${fieldName}`}`,
-                            },
-                            [`avg`]: {
-                              $avg: `$${`calc_${fieldName}`}`,
-                            },
-                            [`companies`]: {
-                              $push: {
-                                company: "$name",
-                                [`calc_${fieldName}`]: `$${`calc_${fieldName}`}`,
-                              },
-                            },
-                          },
-                        },
-                        {
-                          $sort: {
-                            "_id.year": -1,
-                          },
-                        },
-                      ],
-                    }),
-                    {}
-                  ),
+                      },
+                    ],
+                  }),
+                  {}
+                ),
               },
             },
           ])
@@ -517,7 +531,7 @@ module.exports = {
 
       return {
         query: { sector, industry, country, exchange },
-        ...calcs && { calcRows: (await calcRows())[0] },
+        ...(calcs && { calcRows: (await calcRows())[0] }),
         defaultRows: (await defaultRows())[0],
       };
     };
@@ -542,6 +556,30 @@ module.exports = {
         .filter((item) => item.industry.length);
 
       return json;
+    };
+
+    getIndustryStocks = async ({ name }) => {
+      const recurse = async (res, offset) => {
+        const call = await this.get(
+          "".concat(
+            "https://eodhistoricaldata.com/api/screener?",
+            `filters=[["industry", "=", "${name}"]]&`,
+            `api_token=${this.keys.eodhistoricaldata}&`,
+            `sort=market_capitalization.desc&`,
+            `&offset=${offset}&limit=100`
+          )
+        );
+
+        const r = [...res, ...call.data];
+
+        if (call.data.length < 100 || offset === 900) {
+          return r;
+        } else {
+          return await recurse(r, offset + 100);
+        }
+      };
+
+      return await recurse([], 0);
     };
 
     saveIndustriesToDB = async () => {
@@ -592,6 +630,9 @@ module.exports = {
             const industryStocks = await this.getIndustryStocks({
               name: encodeURIComponent(industry),
             });
+
+            // https://maps.googleapis.com/maps/api/geocode/json?&address=USA&key=AIzaSyAMIu4lJGH969CHlLdKj3Uc_AMoUntOWsM
+            // results[0].address_components.long_name(or)short_name
 
             const industryRes = {
               sector,
@@ -784,7 +825,7 @@ module.exports = {
                   //   console.log({
                   //     k: code + "." + EDOExchange,
                   //     stock: stock.name
-                  //   })
+                  // })
 
                   const updated = await this.mongoDBStocksTable.updateOne(
                     {
@@ -824,10 +865,10 @@ module.exports = {
 
                 //   console.log(
                 //     "ADDED: " + code + "." + exchange + " | " + stock.exchange
-                //   );
-                // } else {
+                //               );
+                //             } else {
                 //   console.log("NOPE: " + code + "." + exchange);
-                // }
+                //             }
 
                 return code + "." + exchange;
               }
@@ -840,6 +881,13 @@ module.exports = {
       );
 
       return;
+    };
+
+    updateStocksCompletely = async () => {
+      // get all industries
+      // get stocks' basics industries (/screener)
+      // get stocks' fundamentals (/fundamentals)
+      // check if stock's country matches listing (/maps.googleapis.com/maps/api/geocode)
     };
   },
 };

@@ -66,7 +66,14 @@ export const Comparer: FunctionComponent<{
                                     // autoSelect
                                     options={options}
                                     getOptionLabel={(option) => option.title}
-                                    value={v}
+                                    // value={v}
+                                    // inputValue={v}
+                                    // onInputChange={(_, newInputValue) => {
+                                    //     console.log({
+                                    //         newInputValue
+                                    //     });
+                                    // }}
+                                    defaultValue={v}
                                     groupBy={(option) => `${option.type}`}
                                     forcePopupIcon={false}
                                     onChange={(event, newInputValue) => {
@@ -76,7 +83,7 @@ export const Comparer: FunctionComponent<{
                                         <TextField
                                             {...params}
                                             variant="outlined"
-                                            label={`Comparison ${i+1}`}
+                                            label={`Comparison ${i + 1}`}
                                             placeholder=""
                                         />
                                     )}
