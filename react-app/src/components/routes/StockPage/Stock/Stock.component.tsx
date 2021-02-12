@@ -65,15 +65,16 @@ export const Stock: FunctionComponent<{
 
         const stock = data && data.getStockByCode;
 
-        const { loading: loading__, error: error__, data: aggregate_for_todo } = !loading && !error ? useQuery(GET_AGGREGATE_FOR_STOCK, {
+        const { loading: loading__, error: error__, data: aggregate_for_todo } = useQuery(GET_AGGREGATE_FOR_STOCK, {
             variables: {
                 // sector: stock.sector,
-                industry: stock.industry,
+                industry: stock && stock.industry,
                 // country: stock.country,
                 // exchange: stock.exchange,
                 // calcs: stock.sector,
             },
-        }) : {};
+            skip: !stock
+        });
 
         const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
 

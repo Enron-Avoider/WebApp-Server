@@ -11,11 +11,11 @@ const mongoClient = new MongoClient(uri, {
 
 const { typeDefs } = require("./state/types");
 const {
-  MessyFinanceDataAPI,
-  MessySectorsAndIndustries,
+//   MessyFinanceDataAPI,
+//   MessySectorsAndIndustries,
   EODDataAPI,
 } = require("./state/data-sources");
-const { stocks, query, mutation } = require("./state/resolvers");
+const { query, mutation } = require("./state/resolvers");
 
 const redisClient = redis.createClient({
   port: 13082,
@@ -37,13 +37,12 @@ mongoClient.connect(async (err) => {
   const server = new ApolloServer({
     typeDefs,
     resolvers: {
-      ...stocks,
       ...query,
       ...mutation,
     },
     dataSources: () => ({
-      messyFinanceDataAPI: new MessyFinanceDataAPI(redisClient),
-      messySectorsAndIndustries: new MessySectorsAndIndustries(redisClient),
+    //   messyFinanceDataAPI: new MessyFinanceDataAPI(redisClient),
+    //   messySectorsAndIndustries: new MessySectorsAndIndustries(redisClient),
       EODDataAPI: new EODDataAPI(mongoDB),
     }),
     context: async ({ req }) => ({

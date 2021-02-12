@@ -1,6 +1,8 @@
 const numeral = require("numeral");
 const math = require("mathjs");
 
+const pipe = require("../utils/pipe");
+
 const rowKeys = {
   pl: [
     {
@@ -125,7 +127,8 @@ const rowKeysPaths = [
 
 const convertEODFundamentalsToEarlyFinancials = (
   fundamentalData,
-  priceData
+  priceData,
+  yearlyCurrencyPairs
 ) => {
   // TODO: Get longest range out of all financials
   const yearRange = Object.keys(fundamentalData.Financials.Balance_Sheet.yearly)
@@ -135,8 +138,6 @@ const convertEODFundamentalsToEarlyFinancials = (
         .filter((value, index, self) => self.indexOf(value) === index)
         .reverse()
     : [];
-
-  //   console.log({ yearRange });
 
   const convertStatementToTable = (statement, yearRange) => {
     const yearFormat = Object.entries(statement).reduce(
@@ -173,10 +174,19 @@ const convertEODFundamentalsToEarlyFinancials = (
     return tableFormat;
   };
 
-  const convertToUSD = () => {
-    // TODO!!
-    // get currency - USD convertion for the period
-    // convert
+  const convertCurrencyInTable = (table, yearlyCurrencyPairs) => {
+    return table.map((r) => ({
+      ...r,
+      ...Object.entries(r).reduce(
+        (acc, [key, value]) => ({
+          ...acc,
+          [key]: isNaN(value)
+            ? value
+            : Number(value) * Number(yearlyCurrencyPairs.perYear[key]),
+        }),
+        {}
+      ),
+    }));
   };
 
   const organizeTable = (statement, statementKey) => {
@@ -290,30 +300,30 @@ const convertEODFundamentalsToEarlyFinancials = (
 
   return {
     years: yearRange,
-    ...(yearRange.length && {
-      // uau this was lazy, REFACTOR
-      pl: ((table) => organizeTable(table, "pl"))(
-        convertStatementToTable(
-          fundamentalData.Financials.Income_Statement.yearly,
-          yearRange
+    ...(yearRange.length
+      ? [
+          ["pl", "Income_Statement"],
+          ["bs", "Balance_Sheet"],
+          ["cf", "Cash_Flow"],
+        ].reduce(
+          (p, [statementShortName, statementInEOD]) => ({
+            ...p,
+            [statementShortName]: pipe(
+              () => ({
+                f: fundamentalData.Financials[statementInEOD].yearly,
+                y: yearRange,
+              }),
+              ({ f, y }) => convertStatementToTable(f, y),
+              (table) => convertCurrencyInTable(table, yearlyCurrencyPairs),
+              (table) => organizeTable(table, statementShortName)
+            )(),
+          }),
+          {}
         )
-      ),
-      bs: ((table) => organizeTable(table, "bs"))(
-        convertStatementToTable(
-          fundamentalData.Financials.Balance_Sheet.yearly,
-          yearRange
-        )
-      ),
-      cf: ((table) => organizeTable(table, "cf"))(
-        convertStatementToTable(
-          fundamentalData.Financials.Cash_Flow.yearly,
-          yearRange
-        )
-      ),
-    }),
-    price: [pricesByYear],
+      : []),
+    price: convertCurrencyInTable([pricesByYear], yearlyCurrencyPairs),
     aggregatedShares: [aggregatedShares],
-    marketCap: [marketCap],
+    marketCap: convertCurrencyInTable([marketCap], yearlyCurrencyPairs),
   };
 };
 
@@ -341,32 +351,6 @@ const yearlyFinancialsWithKeys = (yearlyFinancials) =>
                 },
               }),
               {}
-            ),
-    }),
-    {}
-  );
-
-const yearlyFinancialsForTable = (yearlyFinancialsWithKeys) =>
-  Object.entries(yearlyFinancialsWithKeys).reduce(
-    (p, [k, v]) => ({
-      ...p,
-      [k]:
-        k === "years"
-          ? v
-          : v.reduce(
-              (p, c) => [
-                ...p,
-                {
-                  ...c,
-                  ...(c.subRows && {
-                    subRows: c.subRows.reduce(
-                      (p_, c_) => [...p_, { ...c_ }],
-                      []
-                    ),
-                  }),
-                },
-              ],
-              []
             ),
     }),
     {}
@@ -495,6 +479,5 @@ module.exports = {
   rowKeysPaths,
   convertEODFundamentalsToEarlyFinancials,
   yearlyFinancialsWithKeys,
-  yearlyFinancialsForTable,
   yearlyFinancialsFlatByYear,
 };
