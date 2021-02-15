@@ -17,13 +17,13 @@ export default function StockSearcher() {
 
     const [name, setName] = useState<string>('');
 
-    const [getStocks, { loading, error, data }] = useLazyQuery(SEARCH_QUERY);
+    const [searchStocks, { loading, error, data }] = useLazyQuery(SEARCH_QUERY);
 
     const handleInputChange = (e: any) =>
         setName(e ? e.target.value : '');
 
     useEffect(() => {
-        name.length > 1 && getStocks({ variables: { name } })
+        name.length > 1 && searchStocks({ variables: { name } })
     }, [name])
 
     // Typography
@@ -58,15 +58,15 @@ export default function StockSearcher() {
                                 loading
                             </MenuItem>
                         )}
-                        {data && data.findStock.map((d: any, i: number) => (
+                        {data && data.searchStocks.map((d: any, i: number) => (
                             <MenuItem
                                 className="list-group-item"
                                 key={d.code + d.exchange + " " + i}
                                 component={Link}
-                                to={`/stock/${d.code}.${d.exchange}`}
+                                to={`/stock/${d.code}.${d.EODExchange}`}
                             >
                                 <Typography noWrap={true}>
-                                    {d.name} ({d.exchange})・ {d.currency_symbol}{numeral(d.market_capitalization).format('(0.00a)')} ・{d.sector} ・{d.industry}
+                                    {d.name} ({d.code})・ {d.currency_symbol}{numeral(d.market_capitalization).format('(0.00a)')} ・{d.sector} ・{d.industry}
                                 </Typography>
                             </MenuItem>
                         ))}
@@ -78,24 +78,6 @@ export default function StockSearcher() {
                     </MenuList> */}
                     </MenuList>
                 </Paper>
-
-                // <ul className="list-group mt-1 list-group-flush StockSearcher_SearchResults">
-                //     {loading && (
-                //         <li className="list-group-item">
-                //             loading
-                //         </li>
-                //     )}
-                //     {data && data.findSimfinStockByName.map((d: any) => (
-                //         <li
-                //             className="list-group-item"
-                //             key={d.ticker}
-                //         >
-                //             <Link to={`/stock/${d.ticker}`}>
-                //                 {d.name}
-                //             </Link>
-                //         </li>
-                //     ))}
-                // </ul>
             )}
         </div>
     );

@@ -1,9 +1,7 @@
-const { MessyFinanceDataAPI } = require("./messyFinanceDataAPI");
-const { MessySectorsAndIndustries } = require("./messySectorsAndIndustries");
 const { EODDataAPI } = require("./eodhistoricaldata.com");
+const { Ours } = require("./ours");
 
 module.exports = {
-  MessyFinanceDataAPI,
-  MessySectorsAndIndustries,
-  EODDataAPI
+  EODDataAPI,
+  Ours
 };

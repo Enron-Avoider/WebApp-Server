@@ -30,11 +30,12 @@ export const GET_STOCK = gql`
 
 export const SEARCH_QUERY = gql`
     query($name: String!) {
-        findStock(name: $name) {
+        searchStocks(name: $name) {
             name,
             code,
             exchange,
-            adjusted_close,
+            EODExchange,
+            # adjusted_close,
             currency_symbol,
             market_capitalization,
             sector,

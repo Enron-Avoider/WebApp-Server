@@ -23,14 +23,14 @@ import {
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 
-import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
-import { GET_INDUSTRY, GET_SECTOR } from '@state/byModel/IndustriesAndSectors/industriesAndSectors.queries';
-import { GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
+// import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
+// import { GET_INDUSTRY, GET_SECTOR } from '@state/byModel/IndustriesAndSectors/industriesAndSectors.queries';
+// import { GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
 
-import { doCalculations } from './calculations'
-import Table from './Table';
+// import { doCalculations } from './calculations'
+// import Table from './Table';
 import CalcRowModal from './CalcRowModal';
-import AddCard from './AddCard';
+// import AddCard from './AddCard';
 import Stock from './Stock';
 
 export const StockPage: FunctionComponent = () => {

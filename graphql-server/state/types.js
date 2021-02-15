@@ -9,7 +9,7 @@ const typeDefs = gql`
     adjusted_close: String
     country: String
     exchange: String
-    EDOExchange: String
+    EODExchange: String
     currency_symbol: String
     currency_code: String
     fundamentalsCurrency: String
@@ -63,12 +63,11 @@ const typeDefs = gql`
     saveExchangesToDB: JSON
     updateStocksInDB: JSON
     updateStocksCompletely: JSON
+    removeEmptyAndDuplicates: JSON
     getDistinctStockNames: JSON
     getCurrencyToCurrencyTimeseries(currency: String, toCurrency: String): JSON
     getIndustryStocks(name: String): JSON
     getExchangeStocks(code: String): JSON
-
-    # getAllIndustries: JSON
   }
 
   type Mutation {

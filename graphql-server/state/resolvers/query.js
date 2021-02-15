@@ -6,21 +6,23 @@ module.exports = {
   Query: {
     //EOD
     searchStocks: async (_source, params, { dataSources }) =>
-      await dataSources.EODDataAPI.searchStocks(params),
+      await dataSources.Ours.searchStocks(params),
     getStockByCode: async (_source, params, { dataSources }) =>
-      dataSources.EODDataAPI.getStockByCode(params),
+      dataSources.Ours.getStockByCode(params),
     getAggregate: async (_source, params, { dataSources }) =>
-      dataSources.EODDataAPI.getAggregate(params),
+      dataSources.Ours.getAggregate(params),
     getAggregateForStock: async (_source, params, { dataSources }) =>
-      dataSources.EODDataAPI.getAggregateForStock(params),
+      dataSources.Ours.getAggregateForStock(params),
     getExchangeStocks: async (_source, params, { dataSources }) =>
       dataSources.EODDataAPI.getExchangeStocks(params),
     getAllExchanges: async (_source, params, { dataSources }) =>
       dataSources.EODDataAPI.getAllExchanges(params),
     updateStocksCompletely: async (_source, params, { dataSources }) =>
       dataSources.EODDataAPI.updateStocksCompletely(params),
+    removeEmptyAndDuplicates: async (_source, params, { dataSources }) =>
+      dataSources.EODDataAPI.removeEmptyAndDuplicates(params),
     getDistinctStockNames: async (_source, params, { dataSources }) =>
-      dataSources.EODDataAPI.getDistinctStockNames(params),
+      dataSources.Ours.getDistinctStockNames(params),
     getCurrencyToCurrencyTimeseries: async (_source, params, { dataSources }) =>
       dataSources.EODDataAPI.getCurrencyToCurrencyTimeseries(params),
   },

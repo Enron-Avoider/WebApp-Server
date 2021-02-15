@@ -1,5 +1,6 @@
 const { RESTDataSource } = require("apollo-datasource-rest");
 const parse = require("csv-parse");
+const { ObjectId } = require('mongodb');
 
 const { EODDataMaps } = require("../data-maps");
 const mathToMongo = require("../utils/mathToMongo");
@@ -15,25 +16,8 @@ module.exports = {
         googlePlaces: "AIzaSyAMIu4lJGH969CHlLdKj3Uc_AMoUntOWsM",
       };
 
-      this.mongoDBStocksTable = mongoDB.collection("tests");
-      this.mongoDBIndustriesTable = mongoDB.collection("Industries");
       this.mongoDBStocksTable = mongoDB.collection("Stocks");
-      this.mongoDBExchangesTable = mongoDB.collection("Exchanges");
     }
-
-    searchStocks = async ({ name }) => {
-      const res = await this.get(
-        `
-          https://eodhistoricaldata.com/api/screener?
-              api_token=${this.keys.eodhistoricaldata}&
-              sort=market_capitalization.desc&
-              filters=[
-                  ["name","match","*${name}*"]
-              ]
-          `.replace(/\s/g, "")
-      );
-      return res.data;
-    };
 
     getStockByCode = async ({ code }) => {
       const fundamentalData = await this.get(
@@ -156,419 +140,6 @@ module.exports = {
         : {};
     };
 
-    getAggregate = async ({ sector, industry, country, exchange }) => {
-      // for every row/calc
-      //  - sum  |> SUM(n)
-      //  - avg  |> SUM(n)/n
-      //  - median |> .sort.find(n/2)
-      //  - max |> .sort.find(n)
-      //  - min |> .sort.find(0)
-      //  - deciles
-
-      // countries | exchanges | sectors > industries || rows&calcs | period
-      //    -- percentils/normal distribution --      ||
-      //           stock value | history?             ||
-
-      // year       *-*     *
-      // country    *-*     exchange
-      // country    *-*     sector
-      // country    *-*     industry
-      // exchange   *-*     sectors
-      // exchange   *-*     industry
-      // sector     1-*     industry
-
-      // rows
-
-      // year
-      // country
-      // sector
-      // industry
-      // exchange
-
-      // metric / ratio (1)
-
-      const counts = async () =>
-        await this.mongoDBStocksTable
-          .aggregate([
-            {
-              $match: {
-                ...(sector && { sector }),
-                ...(industry && { industry }),
-                ...(country && { country }),
-                ...(exchange && { exchange }),
-              },
-            },
-            {
-              $facet: {
-                ...["country", "exchange", "industry", "sector"].reduce(
-                  (p, c) => ({
-                    ...p,
-                    [c]: [
-                      {
-                        $group: {
-                          _id: `$${c}`,
-                          count: {
-                            $sum: 1,
-                          },
-                        },
-                      },
-                      { $sort: { count: -1 } },
-                    ],
-                  }),
-                  {}
-                ),
-              },
-            },
-          ])
-          .toArray();
-
-      const yearlyCounts = async () =>
-        await this.mongoDBStocksTable
-          .aggregate([
-            {
-              $match: {
-                ...(sector && { sector }),
-                ...(industry && { industry }),
-                ...(country && { country }),
-                ...(exchange && { exchange }),
-              },
-            },
-            {
-              $unwind: {
-                path: "$yearlyFinancials.years",
-              },
-            },
-            {
-              $facet: {
-                ...["country", "exchange", "industry", "sector"].reduce(
-                  (p, c) => ({
-                    ...p,
-                    [c]: [
-                      {
-                        $group: {
-                          _id: {
-                            [c]: `$${c}`,
-                            year: "$yearlyFinancials.years",
-                          },
-                          count: {
-                            $sum: 1,
-                          },
-                        },
-                      },
-                      { $sort: { "_id.year": -1 } },
-                      {
-                        $group: {
-                          _id: {
-                            [c]: `$_id.${c}`,
-                          },
-                          years: {
-                            $push: {
-                              year: "$_id.year",
-                              count: "$count",
-                            },
-                          },
-                        },
-                      },
-                      { $sort: { "years.1.count": -1 } },
-                    ],
-                  }),
-                  {}
-                ),
-              },
-            },
-          ])
-          .toArray();
-
-      const yearlyAvgs = async () =>
-        await this.mongoDBStocksTable
-          .aggregate([
-            {
-              $match: {
-                ...(sector && { sector }),
-                ...(industry && { industry }),
-                ...(country && { country }),
-                ...(exchange && { exchange }),
-                yearlyFinancialsWithKeys: {
-                  $exists: true,
-                },
-              },
-            },
-            {
-              $addFields: {
-                marketCap: {
-                  $objectToArray:
-                    "$yearlyFinancialsWithKeys.marketCap.Market Cap",
-                },
-              },
-            },
-            {
-              $unwind: {
-                path: "$marketCap",
-              },
-            },
-            {
-              $facet: {
-                ...["country", "exchange", "industry", "sector"].reduce(
-                  (p, c) => ({
-                    ...p,
-                    [c]: [
-                      {
-                        $group: {
-                          _id: {
-                            [c]: `$${c}`,
-                            year: "$marketCap.k",
-                          },
-                          count: {
-                            $sum: 1,
-                          },
-                          sum: {
-                            $sum: "$marketCap.v",
-                          },
-                          avg: {
-                            $avg: "$marketCap.v",
-                          },
-                          stdDevPop: {
-                            $stdDevPop: "$marketCap.v",
-                          },
-                        },
-                      },
-                      { $sort: { "_id.year": -1 } },
-                      {
-                        $group: {
-                          _id: {
-                            [c]: `$_id.${c}`,
-                          },
-                          years: {
-                            $push: {
-                              year: "$_id.year",
-                              count: "$count",
-                              sum: "$sum",
-                              avg: "$avg",
-                              stdDev: "$stdDevPop",
-                            },
-                          },
-                        },
-                      },
-                      { $sort: { "years.1.count": -1 } },
-                    ],
-                  }),
-                  {}
-                ),
-              },
-            },
-          ])
-          .toArray();
-
-      //   console.log({ counts });
-
-      return {
-        query: { sector, industry, country, exchange },
-        // count: stocks.length,
-        counts: await counts(),
-        // years,
-        yearlyCounts: await yearlyCounts(),
-        yearlyAvgs: await yearlyAvgs(),
-        // financials,
-      };
-    };
-
-    getAggregateForStock = async ({
-      sector,
-      industry,
-      country,
-      exchange,
-      calcs,
-    }) => {
-      const defaultRows = async () =>
-        await this.mongoDBStocksTable
-          .aggregate([
-            {
-              $match: {
-                ...(sector && { sector }),
-                ...(industry && { industry }),
-                ...(country && { country }),
-                ...(exchange && { exchange }),
-              },
-            },
-            {
-              $unwind: {
-                path: "$yearlyFinancialsByYear",
-              },
-            },
-            {
-              $facet: {
-                ...EODDataMaps.rowKeysPaths
-                  .map((k) => ({
-                    fieldName: k.replace(/\./g, "_"),
-                    path: `yearlyFinancialsByYear.${k}.v`,
-                  }))
-                  .reduce(
-                    (p, { fieldName, path }) => ({
-                      ...p,
-                      [fieldName]: [
-                        {
-                          $project: {
-                            name: 1,
-                            "yearlyFinancialsByYear.year": 1,
-                            [path]: { $toDecimal: `$${path}` },
-                          },
-                        },
-                        {
-                          $sort: {
-                            [path]: -1,
-                          },
-                        },
-                        {
-                          $group: {
-                            _id: {
-                              year: "$yearlyFinancialsByYear.year",
-                            },
-                            [`count`]: {
-                              $sum: 1,
-                            },
-                            [`sum`]: {
-                              $sum: `$${path}`,
-                            },
-                            [`avg`]: {
-                              $avg: `$${path}`,
-                            },
-                            [`companies`]: {
-                              $push: {
-                                company: "$name",
-                                v: `$${path}`,
-                              },
-                            },
-                          },
-                        },
-                        {
-                          $sort: {
-                            "_id.year": -1,
-                          },
-                        },
-                      ],
-                    }),
-                    {}
-                  ),
-              },
-            },
-          ])
-          .toArray();
-
-      const calcRows = async () => {
-        // const calcs_ = [
-        //   {
-        //     title: "Market Cap",
-        //     scope: {
-        //       a: "aggregatedShares.outstandingShares",
-        //       b: "price.price",
-        //     },
-        //     calc: "a*b",
-        //   },
-        // ];
-
-        const calcs_ = calcs.map((c) => {
-          const paths = Object.values(c.scope).map(
-            (v) => `yearlyFinancialsByYear.${v}.v`
-          );
-
-          return {
-            fieldName: c.title.replace(/\./g, "_"),
-            calc: mathToMongo(
-              c.calc,
-              paths.map((p) => `$${p}`)
-            ),
-            paths,
-          };
-        });
-
-        return await this.mongoDBStocksTable
-          .aggregate([
-            {
-              $match: {
-                ...(sector && { sector }),
-                ...(industry && { industry }),
-                ...(country && { country }),
-                ...(exchange && { exchange }),
-              },
-            },
-            {
-              $unwind: {
-                path: "$yearlyFinancialsByYear",
-              },
-            },
-            {
-              $addFields: {
-                ...calcs_.reduce(
-                  (p, { fieldName, calc, paths }) => ({
-                    ...p,
-                    [`calc_${fieldName}`]: calc,
-                  }),
-                  {}
-                ),
-              },
-            },
-            {
-              $facet: {
-                ...calcs_.reduce(
-                  (p, { fieldName, calc, paths }) => ({
-                    ...p,
-                    [`calc_${fieldName}`]: [
-                      {
-                        $project: {
-                          name: 1,
-                          "yearlyFinancialsByYear.year": 1,
-                          [`calc_${fieldName}`]: 1,
-                        },
-                      },
-                      {
-                        $sort: {
-                          [`calc_${fieldName}`]: -1,
-                        },
-                      },
-                      {
-                        $group: {
-                          _id: {
-                            year: "$yearlyFinancialsByYear.year",
-                          },
-                          [`count`]: {
-                            $sum: 1,
-                          },
-                          [`sum`]: {
-                            $sum: `$${`calc_${fieldName}`}`,
-                          },
-                          [`avg`]: {
-                            $avg: `$${`calc_${fieldName}`}`,
-                          },
-                          [`companies`]: {
-                            $push: {
-                              company: "$name",
-                              [`calc_${fieldName}`]: `$${`calc_${fieldName}`}`,
-                            },
-                          },
-                        },
-                      },
-                      {
-                        $sort: {
-                          "_id.year": -1,
-                        },
-                      },
-                    ],
-                  }),
-                  {}
-                ),
-              },
-            },
-          ])
-          .toArray();
-      };
-
-      return {
-        query: { sector, industry, country, exchange },
-        ...(calcs && { calcRows: (await calcRows())[0] }),
-        defaultRows: (await defaultRows())[0],
-      };
-    };
-
     getAllExchanges = async () => {
       return await this.get(`
         https://eodhistoricaldata.com/api/exchanges-list/?api_token=${this.keys.eodhistoricaldata}
@@ -624,17 +195,6 @@ module.exports = {
       };
     };
 
-    getDistinctStockNames = async () => {
-      const getDistinctStockNames = await this.mongoDBStocksTable.distinct(
-        "name"
-      );
-
-      return {
-        count: getDistinctStockNames.length,
-        names: getDistinctStockNames,
-      };
-    };
-
     getCurrencyToCurrencyTimeseries = async ({ currency, toCurrency }) => {
       const getCurrencyToCurrencyTimeseries = await this.get(
         `
@@ -674,12 +234,10 @@ module.exports = {
             !!stockInDB &&
             (new Date() - new Date(stockInDB.retrieved_at)) /
               (1000 * 60 * 60 * 24) <
-              1
+              14
           ) {
-            return "Skipped [Updated < 1 day ago]: " + Code + "." + Exchange;
+            return "Skipped [Updated < 14 days ago]: " + Code + "." + Exchange;
           }
-
-          //   console.log(`${Code}.${Exchange}`);
 
           const stock = await this.getStockByCode({
             code: Code + "." + EODExchange,
@@ -707,9 +265,11 @@ module.exports = {
               { $set: { ...stock } }
             );
             return "Updated: " + Code + "." + Exchange + "." + EODExchange;
-          } else {
+          } else if (stock.code) {
             const inserted = await this.mongoDBStocksTable.insertOne(stock);
             return "Created: " + Code + "." + Exchange + "." + EODExchange;
+          } else {
+            return "Failed: " + Code + "." + Exchange + "." + EODExchange;
           }
         })
       );
@@ -748,6 +308,7 @@ module.exports = {
               });
 
               console.log({
+                progress: `${(i / exchangeStockBatches.length) * 100}%`,
                 savedStocks,
               });
 
@@ -770,6 +331,75 @@ module.exports = {
       );
 
       return loopThroughExchangesOneByOne;
+    };
+
+    removeEmptyAndDuplicates = async () => {
+      const dupes = await this.mongoDBStocksTable
+        .aggregate([
+          {
+            $group: {
+              _id: {
+                code: "$code",
+                EODExchange: "$EODExchange",
+              },
+              count: {
+                $sum: 1,
+              },
+            },
+          },
+          {
+            $sort: {
+              count: -1,
+            },
+          },
+          {
+            $match: {
+              count: {
+                $gt: 1,
+              },
+            },
+          },
+        ])
+        .toArray();
+
+      //   const empties = await this.mongoDBStocksTable
+      //     .find({ code: { $exists: false } })
+      //     .toArray();
+
+      //   const removeEmpties = await this.mongoDBStocksTable
+      //     .remove({ code: { $exists: false } });
+
+      const dupesLoop = await dupes.reduce(async (accUnresolved, dupe, i) => {
+        const accResolved = await accUnresolved;
+
+        await new Promise((t) => setTimeout(t, 10));
+
+        const stockInDB = (
+          await this.mongoDBStocksTable
+            .find({
+              code: dupe._id.code,
+              EODExchange: dupe._id.EODExchange,
+            })
+            .toArray()
+        )[0];
+
+        // const removeDupe = await this.mongoDBStocksTable.remove({
+        //   _id: ObjectId(stockInDB._id),
+        // });
+
+        console.log({
+          progress: `${(i)} / ${(dupes.length)}`,
+          dupe,
+          stockInDB: ObjectId(stockInDB._id),
+        });
+
+        return [...accResolved, dupe];
+      }, []);
+
+      return {
+        count: dupes.length,
+        dupes,
+      };
     };
   },
 };
