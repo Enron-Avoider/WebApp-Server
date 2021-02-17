@@ -13,6 +13,7 @@ module.exports = {
     getDistinctStockNames: async (_source, params, { dataSources }) =>
       dataSources.Ours.getDistinctStockNames(params),
 
+    // TODO: encapsulate somewhere else
     getCurrencyToCurrencyTimeseries: async (_source, params, { dataSources }) =>
       dataSources.EODDataAPI.getCurrencyToCurrencyTimeseries(params),
     getExchangeStocks: async (_source, params, { dataSources }) =>

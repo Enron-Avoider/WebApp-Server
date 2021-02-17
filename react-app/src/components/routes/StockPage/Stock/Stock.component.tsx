@@ -5,31 +5,20 @@ import numeral from 'numeral';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import PercentagePath from "@assets/icon-paths/percentage";
 import {
     Paper,
     Grid,
     Box,
     Typography,
     Avatar,
-    IconButton,
-    ClickAwayListener,
-    MenuList,
-    Button,
-    Card,
-    CardContent,
-    SvgIcon,
 } from '@material-ui/core';
-import { FilterList, Equalizer } from '@material-ui/icons';
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import { GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
 import { GET_AGGREGATE_FOR_STOCK } from '@state/byModel/Aggregate/aggregate.queries';
-// import getStock from '@state/effects/getStock.effect';
 
-import { doCalculations } from '../calculations'
+import { doCalculations } from '../calculations.map'
 import Table from '../Table';
-import Charts from '../Charts';
 import './style.sass';
 import Comparer from '../Comparer';
 
@@ -54,16 +43,17 @@ export const Stock: FunctionComponent<{
         const { loading, error, data } = useQuery(GET_STOCK, {
             variables: { ticker },
         });
+
         const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
             variables: { ticker },
         });
 
-        // console.log({ calculations });
-
-        // const { stock } = getStock({ ticker });
-        // console.log({ stock });
 
         const stock = data && data.getStockByCode;
+
+        const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
+
+        // TODO: getMergedAggregates.effect
 
         const { loading: loading__, error: error__, data: aggregate_for_todo } = useQuery(GET_AGGREGATE_FOR_STOCK, {
             variables: {
@@ -71,15 +61,20 @@ export const Stock: FunctionComponent<{
                 industry: stock && stock.industry,
                 // country: stock.country,
                 // exchange: stock.exchange,
-                // calcs: stock.sector,
+                ...calculations?.calculations.length && { calcs: calculations?.calculations }
             },
             skip: !stock
         });
 
-        const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
-
         const convertAggregateArrayToObjectWithYearlyKeys = (arr: any) =>
-            arr?.reduce((p: any, c: any) => ({ ...p, [c._id.year]: c }), {});
+            arr?.reduce((p: any, c: any) => ({
+                ...p, [c._id.year]: {
+                    ...c,
+                    rank: (
+                        r => r > -1 ? r + 1 : '-'
+                    )(c.companies.findIndex((company: any) => company.company === stock.name)),
+                }
+            }), {});
 
         const mergedStockAndAggregateYearlyFinancials = stock && aggregate_for_todo &&
             (Object.entries(stock.yearlyFinancials) as any)
@@ -105,7 +100,42 @@ export const Stock: FunctionComponent<{
                     {}
                 );
 
-        console.log({ stock, aggregate_for_todo, mergedStockAndAggregateYearlyFinancials });
+        const mergedAggregateCalculations = calculationResults?.length && aggregate_for_todo?.getAggregateForStock?.calcRows &&
+            (Object.entries(calculationResults) as any)
+                .filter(([key, value]: any) => !!value && key !== '__typename')
+                .map(
+                    ([k, v]: any) => ({
+                        // ...p,
+                        ...v,
+                        aggregate: convertAggregateArrayToObjectWithYearlyKeys(
+                            aggregate_for_todo.getAggregateForStock.calcRows[`calc_${v.title}`]
+                        ),
+                        // k,
+                        // v,
+                        // [k]: v && v.map((v_: any) => ({
+                        //     ...v_,
+                        //     aggregate: convertAggregateArrayToObjectWithYearlyKeys(
+                        //         aggregate_for_todo.getAggregateForStock.calcRows[`calc_${v_.title}`]
+                        //     ),
+                        //     // ...v_.subRows && {
+                        //     //     subRows: v_.subRows.map((v__: any) => ({
+                        //     //         ...v__,
+                        //     //         aggregate: convertAggregateArrayToObjectWithYearlyKeys(
+                        //     //             aggregate_for_todo.getAggregateForStock.calcRows[`${k}_${v_.title}_${v__.title}`]
+                        //     //         ),
+                        //     //     }))
+                        //     // }
+                        // }))
+                    })
+                );
+
+        console.log({
+            stock,
+            aggregate_for_todo,
+            mergedStockAndAggregateYearlyFinancials,
+            calculationResults,
+            mergedAggregateCalculations
+        });
 
         return <>{
             stock ? (
@@ -198,7 +228,7 @@ export const Stock: FunctionComponent<{
                             ticker={ticker}
                             title={'Ratios'}
                             years={stock.yearlyFinancials.years}
-                            data={calculationResults}
+                            data={mergedAggregateCalculations || calculationResults}
                             allowNewCalc={true}
                             showPercentage={showPercentage}
                             toggleShowPercentage={toggleShowPercentage}
@@ -270,7 +300,7 @@ export const Stock: FunctionComponent<{
                                                 showGraph={showGraph}
                                                 toggleShowGraph={toggleShowGraph}
                                                 years={stock.yearlyFinancials.years}
-                                                data={stock.yearlyFinancials.bs}
+                                                data={mergedStockAndAggregateYearlyFinancials?.bs || stock.yearlyFinancials.bs}
                                                 isBiggerHACK={true}
                                             />
                                         </Paper>
@@ -286,7 +316,7 @@ export const Stock: FunctionComponent<{
                                                 showGraph={showGraph}
                                                 toggleShowGraph={toggleShowGraph}
                                                 years={stock.yearlyFinancials.years}
-                                                data={stock.yearlyFinancials.cf}
+                                                data={mergedStockAndAggregateYearlyFinancials?.cf || stock.yearlyFinancials.cf}
                                                 isBiggerHACK={true}
                                             />
                                         </Paper>

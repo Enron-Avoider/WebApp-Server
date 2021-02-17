@@ -35,8 +35,6 @@ export const SEARCH_QUERY = gql`
             code,
             exchange,
             EODExchange,
-            # adjusted_close,
-            currency_symbol,
             market_capitalization,
             sector,
             industry

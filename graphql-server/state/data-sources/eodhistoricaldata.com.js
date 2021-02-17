@@ -1,6 +1,6 @@
 const { RESTDataSource } = require("apollo-datasource-rest");
 const parse = require("csv-parse");
-const { ObjectId } = require('mongodb');
+const { ObjectId } = require("mongodb");
 
 const { EODDataMaps } = require("../data-maps");
 const mathToMongo = require("../utils/mathToMongo");
@@ -196,18 +196,27 @@ module.exports = {
     };
 
     getCurrencyToCurrencyTimeseries = async ({ currency, toCurrency }) => {
-      const getCurrencyToCurrencyTimeseries = await this.get(
-        `
+      const areCurrenciesSame = currency === toCurrency;
+
+      const getCurrencyToCurrencyTimeseries =
+        !areCurrenciesSame &&
+        (await this.get(
+          `
             https://eodhistoricaldata.com/api/eod/${currency}${toCurrency}.FOREX?
                 fmt=json&
                 api_token=${this.keys.eodhistoricaldata}
         `
-      );
+        ));
 
-      const perYear = getCurrencyToCurrencyTimeseries.reduce(
-        (p, c) => ({ ...p, [c.date.substring(0, 4)]: c.close }),
-        {}
-      );
+      const perYear = !areCurrenciesSame
+        ? getCurrencyToCurrencyTimeseries.reduce(
+            (p, c) => ({ ...p, [c.date.substring(0, 4)]: c.close }),
+            {}
+          )
+        : Array(45)
+            .fill(null)
+            .map((_, i) => 1980 + i)
+            .reduce((p, c) => ({ ...p, [c]: 1 }), {});
 
       return {
         query: {
@@ -282,10 +291,10 @@ module.exports = {
       const ExchangesFromEODAPI = await this.getAllExchanges();
       // get exchange Stock codes
       const loopThroughExchangesOneByOne = await ExchangesFromEODAPI.reduce(
-        async (accUnresolved, exchange, i) => {
+        async (accUnresolved, exchange, j) => {
           const accResolved = await accUnresolved;
 
-          console.log(`working on exchange`, { exchange: exchange.Name });
+        //   console.log(`working on exchange`, { exchange: exchange.Name });
 
           await new Promise((t) => setTimeout(t, 1000));
 
@@ -302,13 +311,20 @@ module.exports = {
             async (accUnresolved, stockBatch, i) => {
               const accResolved = await accUnresolved;
 
-              await new Promise((t) => setTimeout(t, 100));
+            //   await new Promise((t) => setTimeout(t, 100));
               const savedStocks = await this.saveBatchOfStocksToDB({
                 stockBatch,
               });
 
+              const onlySkippedStocks = savedStocks.reduce((p, c) => c.includes('Skipped') ? p + 1 : p, 0) === 10;
+
+              await new Promise((t) => setTimeout(t, onlySkippedStocks ? 10 : 100 ));
+
               console.log({
-                progress: `${(i / exchangeStockBatches.length) * 100}%`,
+                onlySkippedStocks,
+                exchange: exchange.Name,
+                exchangeProgress: `${(j / ExchangesFromEODAPI.length) * 100}%`,
+                progressStock: `${(i / exchangeStockBatches.length) * 100}%`,
                 savedStocks,
               });
 

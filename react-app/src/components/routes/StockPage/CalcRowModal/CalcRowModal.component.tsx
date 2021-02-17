@@ -25,7 +25,7 @@ import {
     REMOVE_CALCULATION,
     SAVE_CALCULATION
 } from '@state/byModel/Calculations/calculations.queries';
-import { doCalculations, scopeToRows, CalculationType } from '../calculations';
+import { doCalculations, scopeToRows, CalculationType } from '../calculations.map';
 
 import Table from '../Table';
 
@@ -72,7 +72,7 @@ export default function NewCalcRowModal() {
                     title: row.title,
                     type: table.tableName
                 },
-                ...row.subRows ?
+                ...row?.subRows ?
                     row.subRows.reduce((p_: any, row_: any) => [
                         ...p_,
                         {
@@ -118,6 +118,7 @@ export default function NewCalcRowModal() {
     ];
 
     // autocompleteValue to calc
+    console.log({ autocompleteValue });
     const calc: CalculationType[] = [
         autocompleteValue.reduce((acc: any, curr: any, i: number) => {
             // console.log(curr.type);
@@ -127,9 +128,9 @@ export default function NewCalcRowModal() {
             return ({
                 scope: {
                     ...acc.scope,
-                    ...(curr.type !== 'Math' ? { [letterIndex]: curr.value } : {})
+                    ...(curr?.type !== 'Math' ? { [letterIndex]: curr?.value } : {})
                 },
-                calc: `${acc.calc}${(curr.type === 'Math' ? curr.value : letterIndex)}`
+                calc: `${acc?.calc}${(curr?.type === 'Math' ? curr?.value : letterIndex)}`
             })
         }, {
             scope: {},
@@ -280,17 +281,23 @@ export default function NewCalcRowModal() {
                     />
 
 
-                    <Box m={-2} mt={2}>
-                        <Table
-                            // title={'Income Statement'}
-                            years={stock?.yearlyFinancials?.years}
-                            data={[
-                                ...Object.values(scopeRows),
-                                ...calcRow
-                            ]}
-                            allowNewCalc={false}
-                        />
-                    </Box>
+                    {stock && (
+                        <Box m={-2} mt={2}>
+                            <Table
+                                // title={'Income Statement'}
+                                years={stock?.yearlyFinancials?.years}
+                                data={[
+                                    ...Object.values(scopeRows),
+                                    ...calcRow
+                                ]}
+                                allowNewCalc={false}
+                            />
+                        </Box>
+
+                    )}
+
+                    {/* <pre>{JSON.stringify(Object.values(scopeRows), null, 2)}</pre>
+                    <pre>{JSON.stringify(calcRow, null, 2)}</pre> */}
 
                     {/*
 

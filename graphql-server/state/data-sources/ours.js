@@ -39,7 +39,7 @@ module.exports = {
 
       const stockInDB = await this.mongoDBStocksTable.findOne({
         code: Ticker,
-        EODExchange,
+        ...EODExchange && { EODExchange },
         is_in_exchange_country: true,
       });
 

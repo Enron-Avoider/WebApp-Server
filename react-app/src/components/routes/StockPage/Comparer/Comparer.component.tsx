@@ -46,7 +46,7 @@ export const Comparer: FunctionComponent<{
             { value: stock.country, title: stock.country, type: 'Country' }
         ];
 
-        console.log({ options, autocompleteValue });
+        // console.log({ options, autocompleteValue });
 
         return (
             <>

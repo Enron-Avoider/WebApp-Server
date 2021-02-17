@@ -123,7 +123,7 @@ export default function Table(
         ...years.map((y: number) => ({
             Header: y,
             accessor: `${y}`,
-            width: 90
+            width: 140
         }))
     ], []);
 
@@ -187,7 +187,7 @@ export default function Table(
                                     prepareRow(row);
 
                                     const changePercentage: any = getRowPercentages(row.original, years);
-                                    console.log({ row });
+                                    // console.log({ row });
 
                                     return (
                                         <div {...row.getRowProps()} className={`
@@ -199,7 +199,7 @@ export default function Table(
                                                     {...cell.getCellProps()}
                                                     className={`
                                                         td
-                                                        ${row.subRows.length ? 'relevant' : ''}
+                                                        ${row?.subRows?.length ? 'relevant' : ''}
                                                     `}
                                                 // title={
                                                 //     cell.column.id !== 'expander' && changePercentage ? (
@@ -230,7 +230,7 @@ export default function Table(
                                                                             {...row.getToggleRowExpandedProps()}
                                                                             title=""
                                                                         >
-                                                                            {row.subRows.length ?
+                                                                            {row?.subRows?.length ?
                                                                                 <span className="arrow"><ArrowDropDown /></span> :
                                                                                 ''
                                                                             }
@@ -263,18 +263,21 @@ export default function Table(
                                                         )} */}
                                                         {row.original.aggregate && (
                                                             <div>
-                                                                <small>{
+                                                                <small className="comparisson">{
                                                                     cell.column.id === 'expander' ?
-                                                                        'industry > Internet Content & Information' :
+                                                                        '[industry] Internet Content & Information' :
                                                                         row.original.aggregate[cell.column.id] ?
-                                                                            <span data-clicker="true" onClick={e => handleClick(e, {
-                                                                                title: `industry > Internet Content & Information | ${row.cells[0].value} | ${cell.column.id}`,
-                                                                                companies: row.original.aggregate[cell.column.id].companies
-                                                                            })}>
-                                                                                avg: {numeral(row.original.aggregate[cell.column.id].avg?.$numberDecimal).format('(0.00a)')} |
-                                                                                sum: {numeral(row.original.aggregate[cell.column.id].sum?.$numberDecimal).format('(0.00a)')} |
-                                                                                count: {row.original.aggregate[cell.column.id].count} |
-                                                                                year: {row.original.aggregate[cell.column.id]._id.year}
+                                                                            <span
+                                                                                data-clicker="true"
+                                                                                onClick={e => handleClick(e, {
+                                                                                    title: `industry > Internet Content & Information | ${row.cells[0].value} | ${cell.column.id}`,
+                                                                                    companies: row.original.aggregate[cell.column.id].companies
+                                                                                })}
+                                                                                title="μ (average) | Σ (sum) | #/n (rank / number of companies)"
+                                                                            >
+                                                                                μ<span className="number">{numeral(row.original.aggregate[cell.column.id].avg?.$numberDecimal).format('(0a)')}</span>{' '}
+                                                                                Σ<span className="number">{numeral(row.original.aggregate[cell.column.id].sum?.$numberDecimal).format('(0a)')}</span>{' '}
+                                                                                #<span className="number">{row.original.aggregate[cell.column.id].rank}/{row.original.aggregate[cell.column.id].count}</span>
                                                                             </span> :
                                                                             '-'
                                                                 }</small>
