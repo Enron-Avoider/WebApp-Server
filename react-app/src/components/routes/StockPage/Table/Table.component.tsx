@@ -306,12 +306,20 @@ export default function Table(
                             </Box>
                             <MenuList>
                                 {companyList.companies.map((c: any, i: number) =>
-                                    <MenuItem key={i}>
-                                        <Box display="flex" justifyContent="space-between" width="100%">
-                                            <span>{c.company}</span>
-                                            <span>{numeral(c.v.$numberDecimal).format('(0.00a)')}</span>
-                                        </Box>
-                                    </MenuItem>
+                                    <Link
+                                        component={Link_}
+                                        color="inherit"
+                                        key={c.code + " " + i}
+                                        to={`/stock/${c.code}`}
+                                        target="_blank"
+                                    >
+                                        <MenuItem key={i}>
+                                            <Box display="flex" justifyContent="space-between" width="100%">
+                                                <span>{c.company}</span>
+                                                <span>{numeral(c.v.$numberDecimal).format('(0.00a)')}</span>
+                                            </Box>
+                                        </MenuItem>
+                                    </Link>
                                 )}
                             </MenuList>
                         </Box>

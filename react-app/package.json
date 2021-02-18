@@ -10,7 +10,6 @@
     "update": "aws s3 sync ./dist s3://www.enron.monster --profile pedro"
   },
   "dependencies": {
-    "@apollo/react-hooks": "^3.1.5",
     "@loadable/component": "^5.12.0",
     "@material-ui/core": "^4.9.11",
     "@material-ui/icons": "^4.9.1",

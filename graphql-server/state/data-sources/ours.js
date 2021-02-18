@@ -299,6 +299,7 @@ module.exports = {
                         {
                           $project: {
                             name: 1,
+                            code: 1,
                             "yearlyFinancialsByYear.year": 1,
                             [path]: { $toDecimal: `$${path}` },
                           },
@@ -325,6 +326,7 @@ module.exports = {
                             [`companies`]: {
                               $push: {
                                 company: "$name",
+                                code: "$code",
                                 v: `$${path}`,
                               },
                             },
@@ -406,8 +408,10 @@ module.exports = {
                       {
                         $project: {
                           name: 1,
+                          code: 1,
                           "yearlyFinancialsByYear.year": 1,
-                          [`calc_${fieldName}`]: 1,
+                          [`calc_${fieldName}`]: { $toDecimal: `$calc_${fieldName}` },
+                        //   [path]: { $toDecimal: `$${path}` },
                         },
                       },
                       {
@@ -432,7 +436,8 @@ module.exports = {
                           [`companies`]: {
                             $push: {
                               company: "$name",
-                              [`calc_${fieldName}`]: `$${`calc_${fieldName}`}`,
+                              code: "$code",
+                              v: `$${`calc_${fieldName}`}`,
                             },
                           },
                         },

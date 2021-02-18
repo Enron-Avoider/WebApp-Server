@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
-import { useLazyQuery } from "@apollo/react-hooks";
+import { useLazyQuery } from "react-apollo";
 import SearchIcon from '@material-ui/icons/Search';
 import { MenuItem, MenuList, Paper, InputBase, Typography, ClickAwayListener } from '@material-ui/core';
 import numeral from 'numeral';
@@ -61,9 +61,9 @@ export default function StockSearcher() {
                             {data && data.searchStocks.map((d: any, i: number) => (
                                 <MenuItem
                                     className="list-group-item"
-                                    key={d.code + d.exchange + " " + i}
+                                    key={d.code + " " + i}
                                     component={Link}
-                                    to={`/stock/${d.code}.${d.EODExchange}`}
+                                    to={`/stock/${d.code}`}
                                 >
                                     <Typography noWrap={true}>
                                         {d.name} ({d.code})・ {d.currency_symbol}{numeral(d.market_capitalization).format('(0.00a)')} ・{d.sector} ・{d.industry}

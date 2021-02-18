@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useParams, Link, useRouteMatch, useHistory, useLocation } from "react-router-dom";
-import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useQuery, useMutation } from "react-apollo";
 import deepFind from 'deep-find';
 import {
     Paper,
@@ -118,9 +118,9 @@ export default function NewCalcRowModal() {
     ];
 
     // autocompleteValue to calc
-    console.log({ autocompleteValue });
+    // console.log({ autocompleteValue });
     const calc: CalculationType[] = [
-        autocompleteValue.reduce((acc: any, curr: any, i: number) => {
+        autocompleteValue?.reduce((acc: any, curr: any, i: number) => {
             // console.log(curr.type);
 
             const letterIndex = (10 + Object.keys(acc.scope).length).toString(36)
@@ -128,9 +128,9 @@ export default function NewCalcRowModal() {
             return ({
                 scope: {
                     ...acc.scope,
-                    ...(curr?.type !== 'Math' ? { [letterIndex]: curr?.value } : {})
+                    ...(curr.type !== 'Math' ? { [letterIndex]: curr.value } : {})
                 },
-                calc: `${acc?.calc}${(curr?.type === 'Math' ? curr?.value : letterIndex)}`
+                calc: `${acc?.calc}${(curr.type === 'Math' ? curr.value : letterIndex)}`
             })
         }, {
             scope: {},
@@ -139,6 +139,9 @@ export default function NewCalcRowModal() {
     ];
 
     const handleAdd = async () => {
+        console.log({
+            calc
+        });
         await addCalculation({
             variables: {
                 title: titleValue,
@@ -147,7 +150,9 @@ export default function NewCalcRowModal() {
                 calc: calc[0].calc,
                 scope: calc[0].scope
             }
-        });
+        })
+            .then(d => console.log({ d }))
+            .catch(e => console.log({ e }));
         handleClose();
     }
 

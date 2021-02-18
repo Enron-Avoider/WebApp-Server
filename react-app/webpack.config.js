@@ -64,7 +64,7 @@ if (isProd) {
     publicPath: "/",
     port: 8080,
     open: true,
-    hot: true,
+    hot: false,
     compress: true,
     stats: "errors-only",
     overlay: true,

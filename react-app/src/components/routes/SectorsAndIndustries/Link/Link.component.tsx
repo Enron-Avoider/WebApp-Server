@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery } from "react-apollo";
 import { GET_ALL_SECTOR_AND_INDUSTRY_LINKS } from '@state/byModel/IndustriesAndSectors/industriesAndSectors.queries';
 
 import './style.sass';

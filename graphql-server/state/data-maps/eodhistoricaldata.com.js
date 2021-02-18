@@ -99,6 +99,18 @@ const rowKeys = {
       oldTitle: "totalCashFromFinancingActivities",
     },
   ],
+  aggregatedShares: [
+    {
+      title: "outstandingShares",
+      oldTitle: "",
+    },
+  ],
+  price: [
+    {
+      title: "price",
+      oldTitle: "",
+    },
+  ],
 };
 
 const rowKeysPaths = [

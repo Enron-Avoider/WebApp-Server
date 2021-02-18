@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { useLazyQuery } from "@apollo/react-hooks";
+import { useLazyQuery } from "react-apollo";
 
 import { GET_AGGREGATE } from '@state/byModel/Aggregate/aggregate.queries';
 

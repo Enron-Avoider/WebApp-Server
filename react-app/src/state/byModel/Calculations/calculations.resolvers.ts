@@ -19,6 +19,12 @@ export const calculationsResolvers = {
                 },
                 __typename: "calculation"
             };
+
+            console.log({
+                calculations,
+                new_calculation
+            });
+
             cache.writeData({
                 data: {
                     calculations: [...calculations, new_calculation]

@@ -29,22 +29,25 @@ console.log({ env, todoResolvers, calculationsResolvers });
     const client = new ApolloClient({
         uri: env.graphql,
         cache,
-        resolvers: { Mutation: {
-            ...calculationsResolvers.Mutation,
-            ...todoResolvers.Mutation,
-        }}
+        resolvers: {
+            Mutation: {
+                ...calculationsResolvers.Mutation,
+                ...todoResolvers.Mutation,
+            }
+        }
     });
 
     try {
-        cache.readQuery({ query: GET_CALCULATIONS });
-        cache.readQuery({ query: GET_TODOS });
+        client.readQuery({ query: GET_CALCULATIONS });
+        client.readQuery({ query: GET_TODOS });
     } catch (error) {
-        cache.writeData({
+        console.log({ error });
+        client.writeData({
             data: {
                 todos: [],
                 calculations: [],
-                searchedStocks: [], // TODO
-                compareWith: {},    // TODO
+                // searchedStocks: [], // TODO
+                // compareWith: {},    // TODO
             }
         });
     }
@@ -60,7 +63,7 @@ console.log({ env, todoResolvers, calculationsResolvers });
                 // grey1: theme.palette.grey['800']
             }
         },
-    }), { factor:  15 });
+    }), { factor: 15 });
 
     ReactDOM.render(
         <ApolloProvider client={client}>

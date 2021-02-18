@@ -1,5 +1,5 @@
 import React, { useState, FunctionComponent } from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery } from "react-apollo";
 import numeral from 'numeral';
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
@@ -47,7 +47,6 @@ export const Stock: FunctionComponent<{
         const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
             variables: { ticker },
         });
-
 
         const stock = data && data.getStockByCode;
 
@@ -131,6 +130,7 @@ export const Stock: FunctionComponent<{
 
         console.log({
             stock,
+            calculations,
             aggregate_for_todo,
             mergedStockAndAggregateYearlyFinancials,
             calculationResults,
@@ -243,8 +243,8 @@ export const Stock: FunctionComponent<{
                             years={stock.yearlyFinancials.years}
                             data={
                                 [
-                                    ...stock.yearlyFinancials.price,
-                                    ...stock.yearlyFinancials.aggregatedShares
+                                    ...(mergedStockAndAggregateYearlyFinancials?.price || stock.yearlyFinancials.price),
+                                    ...(mergedStockAndAggregateYearlyFinancials?.aggregatedShares || stock.yearlyFinancials.aggregatedShares),
                                 ]
                             }
                             showPercentage={showPercentage}

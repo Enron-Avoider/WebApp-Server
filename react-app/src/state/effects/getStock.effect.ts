@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery } from "react-apollo";
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import { GET_AGGREGATE_FOR_STOCK } from '@state/byModel/Aggregate/aggregate.queries';

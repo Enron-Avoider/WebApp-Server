@@ -1,6 +1,6 @@
 import React, { useState, FunctionComponent } from 'react';
 import { useParams } from "react-router-dom";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery } from "react-apollo";
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
 import { Link } from 'react-router-dom';
 import ReactResizeDetector from 'react-resize-detector';

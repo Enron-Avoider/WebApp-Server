@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery } from "react-apollo";
 
 import { GET_ALL_INDUSTRIES, GET_ALL_SECTORS } from '@state/byModel/IndustriesAndSectors/industriesAndSectors.queries';
 import './style.sass';
