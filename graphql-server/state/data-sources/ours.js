@@ -347,17 +347,6 @@ module.exports = {
           .toArray();
 
       const calcRows = async () => {
-        // const calcs_ = [
-        //   {
-        //     title: "Market Cap",
-        //     scope: {
-        //       a: "aggregatedShares.outstandingShares",
-        //       b: "price.price",
-        //     },
-        //     calc: "a*b",
-        //   },
-        // ];
-
         const calcs_ = calcs.map((c) => {
           const paths = Object.values(c.scope).map(
             (v) => `yearlyFinancialsByYear.${v}.v`
@@ -372,6 +361,8 @@ module.exports = {
             paths,
           };
         });
+
+        console.log(JSON.stringify(calcs_, null, 2));
 
         return await this.mongoDBStocksTable
           .aggregate([

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTable, useBlockLayout, useExpanded, Column } from "react-table";
 import { useSticky } from 'react-table-sticky';
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
-import { useParams, Link as Link_, useLocation } from "react-router-dom";
+import { useParams, Link as Link_, useLocation, useHistory } from "react-router-dom";
 import numeral from 'numeral';
 import {
     Paper,
@@ -24,7 +24,7 @@ import { ArrowDropDown, Equalizer } from '@material-ui/icons';
 const math = require("mathjs");
 
 import PercentagePath from "@assets/icon-paths/percentage";
-
+import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import NewCalcRowButton from '../NewCalcRowButton';
 import GraphCard from './GraphCard';
 
@@ -65,8 +65,8 @@ export default function Table(
         data,
         title = '',
         allowNewCalc = false,
-        showPercentage,
-        toggleShowPercentage,
+        // showPercentage,
+        // toggleShowPercentage,
         showGraph,
         toggleShowGraph,
         isBiggerHACK
@@ -76,8 +76,8 @@ export default function Table(
         data: {}[],
         title?: string,
         allowNewCalc?: boolean,
-        showPercentage?: boolean,
-        toggleShowPercentage?: any,
+        // showPercentage?: boolean,
+        // toggleShowPercentage?: any,
         showGraph?: boolean,
         toggleShowGraph?: any,
         isBiggerHACK?: boolean
@@ -112,6 +112,18 @@ export default function Table(
     }
 
     const location = useLocation();
+    const history = useHistory();
+    const { allSearchParams, getNewSearchParamsString } = useSearchParams();
+
+    const { showPercentage } = allSearchParams;
+
+    const toggleShowPercentage = () => history.push({
+        pathname: location.pathname,
+        search: getNewSearchParamsString({
+            ...showPercentage && { keysToRemove: ['showPercentage'] },
+            ...!showPercentage && { paramsToAdd: { showPercentage: true } }
+        }),
+    })
 
     const columns = React.useMemo(() => [
         {
@@ -241,8 +253,7 @@ export default function Table(
                                                                                     color="inherit"
                                                                                     to={{
                                                                                         pathname: location.pathname,
-                                                                                        search: `?ratio=${cell.value}&ticker=${ticker}`
-                                                                                        //${title}/${cell.value}
+                                                                                        search: getNewSearchParamsString({ paramsToAdd: { ratio: cell.value, ticker } })
                                                                                     }}
                                                                                 >
                                                                                     {cell.value || ''}

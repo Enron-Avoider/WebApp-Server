@@ -15,7 +15,8 @@
         "@env": ["environments/index"],
         "@components/*": ["src/components/*"],
         "@assets/*": ["src/assets/*"],
-        "@state/*": ["src/state/*"]
+        "@state/*": ["src/state/*"],
+        "@types/*": ["src/types/*"]
     }
   },
   "include": [

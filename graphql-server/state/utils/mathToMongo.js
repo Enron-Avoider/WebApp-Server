@@ -25,10 +25,25 @@ const mathToMongo = (mathExpr, args) => {
     switch (node.type) {
       case "BinaryExpression":
         const part = {};
-        part[operators[node.operator]] = [
-          transformJsepExpression(node.left, args),
-          transformJsepExpression(node.right, args),
-        ];
+        if (node.operator === "/") {
+          part["$cond"] = [
+            {
+              $eq: [transformJsepExpression(node.right, args), 0],
+            },
+            0,
+            {
+              $divide: [
+                transformJsepExpression(node.left, args),
+                transformJsepExpression(node.right, args),
+              ],
+            },
+          ];
+        } else {
+          part[operators[node.operator]] = [
+            transformJsepExpression(node.left, args),
+            transformJsepExpression(node.right, args),
+          ];
+        }
         return part;
 
       case "Literal":

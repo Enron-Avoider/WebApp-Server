@@ -1,4 +1,4 @@
-import React, { useState, FunctionComponent } from "react";
+import React, { useState, FunctionComponent, useContext } from "react";
 
 import PercentagePath from "@assets/icon-paths/percentage";
 import {
@@ -20,6 +20,8 @@ import {
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { FilterList, Equalizer } from '@material-ui/icons';
 
+import { calculationsStore } from '@state/byModel/Calculations/calculations.contextReducer';
+
 import "./style.sass";
 
 export const Comparer: FunctionComponent<{
@@ -27,6 +29,8 @@ export const Comparer: FunctionComponent<{
 }> = ({
     stock
 }) => {
+
+        const { state: calculationsState, dispatch } = useContext(calculationsStore);
 
         const [autocompleteValue, setAutocompleteValue] = React.useState([
             [{ value: stock.industry, title: stock.industry, type: 'Industry' }],
@@ -50,6 +54,7 @@ export const Comparer: FunctionComponent<{
 
         return (
             <>
+                <button onClick={() => dispatch({ type: 'hii' })}> Hii! {calculationsState.hi} </button>
                 <Box display="flex" flexDirection="column" p={2}>
                     <Box pb={2}>
                         <Typography variant="h5">

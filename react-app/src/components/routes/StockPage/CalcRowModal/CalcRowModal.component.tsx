@@ -26,6 +26,7 @@ import {
     SAVE_CALCULATION
 } from '@state/byModel/Calculations/calculations.queries';
 import { doCalculations, scopeToRows, CalculationType } from '../calculations.map';
+import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 
 import Table from '../Table';
 
@@ -34,24 +35,23 @@ import "./style.sass";
 export default function NewCalcRowModal() {
 
     const location = useLocation();
-    const { rowTitle, ticker } = (q => ({
-        rowTitle: q.get('ratio') || '',
-        ticker: q.get('ticker') || '',
-    }))(new URLSearchParams(location.search));
-    // console.log({ rowTitle, ticker, location });
-    // const { ticker, rowTitle, tableName } = useParams();
+
+    const { allSearchParams, getNewSearchParamsString } = useSearchParams();
+
+    const searchParams = allSearchParams;
+
     const { loading, error, data } = useQuery(GET_STOCK, {
-        variables: { ticker },
+        variables: { ticker: searchParams.ticker },
     });
     const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
-        variables: { ticker },
+        variables: { ticker: searchParams.ticker },
     });
     const [addCalculation] = useMutation(ADD_CALCULATION);
     const [removeCalculation] = useMutation(REMOVE_CALCULATION);
     const [saveCalculation] = useMutation(SAVE_CALCULATION);
     const [existing, setExistinging] = React.useState<Object>({});
 
-    const isOpen = !!ticker;
+    const isOpen = !!searchParams.ticker;
 
     const stock = data && data.getStockByCode;
 
@@ -95,7 +95,15 @@ export default function NewCalcRowModal() {
 
     const history = useHistory();
     const handleClose = () => {
-        history.push(location.pathname)
+        setTitleValue('');
+        setAboutValue('');
+        setAutocompleteValue([]);
+        history.push({
+            pathname: location.pathname,
+            search: getNewSearchParamsString({
+                keysToRemove: ['ratio', 'ticker']
+            }),
+        })
     };
 
     const [titleValue, setTitleValue] = React.useState('');
@@ -159,7 +167,7 @@ export default function NewCalcRowModal() {
     const handleRemove = async () => {
         await removeCalculation({
             variables: {
-                title: rowTitle,
+                title: searchParams.ratio,
             }
         });
         handleClose();
@@ -169,7 +177,7 @@ export default function NewCalcRowModal() {
         await saveCalculation({
             variables: {
                 newTitle: titleValue,
-                title: rowTitle,
+                title: searchParams.ratio,
                 about: aboutValue,
                 onTable: 'hum',
                 calc: calc[0].calc,
@@ -187,7 +195,7 @@ export default function NewCalcRowModal() {
     const scopeRows = scopeToRows(calc[0].scope, stock);
 
     useEffect(() => {
-        const existing = calculations.calculations.find((c: any) => c.title === rowTitle);
+        const existing = calculations.calculations.find((c: any) => c.title === searchParams.ratio);
         setExistinging(existing);
         if (existing) {
             setTitleValue(existing.title);
@@ -201,7 +209,7 @@ export default function NewCalcRowModal() {
             });
             setAutocompleteValue(autocompleteValue);
         }
-    }, [calculations, rowTitle]);
+    }, [calculations, searchParams.ratio]);
 
     return (
         <Dialog open={isOpen} onClose={handleClose}>
