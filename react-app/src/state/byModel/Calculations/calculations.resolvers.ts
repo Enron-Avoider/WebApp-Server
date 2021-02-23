@@ -2,6 +2,8 @@ import { GET_CALCULATIONS } from "./calculations.queries";
 
 export const calculationsResolvers = {
     Mutation: {
+        // Deprecated
+        // Local state with Apollo was NOT FUN 😤
         addCalculation: (_: any, calculation: any, { cache }: any) => {
             const { calculations } = cache.readQuery({ query: GET_CALCULATIONS });
             const new_calculation = {

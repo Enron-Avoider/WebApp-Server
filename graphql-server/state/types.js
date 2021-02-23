@@ -37,6 +37,22 @@ const typeDefs = gql`
     cf: [JSON]
   }
 
+  type Calc {
+    title: String
+    about: String
+    calc: String
+    scope: JSON
+  }
+
+  type RatioCollection {
+    id: String
+    name: String
+    isOwnedByPlatform: Boolean
+    isOwnedByUser: Boolean
+    about: String
+    calcs: [Calc]
+  }
+
   type Query {
     searchStocks(name: String): [EODStock]
     getStockByCode(code: String): EODStock
@@ -68,9 +84,11 @@ const typeDefs = gql`
     getCurrencyToCurrencyTimeseries(currency: String, toCurrency: String): JSON
     getIndustryStocks(name: String): JSON
     getExchangeStocks(code: String): JSON
+    getRatioCollections: [RatioCollection]
   }
 
   type Mutation {
+    saveRatioCollection(ratioCollection: JSON): RatioCollection
     resetCache(key: String!): JSON
   }
 `;

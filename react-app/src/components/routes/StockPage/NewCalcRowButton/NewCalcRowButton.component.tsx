@@ -7,15 +7,14 @@ import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 
 import "./style.sass";
 
-export default function NewCalcRowButton({ title, ticker }: { title: string, ticker?: string }) {
+export default function NewCalcRowButton({ title, ticker, newCalcCollection }: { title: string, ticker: string, newCalcCollection: string }) {
 
     const history = useHistory();
     const location = useLocation();
-    const { allSearchParams, getNewSearchParamsString } = useSearchParams();
+    const { allSearchParams, getNewSearchParamsString, updateParams } = useSearchParams();
 
-    const handleClickOpen = () => history.push({
-        pathname: location.pathname,
-        search: getNewSearchParamsString({ paramsToAdd: { ratio: 'new', ticker } })
+    const handleClickOpen = () => updateParams({
+        search: getNewSearchParamsString({ paramsToAdd: { ratio: 'new', ticker, ratioCollection: newCalcCollection } })
     });
 
     return (

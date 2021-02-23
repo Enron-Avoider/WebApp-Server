@@ -12,15 +12,12 @@
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
-        "@env": ["environments/index"],
-        "@components/*": ["src/components/*"],
-        "@assets/*": ["src/assets/*"],
-        "@state/*": ["src/state/*"],
-        "@types/*": ["src/types/*"]
+      "@env": ["environments/index"],
+      "@components/*": ["src/components/*"],
+      "@assets/*": ["src/assets/*"],
+      "@state/*": ["src/state/*"],
+      "@types/*": ["src/types/*"]
     }
   },
-  "include": [
-    "src",
-    "custom.d.ts"
-  ]
+  "include": ["src", "custom.d"]
 }

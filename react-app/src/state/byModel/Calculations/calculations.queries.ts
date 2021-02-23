@@ -1,5 +1,44 @@
 import { gql } from "apollo-boost";
 
+export const GET_RATIO_COLLECTIONS = gql`
+{
+  getRatioCollections {
+    id
+    name
+    about
+    isOwnedByUser
+    isOwnedByPlatform
+    calcs {
+      title
+      calc
+      about
+      scope
+    }
+  }
+}
+`;
+
+export const SAVE_RATIO_COLLECTION = gql`
+  mutation saveRatioCollection($ratioCollection: JSON!) {
+    saveRatioCollection(ratioCollection: $ratioCollection) {
+        id
+        name
+        isOwnedByPlatform
+        isOwnedByUser
+        about
+        calcs {
+            title
+            about
+            calc
+            scope
+        }
+    }
+  }
+`;
+
+
+// Deprecated
+// Local state with Apollo was NOT FUN 😤
 export const GET_CALCULATIONS = gql`
   {
     calculations @client {

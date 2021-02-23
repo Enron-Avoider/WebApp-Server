@@ -1,26 +1,25 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, IconButton } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import { Grid, Box, Button, Menu, MenuItem, useMediaQuery, Badge } from '@material-ui/core';
+import { Grid, Box, Link, Badge } from '@material-ui/core';
 import { useTheme, makeStyles } from '@material-ui/core/styles';
+import { useQuery } from "react-apollo";
 
+import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import logoImg from '@assets/e-transparent.png';
 import StockSearcher from '@components/shared/StockSearcher';
 
 import './style.sass';
 
-const useStyles = makeStyles((theme) => ({
-    logo: {
-        'max-height': '50px',
-        'padding-top': '3px'
-    }
-}));
-
 export default function Header() {
-    const classes = useStyles();
-    const theme = useTheme();
-    const sm = useMediaQuery(theme.breakpoints.down('sm'));
+    const { ticker } = useParams<{ ticker: string }>();
+
+    const { loading, error, data } = useQuery(GET_STOCK, {
+        variables: { ticker },
+        skip: !ticker
+    });
+    const stock = data && data.getStockByCode;
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -47,7 +46,7 @@ export default function Header() {
                         >
                             <>
                                 <Box mr={2}>
-                                    <img className={classes.logo} src={logoImg} />
+                                    <img className="logo" src={logoImg} />
                                 </Box>
                                 <Grid container direction="column" justify="center">
                                     <Grid item >
@@ -57,9 +56,11 @@ export default function Header() {
                                     </Grid>
                                     <Grid item>
                                         <Box mt={-1}>
-                                            <Typography variant="subtitle1">
-                                                ask why.
-                                            </Typography>
+                                            <Link color="inherit" href="https://www.youtube.com/watch?v=NsHxKoYhs3U" target="_blank">
+                                                <Typography variant="subtitle1">
+                                                    ask why.
+                                                </Typography>
+                                            </Link>
                                         </Box>
                                     </Grid>
                                 </Grid>
@@ -98,7 +99,7 @@ export default function Header() {
                             </> */}
 
                             {/* {!sm && ( */}
-                                <StockSearcher />
+                            <StockSearcher />
                             {/* )} */}
 
                             {/* {sm && (

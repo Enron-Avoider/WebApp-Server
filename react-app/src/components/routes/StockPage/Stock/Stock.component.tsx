@@ -12,18 +12,20 @@ import {
     Box,
     Typography,
     Avatar,
+    Link,
 } from '@material-ui/core';
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
-import { GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
+import { GET_RATIO_COLLECTIONS, GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
 import { GET_AGGREGATE_FOR_STOCK } from '@state/byModel/Aggregate/aggregate.queries';
 import { calculationsStore } from '@state/byModel/Calculations/calculations.contextReducer';
 
+import './style.sass';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import { doCalculations } from '../calculations.map'
 import Table from '../Table';
-import './style.sass';
-import Comparer from '../Comparer';
+import { mergeStockAndAggregateYearlyFinancials, mergeAggregateCalculations } from './Stock.map';
+import RatioCollections from '../RatioCollections';
 
 export const Stock: FunctionComponent<{
     ticker: string,
@@ -47,10 +49,12 @@ export const Stock: FunctionComponent<{
 
         const { loading, error, data } = useQuery(GET_STOCK, {
             variables: { ticker },
+            skip: !ticker
         });
 
         const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
             variables: { ticker },
+            skip: !ticker
         });
 
         const stock = data && data.getStockByCode;
@@ -70,68 +74,9 @@ export const Stock: FunctionComponent<{
             skip: !stock
         });
 
-        const convertAggregateArrayToObjectWithYearlyKeys = (arr: any) =>
-            arr?.reduce((p: any, c: any) => ({
-                ...p, [c._id.year]: {
-                    ...c,
-                    rank: (
-                        r => r > -1 ? r + 1 : '-'
-                    )(c.companies.findIndex((company: any) => company.company === stock.name)),
-                }
-            }), {});
+        const mergedStockAndAggregateYearlyFinancials = mergeStockAndAggregateYearlyFinancials(stock, aggregate_for_todo);
 
-        const mergedStockAndAggregateYearlyFinancials = stock && aggregate_for_todo &&
-            (Object.entries(stock.yearlyFinancials) as any)
-                .filter(([key, value]: any) => !!value && key !== '__typename')
-                .reduce(
-                    (p: any, [k, v]: any) => ({
-                        ...p,
-                        [k]: (k === "years") ? v : v.map((v_: any) => ({
-                            ...v_,
-                            aggregate: convertAggregateArrayToObjectWithYearlyKeys(
-                                aggregate_for_todo.getAggregateForStock.defaultRows[`${k}_${v_.title}`]
-                            ),
-                            ...v_.subRows && {
-                                subRows: v_.subRows.map((v__: any) => ({
-                                    ...v__,
-                                    aggregate: convertAggregateArrayToObjectWithYearlyKeys(
-                                        aggregate_for_todo.getAggregateForStock.defaultRows[`${k}_${v_.title}_${v__.title}`]
-                                    ),
-                                }))
-                            }
-                        }))
-                    }),
-                    {}
-                );
-
-        const mergedAggregateCalculations = calculationResults?.length && aggregate_for_todo?.getAggregateForStock?.calcRows &&
-            (Object.entries(calculationResults) as any)
-                .filter(([key, value]: any) => !!value && key !== '__typename')
-                .map(
-                    ([k, v]: any) => ({
-                        // ...p,
-                        ...v,
-                        aggregate: convertAggregateArrayToObjectWithYearlyKeys(
-                            aggregate_for_todo.getAggregateForStock.calcRows[`calc_${v.title}`]
-                        ),
-                        // k,
-                        // v,
-                        // [k]: v && v.map((v_: any) => ({
-                        //     ...v_,
-                        //     aggregate: convertAggregateArrayToObjectWithYearlyKeys(
-                        //         aggregate_for_todo.getAggregateForStock.calcRows[`calc_${v_.title}`]
-                        //     ),
-                        //     // ...v_.subRows && {
-                        //     //     subRows: v_.subRows.map((v__: any) => ({
-                        //     //         ...v__,
-                        //     //         aggregate: convertAggregateArrayToObjectWithYearlyKeys(
-                        //     //             aggregate_for_todo.getAggregateForStock.calcRows[`${k}_${v_.title}_${v__.title}`]
-                        //     //         ),
-                        //     //     }))
-                        //     // }
-                        // }))
-                    })
-                );
+        const mergedAggregateCalculations = mergeAggregateCalculations(calculationResults, aggregate_for_todo, stock);
 
         console.log({
             stock,
@@ -151,27 +96,13 @@ export const Stock: FunctionComponent<{
                         <Box mt={2}>
 
                             <Grid container spacing={2}>
-                                {/* <Grid item xs={2} container>
-                                <Box flex={1}>
-                                    <Paper style={{ height: '100%' }}>
-                                        <Box
-                                            display="flex"
-                                            alignItems="center"
-                                            justifyContent="center"
-                                            height="100%"
-                                        >
-                                            <Avatar variant="rounded" src={stock.logo} />
-                                        </Box>
-                                    </Paper>
-                                </Box>
-                            </Grid> */}
-                                <Grid item xs={5}>
+                                <Grid item xs={12}>
                                     <Paper style={{ height: '100%' }}>
                                         <Box display="flex" flexDirection="row" p={2}>
                                             <Box flex="1" maxWidth="100%">
                                                 <Box display="flex" flexDirection="column" justifyContent="space-between">
                                                     <Box display="flex" flexDirection="row">
-                                                        <Box display="flex" alignItems="center" flex="auto">
+                                                        <Box display="flex" alignItems="center" mr={2}>
                                                             <Typography variant="h5">
                                                                 {stock.name}
                                                             </Typography>
@@ -185,60 +116,57 @@ export const Stock: FunctionComponent<{
                                                             display="flex"
                                                             alignItems="center"
                                                             justifyContent="center"
-                                                        // height="100%"
                                                         >
                                                             <Avatar variant="rounded" src={`//${stock.logo}`} />
                                                         </Box>
+                                                        <Box display="flex" flex="auto" alignItems="flex-end" flexDirection="column">
+                                                            <Typography
+                                                                display="block"
+                                                                noWrap={true}
+                                                                variant="body1"
+                                                            >
+                                                                <Link href="#" color="primary" target="_blank">
+                                                                    <span title="sector">{stock.sector}</span>
+                                                                </Link>
+                                                                {" "}・{" "}
+                                                                <Link href="#" color="primary" target="_blank">
+                                                                    <span title="industry">{stock.industry}</span>
+                                                                </Link>
+                                                            </Typography>
+                                                            <Typography
+                                                                display="block"
+                                                                noWrap={true}
+                                                                variant="body1"
+                                                            >
+                                                                <Link href="#" color="primary" target="_blank">
+                                                                    <span title="exchange">{stock.exchange}</span>
+                                                                </Link>
+                                                                {" "}・{" "}
+                                                                <Link href="#" color="primary" target="_blank">
+                                                                    <span title="country">{stock.country}</span>
+                                                                </Link>
+                                                            </Typography>
+                                                        </Box>
                                                     </Box>
-                                                    <Box my={2}>
+                                                    {/* <Box mt={2}>
                                                         <Typography
                                                             display="block"
                                                             noWrap={true}
-                                                            variant="body1"
-                                                        >
-                                                            <span title="sector">{stock.sector}</span>
-                                                            {" "}・{" "}
-                                                            <span title="industry">{stock.industry}</span>
-                                                        </Typography>
-                                                        <Typography
-                                                            display="block"
-                                                            noWrap={true}
-                                                            variant="body1"
-                                                        >
-                                                            {stock.exchange}
-                                                            {" "}・{" "}
-                                                            {stock.country}
-                                                        </Typography>
-                                                    </Box>
-                                                    <Box mt={2}>
-                                                        <Typography
-                                                            display="block"
-                                                            noWrap={true}
-                                                        >{(stock.currency_symbol === 'p' ? '£' : stock.currency_symbol) + ' ' + numeral(stock.market_capitalization).format('(0.00a)')}</Typography>
-                                                    </Box>
+                                                        >{'$ ' + numeral(stock.market_capitalization).format('(0.00a)')}</Typography>
+                                                    </Box> */}
                                                 </Box>
                                             </Box>
                                         </Box>
-                                    </Paper>
-                                </Grid>
-                                <Grid item xs={7}>
-                                    <Paper style={{ height: '100%' }}>
-                                        <Comparer stock={stock} />
                                     </Paper>
                                 </Grid>
                             </Grid>
 
                         </Box>
 
-                        <Paper>
-                            <Table
-                                ticker={ticker}
-                                title={'Ratios'}
-                                years={stock.yearlyFinancials.years}
-                                data={mergedAggregateCalculations || calculationResults}
-                                allowNewCalc={true}
-                            />
-                        </Paper>
+                        <RatioCollections
+                            stock={stock}
+                            ticker={ticker}
+                        />
 
                         <Paper>
                             <Table
@@ -263,7 +191,7 @@ export const Stock: FunctionComponent<{
                                 >
                                     <Typography variant="h5">
                                         Fin. Statements
-                                </Typography>
+                                    </Typography>
 
                                     <ToggleButtonGroup size="small" exclusive value={visibleFinancials || 'pl'} onChange={handleVisibleFinancials} color="primary">
                                         <ToggleButton value="pl" defaultChecked>Income Statement</ToggleButton>
@@ -280,7 +208,6 @@ export const Stock: FunctionComponent<{
                                                     title={'Income Statement'}
                                                     years={stock.yearlyFinancials.years}
                                                     data={mergedStockAndAggregateYearlyFinancials?.pl || stock.yearlyFinancials.pl}
-                                                    isBiggerHACK={true}
                                                 />
                                             </Paper>
                                         </Grid>
@@ -292,7 +219,6 @@ export const Stock: FunctionComponent<{
                                                     title={'Balance Sheet'}
                                                     years={stock.yearlyFinancials.years}
                                                     data={mergedStockAndAggregateYearlyFinancials?.bs || stock.yearlyFinancials.bs}
-                                                    isBiggerHACK={true}
                                                 />
                                             </Paper>
                                         </Grid>
@@ -304,7 +230,6 @@ export const Stock: FunctionComponent<{
                                                     title={'Cash Flow'}
                                                     years={stock.yearlyFinancials.years}
                                                     data={mergedStockAndAggregateYearlyFinancials?.cf || stock.yearlyFinancials.cf}
-                                                    isBiggerHACK={true}
                                                 />
                                             </Paper>
                                         </Grid>

@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 
 export default function useSearchParams() {
     const location = useLocation();
+    const history = useHistory();
 
     const allSearchParams = Object.fromEntries(new URLSearchParams(location.search)) as {
         ticker?: string,
         ratio?: string,
         visibleFinancials?: 'pl' | 'bs' | 'cf',
-        showPercentage?: boolean
+        showPercentage?: boolean,
+        ratioCollections?: string,
+        ratioCollection?: string,
     };
 
     const getNewSearchParamsString = ({
@@ -23,10 +26,17 @@ export default function useSearchParams() {
             ...paramsToAdd
         })
             .filter(([k, v]) => !keysToRemove?.includes(k))
-            .reduce((p, [k, v]) => ({ ...p, [k]: v }), {})).toString()
+            .reduce((p, [k, v]) => ({ ...p, [k]: v }), {})).toString();
+
+    const updateParams = ({ search }: { search: string }) =>
+        history.push({
+            pathname: location.pathname,
+            search
+        })
 
     return {
         allSearchParams,
-        getNewSearchParamsString
+        getNewSearchParamsString,
+        updateParams
     };
 }

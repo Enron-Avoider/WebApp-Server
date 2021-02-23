@@ -1,5 +1,6 @@
 const { RESTDataSource } = require("apollo-datasource-rest");
 const { ObjectId } = require("mongodb");
+const { customAlphabet, urlAlphabet } = require("nanoid");
 
 const { EODDataMaps } = require("../data-maps");
 const mathToMongo = require("../utils/mathToMongo");
@@ -13,6 +14,7 @@ module.exports = {
       this.keys = {};
 
       this.mongoDBStocksTable = mongoDB.collection("Stocks");
+      this.mongoDBRatioCollectionTable = mongoDB.collection("RatioCollection");
     }
 
     searchStocks = async ({ name }) => {
@@ -39,7 +41,7 @@ module.exports = {
 
       const stockInDB = await this.mongoDBStocksTable.findOne({
         code: Ticker,
-        ...EODExchange && { EODExchange },
+        ...(EODExchange && { EODExchange }),
         is_in_exchange_country: true,
       });
 
@@ -362,8 +364,6 @@ module.exports = {
           };
         });
 
-        console.log(JSON.stringify(calcs_, null, 2));
-
         return await this.mongoDBStocksTable
           .aggregate([
             {
@@ -401,8 +401,10 @@ module.exports = {
                           name: 1,
                           code: 1,
                           "yearlyFinancialsByYear.year": 1,
-                          [`calc_${fieldName}`]: { $toDecimal: `$calc_${fieldName}` },
-                        //   [path]: { $toDecimal: `$${path}` },
+                          [`calc_${fieldName}`]: {
+                            $toDecimal: `$calc_${fieldName}`,
+                          },
+                          //   [path]: { $toDecimal: `$${path}` },
                         },
                       },
                       {
@@ -655,6 +657,72 @@ module.exports = {
       return {
         count: dupes.length,
         dupes,
+      };
+    };
+
+    getRatioCollections = async () => {
+      return await this.mongoDBRatioCollectionTable.find().toArray();
+    };
+
+    getUniqueNanoid = async (table) => {
+      const nanoid = customAlphabet(urlAlphabet, 2)();
+
+      const nanoidInDB = (
+        await table
+          .find({
+            nanoid,
+          })
+          .toArray()
+      )[0];
+
+      if (!!nanoidInDB) {
+        console.log(`${nanoid} already used`);
+        return this.getUniqueNanoid(table);
+      } else {
+        return nanoid;
+      }
+    };
+
+    saveRatioCollection = async ({ ratioCollection }) => {
+      // TODO: check permission
+
+      console.log("heeeere!!", {
+        ratioCollection: JSON.stringify(ratioCollection, null, 2),
+      });
+
+      const ratioCollectionInDB =
+        ratioCollection.nanoid &&
+        (
+          await this.mongoDBRatioCollectionTable
+            .find({
+              id: ratioCollection.id,
+            })
+            .toArray()
+        )[0];
+
+      const newNanoid = await this.getUniqueNanoid(
+        this.mongoDBRatioCollectionTable
+      );
+
+      if (!!ratioCollectionInDB) {
+        const updated = await this.mongoDBRatioCollectionTable.updateOne(
+          { _id: ratioCollectionInDB._id },
+          { $set: { ...ratioCollection } }
+        );
+        console.log(`updated ${ratioCollection.name}`);
+      } else {
+        const created = await this.mongoDBRatioCollectionTable.insertOne({
+          ...ratioCollection,
+          id: newNanoid,
+        });
+        console.log(`created ${ratioCollection.name}`);
+      }
+
+      return {
+        ...ratioCollection,
+        id: !!ratioCollectionInDB ? ratioCollectionInDB.id : newNanoid,
+        // isOwnedByPlatform: 'TODO',
+        // isOwnedByUser: 'TODO'
       };
     };
   },

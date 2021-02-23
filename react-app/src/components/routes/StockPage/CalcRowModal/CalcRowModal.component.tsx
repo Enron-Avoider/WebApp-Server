@@ -20,10 +20,9 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import {
-    GET_CALCULATIONS,
-    ADD_CALCULATION,
     REMOVE_CALCULATION,
-    SAVE_CALCULATION
+    GET_RATIO_COLLECTIONS,
+    SAVE_RATIO_COLLECTION
 } from '@state/byModel/Calculations/calculations.queries';
 import { doCalculations, scopeToRows, CalculationType } from '../calculations.map';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
@@ -37,19 +36,34 @@ export default function NewCalcRowModal() {
     const location = useLocation();
 
     const { allSearchParams, getNewSearchParamsString } = useSearchParams();
-
     const searchParams = allSearchParams;
+
+    const { loading: ratioCollections_loading, error: ratioCollections_error, data: ratioCollectionsQ } = useQuery(GET_RATIO_COLLECTIONS, {
+        variables: { ticker: searchParams.ticker },
+        skip: !searchParams.ticker
+    });
+
+    const [chosenCollectionName, chosenCollectionId] = searchParams.ratioCollection?.split('.') || [];
+
+    const chosenCollection = ratioCollectionsQ?.getRatioCollections.find((c: any) => c.id === chosenCollectionId);
+
+    const existingCalc = chosenCollection?.calcs?.find((c: any) => c.title === searchParams.ratio);
+
+    console.log({
+        chosenCollectionName,
+        chosenCollectionId,
+        ratioCollectionsQ,
+        chosenCollection,
+        existingCalc
+    });
 
     const { loading, error, data } = useQuery(GET_STOCK, {
         variables: { ticker: searchParams.ticker },
+        skip: !searchParams.ticker
     });
-    const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
-        variables: { ticker: searchParams.ticker },
-    });
-    const [addCalculation] = useMutation(ADD_CALCULATION);
+
     const [removeCalculation] = useMutation(REMOVE_CALCULATION);
-    const [saveCalculation] = useMutation(SAVE_CALCULATION);
-    const [existing, setExistinging] = React.useState<Object>({});
+    const [saveRatioCollection] = useMutation(SAVE_RATIO_COLLECTION);
 
     const isOpen = !!searchParams.ticker;
 
@@ -101,7 +115,7 @@ export default function NewCalcRowModal() {
         history.push({
             pathname: location.pathname,
             search: getNewSearchParamsString({
-                keysToRemove: ['ratio', 'ticker']
+                keysToRemove: ['ratio', 'ticker', 'ratioCollection']
             }),
         })
     };
@@ -147,20 +161,15 @@ export default function NewCalcRowModal() {
     ];
 
     const handleAdd = async () => {
+        console.log('SADFEQWFDWAFSVFDAWDDWADsdadadvjbASDAASDasdas');
         console.log({
             calc
         });
-        await addCalculation({
+        await saveRatioCollection({
             variables: {
-                title: titleValue,
-                about: aboutValue,
-                onTable: 'hum',
-                calc: calc[0].calc,
-                scope: calc[0].scope
+                ratioCollection: chosenCollection,
             }
-        })
-            .then(d => console.log({ d }))
-            .catch(e => console.log({ e }));
+        });
         handleClose();
     }
 
@@ -174,14 +183,46 @@ export default function NewCalcRowModal() {
     }
 
     const handleSave = async () => {
-        await saveCalculation({
+
+        console.log({
+            calc,
+            titleValue,
+            aboutValue,
+            existingCalc,
+            chosenCollection,
+            calcs: chosenCollection.calcs.map((c: any) => {
+                if (c.title === existingCalc.title) {
+                    return {
+                        ...c,
+                        calc: calc[0].calc,
+                        title: titleValue,
+                        about: aboutValue,
+                        scope: calc[0].scope
+                    }
+                } else {
+                    return c;
+                }
+            })
+        });
+
+        await saveRatioCollection({
             variables: {
-                newTitle: titleValue,
-                title: searchParams.ratio,
-                about: aboutValue,
-                onTable: 'hum',
-                calc: calc[0].calc,
-                scope: calc[0].scope
+                ratioCollection: {
+                    ...chosenCollection,
+                    calcs: chosenCollection.calcs.map((c: any) => {
+                        if (c.title === existingCalc.title) {
+                            return {
+                                ...c,
+                                calc: calc[0].calc,
+                                title: titleValue,
+                                about: aboutValue,
+                                scope: calc[0].scope
+                            }
+                        } else {
+                            return c;
+                        }
+                    })
+                }
             }
         });
         handleClose();
@@ -195,21 +236,19 @@ export default function NewCalcRowModal() {
     const scopeRows = scopeToRows(calc[0].scope, stock);
 
     useEffect(() => {
-        const existing = calculations.calculations.find((c: any) => c.title === searchParams.ratio);
-        setExistinging(existing);
-        if (existing) {
-            setTitleValue(existing.title);
-            setAboutValue(existing.about);
-            const autocompleteValue = existing?.calc.split('').map((letter: string) => {
+        if (existingCalc) {
+            setTitleValue(existingCalc.title);
+            setAboutValue(existingCalc.about);
+            const autocompleteValue = existingCalc?.calc.split('').map((letter: string) => {
                 if (['a', 'b', 'c', 'd', 'e', 'f', 'g'].includes(letter)) {
-                    return options.find((op) => op.value === existing.scope[letter])
+                    return options.find((op) => op.value === existingCalc.scope[letter])
                 } else {
                     return options.find((op) => op.value === letter)
                 }
             });
             setAutocompleteValue(autocompleteValue);
         }
-    }, [calculations, searchParams.ratio]);
+    }, [searchParams.ratio]);
 
     return (
         <Dialog open={isOpen} onClose={handleClose}>
@@ -326,7 +365,7 @@ export default function NewCalcRowModal() {
 
                 </DialogContent>
                 <DialogActions>
-                    {existing && (
+                    {existingCalc && (
                         <>
                             <Button onClick={handleRemove} color="primary">
                                 Remove
@@ -337,7 +376,7 @@ export default function NewCalcRowModal() {
                             </Button>
                         </>
                     )}
-                    {!existing && (
+                    {!existingCalc && (
                         <Button onClick={handleAdd} color="secondary">
                             Add
                         </Button>

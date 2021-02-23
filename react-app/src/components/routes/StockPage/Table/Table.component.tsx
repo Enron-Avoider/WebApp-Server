@@ -19,6 +19,7 @@ import {
     Popper,
     MenuList,
     MenuItem,
+    TextField
 } from '@material-ui/core';
 import { ArrowDropDown, Equalizer } from '@material-ui/icons';
 const math = require("mathjs");
@@ -64,23 +65,15 @@ export default function Table(
         years,
         data,
         title = '',
-        allowNewCalc = false,
-        // showPercentage,
-        // toggleShowPercentage,
-        showGraph,
-        toggleShowGraph,
-        isBiggerHACK
+        newCalcCollection,
+        onTitleEdit,
     }: {
         ticker?: string,
         years: number[],
         data: {}[],
         title?: string,
-        allowNewCalc?: boolean,
-        // showPercentage?: boolean,
-        // toggleShowPercentage?: any,
-        showGraph?: boolean,
-        toggleShowGraph?: any,
-        isBiggerHACK?: boolean
+        newCalcCollection?: string,
+        onTitleEdit?: Function
     }
 ) {
 
@@ -162,9 +155,22 @@ export default function Table(
 
             {title && (
                 <Box position="relative" mt={-1} display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h5">
-                        {title}
-                    </Typography>
+                    {onTitleEdit ? (
+                        <TextField
+                            // label="Name"
+                            // fullWidth
+                            // size="small"
+                            // variant="outlined"
+                            value={title}
+                            onChange={(event: any) => {
+                                onTitleEdit(event?.target?.value);
+                            }}
+                        />
+                    ) : (
+                            <Typography variant="h5">
+                                {title}
+                            </Typography>
+                        )}
 
                     <Box>
                         <IconButton color={showPercentage ? 'secondary' : 'primary'} onClick={toggleShowPercentage}>
@@ -253,7 +259,7 @@ export default function Table(
                                                                                     color="inherit"
                                                                                     to={{
                                                                                         pathname: location.pathname,
-                                                                                        search: getNewSearchParamsString({ paramsToAdd: { ratio: cell.value, ticker } })
+                                                                                        search: getNewSearchParamsString({ paramsToAdd: { ratio: cell.value, ticker, ratioCollection: newCalcCollection } })
                                                                                     }}
                                                                                 >
                                                                                     {cell.value || ''}
@@ -339,7 +345,7 @@ export default function Table(
             </Popper>
 
 
-            {allowNewCalc && <NewCalcRowButton title={title} ticker={ticker} />}
+            {newCalcCollection && <NewCalcRowButton title={title} ticker={ticker || ''} newCalcCollection={newCalcCollection} />}
 
         </Box>
 
