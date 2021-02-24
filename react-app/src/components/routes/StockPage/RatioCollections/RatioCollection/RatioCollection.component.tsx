@@ -47,7 +47,7 @@ export const RatioCollection: FunctionComponent<{
             setTitle(edit);
         }
 
-        // const { loading: loading__, error: error__, data: aggregate_for_todo } = useQuery(GET_AGGREGATE_FOR_STOCK, {
+        // const { loading: loading__, error: error__, data: aggregate_for_todo } = useQuery(GET_AGGREGATE_FOR_FINANCIAL_ROWS, {
         //     variables: {
         //         // sector: stock.sector,
         //         industry: stock && stock.industry,

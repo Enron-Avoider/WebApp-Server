@@ -6,8 +6,10 @@ module.exports = {
       dataSources.Ours.getStockByCode(params),
     getAggregate: async (_source, params, { dataSources }) =>
       dataSources.Ours.getAggregate(params),
-    getAggregateForStock: async (_source, params, { dataSources }) =>
-      dataSources.Ours.getAggregateForStock(params),
+    getAggregateForFinancialRows: async (_source, params, { dataSources }) =>
+      dataSources.Ours.getAggregateForFinancialRows(params),
+    getAggregateForCalcRows: async (_source, params, { dataSources }) =>
+      dataSources.Ours.getAggregateForCalcRows(params),
     removeEmptyAndDuplicates: async (_source, params, { dataSources }) =>
       dataSources.Ours.removeEmptyAndDuplicates(params),
     getDistinctStockNames: async (_source, params, { dataSources }) =>

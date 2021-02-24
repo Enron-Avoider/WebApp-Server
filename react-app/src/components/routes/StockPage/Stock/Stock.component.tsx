@@ -16,7 +16,7 @@ import {
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import { GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
-import { GET_AGGREGATE_FOR_STOCK } from '@state/byModel/Aggregate/aggregate.queries';
+import { GET_AGGREGATE_FOR_FINANCIAL_ROWS } from '@state/byModel/Aggregate/aggregate.queries';
 
 import './style.sass';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
@@ -52,18 +52,20 @@ export const Stock: FunctionComponent<{
 
         // TODO: getMergedAggregates.effect
 
-        const { loading: loading__, error: error__, data: aggregate_for_todo } = useQuery(GET_AGGREGATE_FOR_STOCK, {
+        const { loading: loading__, error: error__, data: aggregateForFinancialRows } = useQuery(GET_AGGREGATE_FOR_FINANCIAL_ROWS, {
             variables: {
-                industry: stock && stock.industry,
+                query: {
+                    industry: stock && stock.industry,
+                }
             },
             skip: !stock
         });
 
-        const mergedStockAndAggregateYearlyFinancials = mergeStockAndAggregateYearlyFinancials(stock, aggregate_for_todo);
+        const mergedStockAndAggregateYearlyFinancials = mergeStockAndAggregateYearlyFinancials(stock, aggregateForFinancialRows);
 
         console.log({
             stock,
-            aggregate_for_todo,
+            aggregateForFinancialRows,
             mergedStockAndAggregateYearlyFinancials,
         });
 

@@ -53,6 +53,13 @@ const typeDefs = gql`
     calcs: [Calc]
   }
 
+  input AggregationInputQuery {
+    sector: String
+    industry: String
+    country: String
+    exchange: String
+  }
+
   type Query {
     searchStocks(name: String): [EODStock]
     getStockByCode(code: String): EODStock
@@ -65,13 +72,13 @@ const typeDefs = gql`
       wtv: String
     ): JSON
 
-    getAggregateForStock(
-      sector: String
-      industry: String
-      country: String
-      exchange: String
+    getAggregateForFinancialRows(
+      query: AggregationInputQuery
+    ): JSON
+
+    getAggregateForCalcRows(
+      query: AggregationInputQuery
       calcs: [JSON]
-      wtv: String
     ): JSON
 
     getAllExchanges: JSON

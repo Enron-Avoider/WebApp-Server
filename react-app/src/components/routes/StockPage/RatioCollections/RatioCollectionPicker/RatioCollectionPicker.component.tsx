@@ -18,13 +18,13 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
     //     allSearchParams
     // });
 
-    const options: { value: string, title: string, type: string }[] = ratioCollections?.map((c: any) => ({
+    const options: { value: string, title: string, type: string }[] = ratioCollections ? ratioCollections?.map((c: any) => ({
         value: c.id,
         title: c.name,
         type: c.isOwnedByPlatform ? 'system' : c.isOwnedByUser ? 'user' : 'other\'s'
-    }));
+    })) : [];
 
-    const pickedChosenCollections = options ? (
+    const pickedChosenCollections = allSearchParams.ratioCollections?.length ? (
         ids => ids?.map(
             (n: any) => options.find((c: any) => c.value === n)
         )
@@ -38,8 +38,13 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
     const handleCollectionToggle = (e: any, { v }: any) => {
         updateParams({
             search: getNewSearchParamsString({
-                paramsToAdd: {
-                    ratioCollections: v.reduce((p: any, c: any) => `${p ? p + '-' : ''}${c.title}.${c.value}`, '')
+                ...v.length && {
+                    paramsToAdd: {
+                        ratioCollections: v.reduce((p: any, c: any) => `${p ? p + '-' : ''}${c.title}.${c.value}`, '')
+                    }
+                },
+                ...!v.length && {
+                    keysToRemove: ['ratioCollections']
                 }
             })
         })

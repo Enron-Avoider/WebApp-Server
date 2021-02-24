@@ -11,9 +11,17 @@ export const GET_AGGREGATE = gql`
     }
 `;
 
-export const GET_AGGREGATE_FOR_STOCK = gql`
+export const GET_AGGREGATE_FOR_FINANCIAL_ROWS = gql`
+    query($query: AggregationInputQuery ) {
+        getAggregateForFinancialRows(
+            query: $query
+        )
+    }
+`;
+
+export const GET_AGGREGATE_FOR_CALC_ROWS = gql`
     query($sector: String, $industry: String, $country: String, $exchange: String, $calcs: [JSON] ) { 
-        getAggregateForStock(
+        getAggregateForCALCRows(
             sector: $sector,
             industry: $industry,
             country: $country, 

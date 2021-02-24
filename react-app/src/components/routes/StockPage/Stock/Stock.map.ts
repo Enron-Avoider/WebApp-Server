@@ -17,14 +17,14 @@ export const mergeStockAndAggregateYearlyFinancials = (stock: any, aggregate_for
                 [k]: (k === "years") ? v : v.map((v_: any) => ({
                     ...v_,
                     aggregate: convertAggregateArrayToObjectWithYearlyKeys(
-                        aggregate_for_todo.getAggregateForStock.defaultRows[`${k}_${v_.title}`],
+                        aggregate_for_todo.getAggregateForFinancialRows.financialRows[`${k}_${v_.title}`],
                         stock
                     ),
                     ...v_.subRows && {
                         subRows: v_.subRows.map((v__: any) => ({
                             ...v__,
                             aggregate: convertAggregateArrayToObjectWithYearlyKeys(
-                                aggregate_for_todo.getAggregateForStock.defaultRows[`${k}_${v_.title}_${v__.title}`],
+                                aggregate_for_todo.getAggregateForFinancialRows.financialRows[`${k}_${v_.title}_${v__.title}`],
                                 stock
                             ),
                         }))
@@ -35,14 +35,14 @@ export const mergeStockAndAggregateYearlyFinancials = (stock: any, aggregate_for
         );
 
 export const mergeAggregateCalculations = (calculationResults: any, aggregate_for_todo: any, stock: any) =>
-    calculationResults?.length && aggregate_for_todo?.getAggregateForStock?.calcRows &&
+    calculationResults?.length && aggregate_for_todo?.getAggregateForFinancialRows?.calcRows &&
     (Object.entries(calculationResults) as any)
         .filter(([key, value]: any) => !!value && key !== '__typename')
         .map(
             ([k, v]: any) => ({
                 ...v,
                 aggregate: convertAggregateArrayToObjectWithYearlyKeys(
-                    aggregate_for_todo.getAggregateForStock.calcRows[`calc_${v.title}`],
+                    aggregate_for_todo.getAggregateForFinancialRows.calcRows[`calc_${v.title}`],
                     stock
                 ),
             })

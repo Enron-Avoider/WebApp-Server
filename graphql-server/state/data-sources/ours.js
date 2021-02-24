@@ -264,23 +264,12 @@ module.exports = {
       };
     };
 
-    getAggregateForStock = async ({
-      sector,
-      industry,
-      country,
-      exchange,
-      calcs,
-    }) => {
-      const defaultRows = async () =>
+    getAggregateForFinancialRows = async ({ query }) => {
+      const financialRows = async () =>
         await this.mongoDBStocksTable
           .aggregate([
             {
-              $match: {
-                ...(sector && { sector }),
-                ...(industry && { industry }),
-                ...(country && { country }),
-                ...(exchange && { exchange }),
-              },
+              $match: query,
             },
             {
               $unwind: {
@@ -348,6 +337,13 @@ module.exports = {
           ])
           .toArray();
 
+      return {
+        query,
+        financialRows: (await financialRows())[0],
+      };
+    };
+
+    getAggregateForCalcRows = async ({ query, calcs }) => {
       const calcRows = async () => {
         const calcs_ = calcs.map((c) => {
           const paths = Object.values(c.scope).map(
@@ -367,12 +363,7 @@ module.exports = {
         return await this.mongoDBStocksTable
           .aggregate([
             {
-              $match: {
-                ...(sector && { sector }),
-                ...(industry && { industry }),
-                ...(country && { country }),
-                ...(exchange && { exchange }),
-              },
+              $match: query,
             },
             {
               $unwind: {
@@ -451,9 +442,8 @@ module.exports = {
       };
 
       return {
-        query: { sector, industry, country, exchange },
+        query,
         ...(calcs && { calcRows: (await calcRows())[0] }),
-        defaultRows: (await defaultRows())[0],
       };
     };
 
@@ -686,10 +676,6 @@ module.exports = {
     saveRatioCollection = async ({ ratioCollection }) => {
       // TODO: check permission
 
-      console.log("heeeere!!", {
-        ratioCollection: JSON.stringify(ratioCollection, null, 2),
-      });
-
       const ratioCollectionInDB =
         ratioCollection.id &&
         (
@@ -709,13 +695,13 @@ module.exports = {
           { _id: ratioCollectionInDB._id },
           { $set: { ...ratioCollection } }
         );
-        console.log(`updated ${ratioCollection.name}`);
+        console.log(`updated ${ratioCollection.name} ${ratioCollection.id}`);
       } else {
         const created = await this.mongoDBRatioCollectionTable.insertOne({
           ...ratioCollection,
           id: newNanoid,
         });
-        console.log(`created ${ratioCollection.name}`);
+        console.log(`created ${ratioCollection.name} ${newNanoid}`);
       }
 
       return {
