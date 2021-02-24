@@ -43,7 +43,8 @@
     "react-scroll-sync": "^0.7.1",
     "react-table": "^7.0.4",
     "react-table-sticky": "^1.1.2",
-    "react-window": "^1.8.5"
+    "react-window": "^1.8.5",
+    "use-debounce": "^5.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",

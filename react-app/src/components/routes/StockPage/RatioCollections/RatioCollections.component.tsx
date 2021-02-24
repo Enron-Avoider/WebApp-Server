@@ -12,7 +12,8 @@ import {
 import './style.sass';
 import Table from '../Table';
 import { doCalculations } from '../calculations.map';
-import RatioCollectionPicker from '../RatioCollectionPicker';
+import RatioCollectionPicker from './RatioCollectionPicker';
+import RatioCollection from './RatioCollection';
 import { GET_RATIO_COLLECTIONS, GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 
@@ -63,20 +64,12 @@ export const RatioCollections: FunctionComponent<{
 
                 <Grid container spacing={3}>
                     {pickedChosenCollectionsWithCalculations?.map((c, i) => (
-                        <Grid key={i} item xs={(12) as any}>
-                            <Paper elevation={5}>
-                                <Box mb={-3}>
-                                    <Table
-                                        ticker={ticker}
-                                        title={c.name}
-                                        years={stock.yearlyFinancials.years}
-                                        data={c.calculationResults}
-                                        onTitleEdit={(edit: string) => console.log(edit)}
-                                        newCalcCollection={`${c.name}.${c.id}`}
-                                    />
-                                </Box>
-                            </Paper>
-                        </Grid>
+                        <RatioCollection
+                            key={i}
+                            ticker={ticker}
+                            stock={stock}
+                            collection={c}
+                        />
                     ))}
                 </Grid>
             </Box>
