@@ -48,7 +48,7 @@ export const RatioCollections: FunctionComponent<{
 
     return (
         <Paper>
-            <Box p={2} mt={2} minHeight={85}>
+            <Box p={2} mt={2} pb={5} minHeight={85}>
                 <Box
                     display="flex"
                     alignItems="center"
@@ -65,14 +65,16 @@ export const RatioCollections: FunctionComponent<{
                     {pickedChosenCollectionsWithCalculations?.map((c, i) => (
                         <Grid key={i} item xs={(12) as any}>
                             <Paper elevation={5}>
-                                <Table
-                                    ticker={ticker}
-                                    title={c.name}
-                                    years={stock.yearlyFinancials.years}
-                                    data={c.calculationResults}
-                                    onTitleEdit={(edit: string) => console.log(edit)}
-                                    newCalcCollection={`${c.name}.${c.id}`}
-                                />
+                                <Box mb={-3}>
+                                    <Table
+                                        ticker={ticker}
+                                        title={c.name}
+                                        years={stock.yearlyFinancials.years}
+                                        data={c.calculationResults}
+                                        onTitleEdit={(edit: string) => console.log(edit)}
+                                        newCalcCollection={`${c.name}.${c.id}`}
+                                    />
+                                </Box>
                             </Paper>
                         </Grid>
                     ))}

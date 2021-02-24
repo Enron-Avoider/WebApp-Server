@@ -691,7 +691,7 @@ module.exports = {
       });
 
       const ratioCollectionInDB =
-        ratioCollection.nanoid &&
+        ratioCollection.id &&
         (
           await this.mongoDBRatioCollectionTable
             .find({

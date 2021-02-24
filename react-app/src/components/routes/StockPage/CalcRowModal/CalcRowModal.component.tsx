@@ -20,7 +20,6 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import {
-    REMOVE_CALCULATION,
     GET_RATIO_COLLECTIONS,
     SAVE_RATIO_COLLECTION
 } from '@state/byModel/Calculations/calculations.queries';
@@ -44,9 +43,7 @@ export default function NewCalcRowModal() {
     });
 
     const [chosenCollectionName, chosenCollectionId] = searchParams.ratioCollection?.split('.') || [];
-
     const chosenCollection = ratioCollectionsQ?.getRatioCollections.find((c: any) => c.id === chosenCollectionId);
-
     const existingCalc = chosenCollection?.calcs?.find((c: any) => c.title === searchParams.ratio);
 
     console.log({
@@ -62,7 +59,6 @@ export default function NewCalcRowModal() {
         skip: !searchParams.ticker
     });
 
-    const [removeCalculation] = useMutation(REMOVE_CALCULATION);
     const [saveRatioCollection] = useMutation(SAVE_RATIO_COLLECTION);
 
     const isOpen = !!searchParams.ticker;
@@ -96,16 +92,19 @@ export default function NewCalcRowModal() {
                         }
                     ], []) :
                     []
-            ], []),
-            // ...(deepFind(stock, table.path).subRows) ? deepFind(stock, table.path).subRows.map((row: any) => ({
-            //     value: `${table.path}.subRows[${row.title}]`,
-            //     title: row.title,
-            //     type: table.tableName
-            // })): []
+            ], [])
         ];
     }, []).filter(i => i.title) : [];
 
-    // console.log({ calcRowOptions, df: deepFind(stock, 'yearlyFinancials.bs') });
+    const options = [
+        { value: '/', title: '/', type: 'Math' },
+        { value: '*', title: '*', type: 'Math' },
+        { value: '+', title: '+', type: 'Math' },
+        { value: '-', title: '-', type: 'Math' },
+        { value: '(', title: '(', type: 'Math' },
+        { value: ")", title: ')', type: 'Math' },
+        ...calcRowOptions
+    ];
 
     const history = useHistory();
     const handleClose = () => {
@@ -122,22 +121,11 @@ export default function NewCalcRowModal() {
 
     const [titleValue, setTitleValue] = React.useState('');
     const [aboutValue, setAboutValue] = React.useState('');
-
     const [autocompleteValue, setAutocompleteValue] = React.useState([]);
 
     const handleOnChange = (e: any, v: any) => {
         setAutocompleteValue(v);
     }
-
-    const options = [
-        { value: '/', title: '/', type: 'Math' },
-        { value: '*', title: '*', type: 'Math' },
-        { value: '+', title: '+', type: 'Math' },
-        { value: '-', title: '-', type: 'Math' },
-        { value: '(', title: '(', type: 'Math' },
-        { value: ")", title: ')', type: 'Math' },
-        ...calcRowOptions
-    ];
 
     // autocompleteValue to calc
     // console.log({ autocompleteValue });
@@ -161,50 +149,39 @@ export default function NewCalcRowModal() {
     ];
 
     const handleAdd = async () => {
-        console.log('SADFEQWFDWAFSVFDAWDDWADsdadadvjbASDAASDasdas');
-        console.log({
-            calc
-        });
         await saveRatioCollection({
             variables: {
-                ratioCollection: chosenCollection,
+                ratioCollection: {
+                    ...chosenCollection,
+                    calcs: [
+                        ...chosenCollection.calcs,
+                        {
+                            calc: calc[0].calc,
+                            title: titleValue,
+                            about: aboutValue,
+                            scope: calc[0].scope
+                        }
+                    ]
+                }
             }
         });
         handleClose();
     }
 
     const handleRemove = async () => {
-        await removeCalculation({
+        await saveRatioCollection({
             variables: {
-                title: searchParams.ratio,
+                ratioCollection: {
+                    ...chosenCollection,
+                    calcs: chosenCollection.calcs
+                        .filter((c: any) => c.title !== existingCalc.title)
+                }
             }
         });
         handleClose();
     }
 
     const handleSave = async () => {
-
-        console.log({
-            calc,
-            titleValue,
-            aboutValue,
-            existingCalc,
-            chosenCollection,
-            calcs: chosenCollection.calcs.map((c: any) => {
-                if (c.title === existingCalc.title) {
-                    return {
-                        ...c,
-                        calc: calc[0].calc,
-                        title: titleValue,
-                        about: aboutValue,
-                        scope: calc[0].scope
-                    }
-                } else {
-                    return c;
-                }
-            })
-        });
-
         await saveRatioCollection({
             variables: {
                 ratioCollection: {
@@ -255,7 +232,12 @@ export default function NewCalcRowModal() {
             <Box
                 minWidth={450}
             >
-                <DialogTitle>Ratio Builder <span title="just kidding, copy this all you want">™️</span></DialogTitle>
+                <DialogTitle>
+                    {!existingCalc ?
+                        `New Ratio on ${chosenCollectionName}` :
+                        `${existingCalc.title} on ${chosenCollectionName}`
+                    }
+                </DialogTitle>
                 <DialogContent>
 
                     <Box display="flex" justifyContent="space-around">
@@ -342,7 +324,6 @@ export default function NewCalcRowModal() {
                                     ...Object.values(scopeRows),
                                     ...calcRow
                                 ]}
-                                allowNewCalc={false}
                             />
                         </Box>
 
