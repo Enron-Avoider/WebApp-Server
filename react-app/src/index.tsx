@@ -12,13 +12,8 @@ import env from '@env';
 
 import App from './App';
 import './index.scss';
-import { GET_TODOS } from '@state/byModel/Todos/todos.queries';
-import { GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
-import { todoResolvers } from '@state/byModel/Todos/todo.resolvers';
-import { calculationsResolvers } from '@state/byModel/Calculations/calculations.resolvers';
-import { CalculationsProvider } from '@state/byModel/Calculations/calculations.contextReducer';
 
-console.log({ env, todoResolvers, calculationsResolvers });
+console.log({ env });
 
 (async () => {
 
@@ -30,28 +25,7 @@ console.log({ env, todoResolvers, calculationsResolvers });
     const client = new ApolloClient({
         uri: env.graphql,
         cache,
-        resolvers: {
-            Mutation: {
-                ...calculationsResolvers.Mutation,
-                ...todoResolvers.Mutation,
-            }
-        }
     });
-
-    try {
-        client.readQuery({ query: GET_CALCULATIONS });
-        client.readQuery({ query: GET_TODOS });
-    } catch (error) {
-        console.log({ error });
-        client.writeData({
-            data: {
-                todos: [],
-                calculations: [],
-                // searchedStocks: [], // TODO
-                // compareWith: {},    // TODO
-            }
-        });
-    }
 
     const darkTheme = responsiveFontSizes(createMuiTheme({
         palette: {
@@ -67,14 +41,13 @@ console.log({ env, todoResolvers, calculationsResolvers });
     }), { factor: 15 });
 
     ReactDOM.render(
-        <CalculationsProvider>
-            <ApolloProvider client={client}>
-                <ThemeProvider theme={darkTheme}>
-                    <CssBaseline />
-                    <App />
-                </ThemeProvider>
-            </ApolloProvider>
-        </CalculationsProvider>,
+
+        <ApolloProvider client={client}>
+            <ThemeProvider theme={darkTheme}>
+                <CssBaseline />
+                <App />
+            </ThemeProvider>
+        </ApolloProvider>,
         document.getElementById('app')
     );
 

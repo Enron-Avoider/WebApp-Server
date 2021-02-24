@@ -1,6 +1,5 @@
 import React, { useState, FunctionComponent, useContext } from 'react';
 import { useQuery } from "react-apollo";
-import numeral from 'numeral';
 import { useParams, useLocation, useHistory } from "react-router-dom";
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
@@ -16,9 +15,8 @@ import {
 } from '@material-ui/core';
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
-import { GET_RATIO_COLLECTIONS, GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
+import { GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
 import { GET_AGGREGATE_FOR_STOCK } from '@state/byModel/Aggregate/aggregate.queries';
-import { calculationsStore } from '@state/byModel/Calculations/calculations.contextReducer';
 
 import './style.sass';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
@@ -45,50 +43,31 @@ export const Stock: FunctionComponent<{
             }),
         });
 
-        const { state: calculationsState, dispatch } = useContext(calculationsStore);
-
         const { loading, error, data } = useQuery(GET_STOCK, {
-            variables: { ticker },
-            skip: !ticker
-        });
-
-        const { loading: loading_, error: error_, data: calculations } = useQuery(GET_CALCULATIONS, {
             variables: { ticker },
             skip: !ticker
         });
 
         const stock = data && data.getStockByCode;
 
-        const calculationResults = stock && doCalculations(calculations?.calculations, stock.yearlyFinancials.years, stock);
-
         // TODO: getMergedAggregates.effect
 
         const { loading: loading__, error: error__, data: aggregate_for_todo } = useQuery(GET_AGGREGATE_FOR_STOCK, {
             variables: {
-                // sector: stock.sector,
                 industry: stock && stock.industry,
-                // country: stock.country,
-                // exchange: stock.exchange,
-                ...calculations?.calculations.length && { calcs: calculations?.calculations }
             },
             skip: !stock
         });
 
         const mergedStockAndAggregateYearlyFinancials = mergeStockAndAggregateYearlyFinancials(stock, aggregate_for_todo);
 
-        const mergedAggregateCalculations = mergeAggregateCalculations(calculationResults, aggregate_for_todo, stock);
-
         console.log({
             stock,
-            calculations,
             aggregate_for_todo,
             mergedStockAndAggregateYearlyFinancials,
-            calculationResults,
-            mergedAggregateCalculations
         });
 
         return <>
-            <button onClick={() => dispatch({ type: 'hii' })}> Hii! {calculationsState.hi} </button>
             {
                 stock ? (
                     <>

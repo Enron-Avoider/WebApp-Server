@@ -46,13 +46,13 @@ export default function NewCalcRowModal() {
     const chosenCollection = ratioCollectionsQ?.getRatioCollections.find((c: any) => c.id === chosenCollectionId);
     const existingCalc = chosenCollection?.calcs?.find((c: any) => c.title === searchParams.ratio);
 
-    console.log({
-        chosenCollectionName,
-        chosenCollectionId,
-        ratioCollectionsQ,
-        chosenCollection,
-        existingCalc
-    });
+    // console.log({
+    //     chosenCollectionName,
+    //     chosenCollectionId,
+    //     ratioCollectionsQ,
+    //     chosenCollection,
+    //     existingCalc
+    // });
 
     const { loading, error, data } = useQuery(GET_STOCK, {
         variables: { ticker: searchParams.ticker },

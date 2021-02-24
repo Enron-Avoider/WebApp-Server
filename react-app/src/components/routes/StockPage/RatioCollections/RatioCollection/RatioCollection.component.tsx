@@ -47,6 +47,17 @@ export const RatioCollection: FunctionComponent<{
             setTitle(edit);
         }
 
+        // const { loading: loading__, error: error__, data: aggregate_for_todo } = useQuery(GET_AGGREGATE_FOR_STOCK, {
+        //     variables: {
+        //         // sector: stock.sector,
+        //         industry: stock && stock.industry,
+        //         // country: stock.country,
+        //         // exchange: stock.exchange,
+        //         ...calculations?.calculations.length && { calcs: calculations?.calculations }
+        //     },
+        //     skip: !stock
+        // });
+
         return (
             <Grid item xs={(12) as any}>
                 <Paper elevation={5}>

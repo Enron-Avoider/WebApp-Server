@@ -7,13 +7,11 @@ import {
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-import { calculationsStore } from '@state/byModel/Calculations/calculations.contextReducer';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 
 import "./style.sass";
 
 export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }> = ({ ratioCollections }) => {
-    const { state: calculationsState, dispatch } = useContext(calculationsStore);
     const { allSearchParams, getNewSearchParamsString, updateParams } = useSearchParams();
 
     // console.log({
@@ -38,9 +36,6 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
     // });
 
     const handleCollectionToggle = (e: any, { v }: any) => {
-        console.log({
-            v
-        });
         updateParams({
             search: getNewSearchParamsString({
                 paramsToAdd: {
@@ -52,7 +47,6 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
 
     return (
         <>
-            <button onClick={() => dispatch({ type: 'hii' })}> Hii! {calculationsState.hi} </button>
             <Box width={350}>
                 <Autocomplete
                     multiple

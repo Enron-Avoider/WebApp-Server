@@ -10,7 +10,6 @@ import {
 } from '@material-ui/core';
 
 import './style.sass';
-import Table from '../Table';
 import { doCalculations } from '../calculations.map';
 import RatioCollectionPicker from './RatioCollectionPicker';
 import RatioCollection from './RatioCollection';
@@ -29,22 +28,22 @@ export const RatioCollections: FunctionComponent<{
 
     const ratioCollections = ratioCollectionsQ?.getRatioCollections;
 
-    const pickedChosenCollections = ratioCollections ? (
+    const pickedCollections = ratioCollections ? (
         ids => ids?.map(
             (n: any) => ratioCollections.find((c: any) => c.id === n)
         )
             .filter((o: any) => typeof o !== 'undefined')
     )(allSearchParams.ratioCollections?.split('-').map(c => c.split('.')[1])) : [];
 
-    const pickedChosenCollectionsWithCalculations = pickedChosenCollections?.map(c => ({
+    const pickedCollectionsWithCalculations = pickedCollections?.map(c => ({
         ...c,
         calculationResults: doCalculations(c.calcs, stock.yearlyFinancials.years, stock)
     }));
 
     // console.log({
-    //     ratioCollections,
-    //     pickedChosenCollections,
-    //     pickedChosenCollectionsWithCalculations
+    //     // ratioCollections,
+    //     // pickedCollections,
+    //     pickedCollectionsWithCalculations
     // });
 
     return (
@@ -63,9 +62,9 @@ export const RatioCollections: FunctionComponent<{
                 </Box>
 
                 <Grid container spacing={3}>
-                    {pickedChosenCollectionsWithCalculations?.map((c, i) => (
+                    {pickedCollectionsWithCalculations?.map((c, i) => (
                         <RatioCollection
-                            key={i}
+                            key={c.name+i}
                             ticker={ticker}
                             stock={stock}
                             collection={c}
