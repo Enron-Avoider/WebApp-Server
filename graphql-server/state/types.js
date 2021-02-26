@@ -63,23 +63,9 @@ const typeDefs = gql`
   type Query {
     searchStocks(name: String): [EODStock]
     getStockByCode(code: String): EODStock
-    getAggregate(
-      sector: String
-      industry: String
-      country: String
-      exchange: String
-      calcs: [JSON]
-      wtv: String
-    ): JSON
-
-    getAggregateForFinancialRows(
-      query: AggregationInputQuery
-    ): JSON
-
-    getAggregateForCalcRows(
-      query: AggregationInputQuery
-      calcs: [JSON]
-    ): JSON
+    getLastYearCounts(query: AggregationInputQuery): JSON
+    getAggregateForFinancialRows(query: AggregationInputQuery): JSON
+    getAggregateForCalcRows(query: AggregationInputQuery, calcs: [JSON]): JSON
 
     getAllExchanges: JSON
     saveIndustriesToDB: JSON

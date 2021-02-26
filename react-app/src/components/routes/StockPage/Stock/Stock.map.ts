@@ -4,7 +4,7 @@ export const convertAggregateArrayToObjectWithYearlyKeys = (arr: any, stock: any
             ...c,
             rank: (
                 r => r > -1 ? r + 1 : '-'
-            )(c.companies.findIndex((company: any) => company.company === stock.name)),
+            )(c.companies?.findIndex((company: any) => company.company === stock.name)),
         }
     }), {});
 

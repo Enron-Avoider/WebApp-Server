@@ -4,8 +4,8 @@ module.exports = {
       await dataSources.Ours.searchStocks(params),
     getStockByCode: async (_source, params, { dataSources }) =>
       dataSources.Ours.getStockByCode(params),
-    getAggregate: async (_source, params, { dataSources }) =>
-      dataSources.Ours.getAggregate(params),
+    getLastYearCounts: async (_source, params, { dataSources }) =>
+      dataSources.Ours.getLastYearCounts(params),
     getAggregateForFinancialRows: async (_source, params, { dataSources }) =>
       dataSources.Ours.getAggregateForFinancialRows(params),
     getAggregateForCalcRows: async (_source, params, { dataSources }) =>

@@ -6,11 +6,14 @@ export default function useSearchParams() {
     const history = useHistory();
 
     const allSearchParams = Object.fromEntries(new URLSearchParams(location.search)) as {
-        ticker?: string,
-        ratio?: string,
         visibleFinancials?: 'pl' | 'bs' | 'cf',
         showPercentage?: boolean,
         ratioCollections?: string,
+        comparisons?: string,
+        
+        // for calc modal
+        ticker?: string,
+        ratio?: string,
         ratioCollection?: string,
     };
 

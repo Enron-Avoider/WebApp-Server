@@ -29,6 +29,7 @@
     "deep-find": "^1.1.0",
     "graphql": "^15.0.0",
     "local-storage": "^2.0.0",
+    "localforage": "^1.9.0",
     "mathjs": "^6.6.4",
     "numeral": "^2.0.6",
     "random-id": "^1.0.4",

@@ -9,6 +9,7 @@ import purple from '@material-ui/core/colors/purple';
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { persistCache } from 'apollo-cache-persist';
 import env from '@env';
+import localforage from "localforage";
 
 import App from './App';
 import './index.scss';
@@ -20,7 +21,7 @@ console.log({ env });
     const cache = new InMemoryCache();
     await persistCache({
         cache,
-        storage: (window as any).localStorage,
+        storage: (localforage as any), //(window as any).localStorage,
     });
     const client = new ApolloClient({
         uri: env.graphql,

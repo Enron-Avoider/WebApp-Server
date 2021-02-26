@@ -1,7 +1,6 @@
 import React, { useState, FunctionComponent, useContext } from "react";
 import {
     Box,
-    Typography,
     Chip,
     TextField
 } from '@material-ui/core';
@@ -18,11 +17,12 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
     //     allSearchParams
     // });
 
-    const options: { value: string, title: string, type: string }[] = ratioCollections ? ratioCollections?.map((c: any) => ({
-        value: c.id,
-        title: c.name,
-        type: c.isOwnedByPlatform ? 'system' : c.isOwnedByUser ? 'user' : 'other\'s'
-    })) : [];
+    const options: { value: string, title: string, type: string }[] = ratioCollections ?
+        ratioCollections?.map((c: any) => ({
+            value: c.id,
+            title: c.name,
+            type: c.isOwnedByPlatform ? 'system' : c.isOwnedByUser ? 'user' : 'other\'s'
+        })) : [];
 
     const pickedChosenCollections = allSearchParams.ratioCollections?.length ? (
         ids => ids?.map(
@@ -61,7 +61,7 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
                     limitTags={1}
                     disableListWrap
                     options={options}
-                    getOptionLabel={option => option.title}
+                    getOptionLabel={option => option ? option?.title : ''}
                     value={pickedChosenCollections}
                     // inputValue={v}
                     // onInputChange={(_, newInputValue) => {
@@ -70,7 +70,7 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
                     //     });
                     // }}
                     // defaultValue={v}
-                    groupBy={option => `${option.type}`}
+                    groupBy={option => `${option?.type}`}
                     // forcePopupIcon={false}
                     onChange={(event, newInputValue) => {
                         handleCollectionToggle(event, { v: newInputValue });
