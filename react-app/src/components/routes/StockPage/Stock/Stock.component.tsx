@@ -67,10 +67,18 @@ export const Stock: FunctionComponent<{
         // .map((c: any) => c.split('.'));
 
 
+        console.log({
+            // stock,
+            // aggregatesForFinancialRows,
+            // mergedStockAndAggregateYearlyFinancials,
+            pickedComparisons,
+            // c: GET_AGGREGATES_FOR_FINANCIAL_ROWS(pickedComparisons || []),
+        });
+
         const {
             loading: loading_aggregatesForFinancialRows, error: error_aggregatesForFinancialRows, data: aggregatesForFinancialRows
-        } = useQuery(GET_AGGREGATES_FOR_FINANCIAL_ROWS(pickedComparisons || []), {
-            skip: !stock
+        } = useQuery(GET_AGGREGATES_FOR_FINANCIAL_ROWS(pickedComparisons || [], stock), {
+            skip: !stock || !pickedComparisons
         });
 
 
@@ -79,7 +87,7 @@ console.log({
     aggregatesForFinancialRows,
     // mergedStockAndAggregateYearlyFinancials,
     pickedComparisons,
-    c: GET_AGGREGATES_FOR_FINANCIAL_ROWS(pickedComparisons || []),
+    // c: GET_AGGREGATES_FOR_FINANCIAL_ROWS(pickedComparisons || []),
 });
 
 return <>

@@ -24,19 +24,19 @@ export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
 
     const options: { value: string, title: string, type: string }[] = [
         {
-            value: 'Stock_Related__Industry',
+            value: 'Stock_Related__industry',
             title: 'Industry',
             type: 'Stock Related'
         }, {
-            value: 'Stock_Related__Sector',
+            value: 'Stock_Related__sector',
             title: 'Sector',
             type: 'Stock Related'
         }, {
-            value: 'Stock_Related__Country',
+            value: 'Stock_Related__country',
             title: 'Country',
             type: 'Stock Related'
         }, {
-            value: 'Stock_Related__Exchange',
+            value: 'Stock_Related__exchange',
             title: 'Exchange',
             type: 'Stock Related'
         },

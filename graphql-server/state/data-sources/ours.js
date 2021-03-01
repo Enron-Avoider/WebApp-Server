@@ -226,7 +226,7 @@ module.exports = {
           return { ...accResolved, ...batchResults };
         }, {});
 
-      const financialRows = await getAllFinancialRows();
+      const financialRows = Object.keys(query).length ? await getAllFinancialRows() : {};
 
       return {
         query,
