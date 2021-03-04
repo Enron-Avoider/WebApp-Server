@@ -10,6 +10,7 @@ export default function useSearchParams() {
         showPercentage?: boolean,
         ratioCollections?: string,
         comparisons?: string,
+        stockName?: string,
         
         // for calc modal
         ticker?: string,

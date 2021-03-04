@@ -9,35 +9,33 @@ export const GET_LAST_YEAR_COUNTS = gql`
 `;
 
 export const GET_AGGREGATE_FOR_FINANCIAL_ROWS = gql`
-    query($query: AggregationInputQuery ) {
+    query($query: AggregationInputQuery, $companiesForRow: String ) {
         getAggregateForFinancialRows(
-            query: $query
+            query: $query,
+            companiesForRow: $companiesForRow
         )
     }
 `;
 
-export const GET_AGGREGATES_FOR_FINANCIAL_ROWS = (aggregatesList: string[], stock: any) => {
+export const GET_AGGREGATES_FOR_FINANCIAL_ROWS = (aggregatesList: string[], stock?: any) => {
     const uglyness = (aggregatesList: string[]) => `${JSON.stringify(aggregatesList.reduce(
         (p, v) => ({
             ...p,
             [v]:
-                (v => `getAggregateForFinancialRows(query: { ${
-                    v[0] === 'Stock_Related' ? v[1].replaceAll("_", " ") : v[0]
-                }: "${
-                    v[0] === 'Stock_Related' ? stock[v[1]] : v[1]?.replaceAll("_", " ")
-                }" })`)
+                (v => `getAggregateForFinancialRows(stockToRank:"${stock.name}", query: { ${v[0] === 'Stock_Related' ? v[1].replaceAll("_", " ") : v[0]
+                    }: "${v[0] === 'Stock_Related' ? stock[v[1]] : v[1]?.replaceAll("_", " ")
+                    }" })`)
                     (v.split('__'))
         }),
         {
             all: `getAggregateForFinancialRows(query: {})`
-        }
-    ))
+        }))
         .replaceAll('\\"', '+')
         .replaceAll('"', '')
         .replaceAll('+', '"')
         }`;
 
-    console.log({ uglyness: uglyness(aggregatesList, stock) });
+    // console.log({ uglyness: uglyness(aggregatesList, stock) });
 
     return gql`${uglyness(aggregatesList)}`;
 }

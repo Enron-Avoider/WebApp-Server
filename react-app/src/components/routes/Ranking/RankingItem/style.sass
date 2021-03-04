@@ -1,0 +1,159 @@
+// styles
+
+.table-wrapper
+    max-width: 100%
+    overflow: auto
+
+    .table
+        border-radius: 4px
+        width: 100%
+        max-height: 500px
+
+    .body .tr
+        &:hover
+            .td
+                background-color: #515151
+
+    .tr:last-child
+        .td
+            border-bottom: 0
+
+    .tr.total
+        border-top: 1px solid rgba(0, 0, 0, 0.8)
+        font-weight: 900
+
+    .arrow
+        position: relative
+        width: 0
+        height: 0
+        display: block
+        left: -23px
+
+    .quartiles
+        opacity: 0
+        transition: opacity 0.5s
+        font-size: 10px
+        padding: 0px 3px
+        margin: 0px 2px 0 15px
+        border: 1px solid white
+
+        > span
+            padding: 0px 5px
+
+    .td:hover .quartiles
+        opacity: 1
+
+    .td, .quartile
+        &:not(:first-child)
+            font-family: dm, Menlo, Monaco, "Courier New", monospace
+            color: rgba(255,255,255, 0.8)
+
+        &.q1, .q1
+            color: rgba(255, 255, 255, 0.4)
+
+        &.q2, .q2
+            color: rgba(255, 255, 255, 0.6)
+
+        &.q3, .q3
+            color: rgba(255, 255, 255, 0.8)
+
+        &.q4, .q4
+            color: rgba(255, 255, 255, 1)
+
+        .pl-1
+            padding-left: 1rem
+
+        .pl-2
+            padding-left: 2rem
+
+        .comparisson
+            font-size: 10px
+
+            // .number
+            //     font-size: 11px
+            //     font-weight: bold
+
+    .th, .td:first-child
+        background-color: #424242
+
+    .td:first-child
+        &.relevant
+            // color: #d500f9
+
+        &.calc, .calc
+            color: orange
+            font-weight: 900
+
+    .th, .td
+        padding: 8px 12px
+        // border-bottom: 1px solid #ddd
+        // background-color: #fff
+        overflow: hidden
+        text-align: right
+        border-bottom: 1px solid rgba(81, 81, 81, 1)
+
+            // border-top: 1px solid rgba(81, 81, 81, 1)
+
+        &:last-child
+            border-right: 0
+
+        &:first-child
+            text-align: left
+            // background-color: black
+            // color: white
+            position: relative
+            text-overflow: ellipsis
+            white-space: nowrap
+            overflow: hidden
+            // overflow: visible
+            text-w
+
+            &:hover
+                position: absolute
+                text-overflow: initial
+                overflow: visible
+
+                // > span
+                //     // background-color: #424242
+                //     background-color: #515151
+                //     // background-color: rgba(66, 66, 66, 0.8)
+                //     padding: 10px
+
+            // span
+            //     position: absolute
+            //     overflow: hidden
+            //     white-space: nowrap
+                // background-color: black
+
+                // width: 250px !important
+                // white-space: inherit
+
+    &.sticky
+        overflow: scroll
+
+        .header, .footer
+            position: sticky
+            z-index: 1
+            // background: black
+            color: white
+            // width: fit-content
+
+        .header
+            top: 0
+            // box-shadow: 0px 2px 2px #ccc
+
+            .th
+                // background-color: black
+
+        .body
+            position: relative
+            z-index: 0
+
+        [data-sticky-td]
+            position: sticky
+
+        // [data-sticky-last-left-td] 
+        //     box-shadow: 2px 0px 2px #ccc
+
+        // [data-sticky-first-right-td] 
+        //     box-shadow: -2px 0px 2px #ccc

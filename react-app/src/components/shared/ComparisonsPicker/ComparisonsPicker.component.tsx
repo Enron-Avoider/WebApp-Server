@@ -6,83 +6,29 @@ import {
     TextField
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { useLazyQuery } from "react-apollo";
 
 import { GET_LAST_YEAR_COUNTS } from '@state/byModel/Aggregate/aggregate.queries';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
+import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
 
 import './style.sass';
 
 export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
     const { allSearchParams, getNewSearchParamsString, updateParams } = useSearchParams();
-
-    const { loading: lastYearCounts_loading, error: lastYearCounts_error, data: lastYearCounts } = useQuery(GET_LAST_YEAR_COUNTS, {
-        variables: {
-            query: {}
-        }
-    });
-
-    const options: { value: string, title: string, type: string }[] = [
-        {
-            value: 'Stock_Related__industry',
-            title: 'Industry',
-            type: 'Stock Related'
-        }, {
-            value: 'Stock_Related__sector',
-            title: 'Sector',
-            type: 'Stock Related'
-        }, {
-            value: 'Stock_Related__country',
-            title: 'Country',
-            type: 'Stock Related'
-        }, {
-            value: 'Stock_Related__exchange',
-            title: 'Exchange',
-            type: 'Stock Related'
-        },
-        ...(lastYearCounts?.getLastYearCounts?.counts.country) ?
-            lastYearCounts?.getLastYearCounts?.counts?.country?.map((c: any) => ({
-                value: `country__${c._id?.replace(" ","_")}`,
-                title: `${c._id} (${c.count})`,
-                type: 'Country'
-            })) :
-            [],
-        ...(lastYearCounts?.getLastYearCounts?.counts.exchange) ?
-            lastYearCounts?.getLastYearCounts?.counts?.exchange?.map((c: any) => ({
-                value: `exchange__${c._id?.replace(" ","_")}`,
-                title: `${c._id} (${c.count})`,
-                type: 'Exchange'
-            })) :
-            [],
-        ...(lastYearCounts?.getLastYearCounts?.counts.sector) ?
-            lastYearCounts?.getLastYearCounts?.counts?.sector?.map((c: any) => ({
-                value: `sector__${c._id?.replace(" ","_")}`,
-                title: `${c._id} (${c.count})`,
-                type: 'Sector'
-            })) :
-            [],
-        ...(lastYearCounts?.getLastYearCounts?.counts.industry) ?
-            lastYearCounts?.getLastYearCounts?.counts?.industry?.map((c: any) => ({
-                value: `industry__${c._id?.replace(" ","_")}`,
-                title: `${c._id} (${c.count})`,
-                type: 'Industry'
-            })) :
-            []
-        // ... true && []
-    ];
+    const { comparisonOptions } = getComparisonOptions();
 
     const pickedComparisons = allSearchParams.comparisons ? (
         ids => ids?.map(
-            (n: any) => options.find((c: any) => c.value === n)
+            (n: any) => comparisonOptions.find((c: any) => c.value === n)
         )
             .filter((o: any) => typeof o !== 'undefined')
     )(allSearchParams.comparisons?.split('-')) : [];
 
-    // console.log({
-    //     pickedComparisons,
-    //     c: allSearchParams.comparisons,
-    //     c1: allSearchParams.comparisons?.split('-'),
-    // });
+    console.log({
+        pickedComparisons,
+        // c: allSearchParams.comparisons,
+        // c1: allSearchParams.comparisons?.split('-'),
+    });
 
     const handleComparisonToggle = (e: any, { v }: any) => {
         updateParams({
@@ -109,7 +55,7 @@ export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
                     // autoSelect
                     limitTags={1}
                     disableListWrap
-                    options={options}
+                    options={comparisonOptions}
                     getOptionLabel={option => option ? option?.title : ''}
                     value={pickedComparisons}
                     // inputValue={v}
@@ -128,7 +74,7 @@ export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
                         <TextField
                             {...params}
                             variant="outlined"
-                            label={`Selected Comparisons`}
+                            label={`Selected Aggregations`}
                             placeholder=""
                         />
                     )}

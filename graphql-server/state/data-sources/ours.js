@@ -15,7 +15,9 @@ module.exports = {
 
       this.mongoDBStocksTable = mongoDB.collection("Stocks");
       this.mongoDBRatioCollectionTable = mongoDB.collection("RatioCollection");
-      this.mongoDBAggregationsCacheTable = mongoDB.collection("AggregationsCache");
+      this.mongoDBAggregationsCacheTable = mongoDB.collection(
+        "AggregationsCache"
+      );
     }
 
     searchStocks = async ({ name }) => {
@@ -94,13 +96,19 @@ module.exports = {
       };
     };
 
-    getAggregateForFinancialRows = async ({ query }) => {
-      console.log({ query });
+    getAggregateForFinancialRows = async ({
+      query,
+      stockToRank,
+      companiesForRow,
+    }) => {
+      console.log({ query, stockToRank, companiesForRow });
       const lastYear = new Date().getFullYear() - 1;
 
-      const rowKeysPathsBatches = chunkUp(EODDataMaps.rowKeysPaths, 1).slice(
-        0,
-        2
+      const rowKeysPathsBatches = chunkUp(
+        EODDataMaps.rowKeysPaths.filter(
+          (k) => !companiesForRow || companiesForRow === k
+        ),
+        1
       );
       // TODO: consider batching by year intervals as well
 
@@ -198,10 +206,10 @@ module.exports = {
         )[0];
 
         if (!!aggregationInDB) {
-          console.log("in db");
+          console.log("in db", { rowKeysPathsBatch });
           return aggregationInDB.financialRows;
         } else {
-          console.log("not in db");
+          console.log("not in db", { rowKeysPathsBatch});
           const financialRows = await getSomeFinancialRows(rowKeysPathsBatch);
           const inserted = await this.mongoDBAggregationsCacheTable.insertOne({
             type: "someFinancialRows",
@@ -218,17 +226,45 @@ module.exports = {
         await rowKeysPathsBatches.reduce(async (accUnresolved, batch, i) => {
           const accResolved = await accUnresolved;
 
-          await new Promise((t) => setTimeout(t, 100));
+        //   await new Promise((t) => setTimeout(t, 1));
           const batchResults = await getSomeFinancialRowsThroughCacheIfPossible(
             batch
           );
 
-          return { ...accResolved, ...batchResults };
+          //   console.log(batchResults);
+
+          return {
+            ...accResolved,
+            // ...batchResults,
+            ...Object.entries(batchResults).reduce(
+              (p, [k, v]) => ({
+                ...p,
+                [k]: v.map((v_) => ({
+                  ...v_,
+                  companies: companiesForRow
+                    ? v_.companies
+                    : v_.companies.length,
+                  ...(stockToRank && {
+                    rank: ((r) => (r > -1 ? r + 1 : "-"))(
+                      v_.companies.findIndex(
+                        (company) => company.company === stockToRank
+                      )
+                    ),
+                  }),
+                })),
+              }),
+              {}
+            ),
+          };
         }, {});
 
-      const financialRows = Object.keys(query).length ? await getAllFinancialRows() : {};
+      const financialRows = Object.keys(query).length
+        ? await getAllFinancialRows()
+        : {};
 
       return {
+        companiesForRow,
+        // keys: EODDataMaps.rowKeysPaths,
         query,
         financialRows,
       };

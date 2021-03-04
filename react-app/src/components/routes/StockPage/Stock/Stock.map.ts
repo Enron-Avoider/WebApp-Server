@@ -1,11 +1,6 @@
 export const convertAggregateArrayToObjectWithYearlyKeys = (arr: any, stock: any) =>
     arr?.reduce((p: any, c: any) => ({
-        ...p, [c._id.year]: {
-            ...c,
-            rank: (
-                r => r > -1 ? r + 1 : '-'
-            )(c.companies?.findIndex((company: any) => company.company === stock.name)),
-        }
+        ...p, [c._id.year]: c
     }), {});
 
 export const mergeStockAndAggregateYearlyFinancials = (stock: any, aggregate_for_todo: any) => stock && aggregate_for_todo &&
@@ -27,6 +22,41 @@ export const mergeStockAndAggregateYearlyFinancials = (stock: any, aggregate_for
                                 aggregate_for_todo.getAggregateForFinancialRows.financialRows[`${k}_${v_.title}_${v__.title}`],
                                 stock
                             ),
+                        }))
+                    }
+                }))
+            }),
+            {}
+        );
+
+export const mergeStockAndAggregatesForYearlyFinancials = ({
+    stock, aggregates
+}: {
+    stock: any, aggregates: any
+}) => stock && aggregates && (Object.entries(stock.yearlyFinancials) as any)
+        .filter(([key, value]: any) => !!value && key !== '__typename')
+        .reduce(
+            (p: any, [k, v]: any) => ({
+                ...p,
+                [k]: (k === "years") ? v : v.map((v_: any) => ({
+                    ...v_,
+                    ...Object.entries(aggregates).reduce((p_, [aggKey, aggValue]: any) => ({
+                        ...p_,
+                        [aggKey]: convertAggregateArrayToObjectWithYearlyKeys(
+                            aggValue.financialRows[`${k}_${v_.title}`],
+                            stock
+                        ),
+                    }), { key: `${k}.${v_.title}` }),
+                    ...v_.subRows && {
+                        subRows: v_.subRows.map((v__: any) => ({
+                            ...v__,
+                            ...Object.entries(aggregates).reduce((p_, [aggKey, aggValue]: any) => ({
+                                ...p_,
+                                [aggKey]: convertAggregateArrayToObjectWithYearlyKeys(
+                                    aggValue.financialRows[`${k}_${v_.title}_${v__.title}`],
+                                    stock
+                                ),
+                            }), {})
                         }))
                     }
                 }))

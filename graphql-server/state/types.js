@@ -64,7 +64,11 @@ const typeDefs = gql`
     searchStocks(name: String): [EODStock]
     getStockByCode(code: String): EODStock
     getLastYearCounts(query: AggregationInputQuery): JSON
-    getAggregateForFinancialRows(query: AggregationInputQuery): JSON
+    getAggregateForFinancialRows(
+        query: AggregationInputQuery,
+        stockToRank: String,
+        companiesForRow: String
+    ): JSON
     getAggregateForCalcRows(query: AggregationInputQuery, calcs: [JSON]): JSON
 
     getAllExchanges: JSON

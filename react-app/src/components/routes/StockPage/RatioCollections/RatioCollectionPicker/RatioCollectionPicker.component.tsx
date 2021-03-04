@@ -79,7 +79,7 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
                         <TextField
                             {...params}
                             variant="outlined"
-                            label={`Selected Collections`}
+                            label={`Selected Ratio Collections`}
                             placeholder=""
                         />
                     )}

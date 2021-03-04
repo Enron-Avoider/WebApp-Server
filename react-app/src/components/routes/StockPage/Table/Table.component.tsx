@@ -19,15 +19,16 @@ import {
     Popper,
     MenuList,
     MenuItem,
-    TextField
+    TextField,
 } from '@material-ui/core';
-import { ArrowDropDown, Equalizer } from '@material-ui/icons';
+import { ArrowDropDown, Equalizer, ZoomOutMap } from '@material-ui/icons';
 const math = require("mathjs");
 
 import PercentagePath from "@assets/icon-paths/percentage";
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import NewCalcRowButton from '../NewCalcRowButton';
 import GraphCard from './GraphCard';
+import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
 
 import "./style.sass";
 
@@ -77,38 +78,18 @@ export default function Table(
     }
 ) {
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const [companyList, setCompanyList] = React.useState({
-        title: '',
-        companies: []
-    });
-    const handleClick = (event: any, { title, companies }: { title: string, companies: any }) => {
-        console.log({
-            companies
-        });
-        setAnchorEl(event.currentTarget === anchorEl ? null : event.currentTarget);
-        setCompanyList({
-            title,
-            companies
-        });
-
-    };
-    const open = Boolean(anchorEl);
-    const handleClickAway = (e: any) => {
-        if (!Object.assign({}, e.target.dataset).clicker) {
-            setAnchorEl(null);
-            setCompanyList({
-                title: '',
-                companies: []
-            });
-        }
-    }
+    console.log({ data });
 
     const location = useLocation();
     const history = useHistory();
     const { allSearchParams, getNewSearchParamsString } = useSearchParams();
 
+    const { getComparisonOption } = getComparisonOptions();
+
     const { showPercentage } = allSearchParams;
+
+    const pickedComparisons = allSearchParams.comparisons?.split('-')
+        .filter((c: any) => typeof c !== 'undefined')
 
     const toggleShowPercentage = () => history.push({
         pathname: location.pathname,
@@ -128,7 +109,7 @@ export default function Table(
         ...years.map((y: number) => ({
             Header: y,
             accessor: `${y}`,
-            width: 140
+            width: 180
         }))
     ], []);
 
@@ -266,6 +247,25 @@ export default function Table(
                                                                                 </Link> :
                                                                                 cell.value
                                                                             }
+
+                                                                            {row.original.key && (
+                                                                                <Box display="inline" position="relative" top={3} left={1}>
+                                                                                    <Link
+                                                                                        component={Link_}
+                                                                                        color="inherit"
+                                                                                        to={{
+                                                                                            pathname: `/Ranking/${row.original.key}`,
+                                                                                            search: getNewSearchParamsString({
+                                                                                                paramsToAdd: { ticker }
+                                                                                            })
+                                                                                        }}
+                                                                                        target="_blank"
+                                                                                    >
+                                                                                        <ZoomOutMap fontSize="inherit" />
+                                                                                    </Link>
+                                                                                </Box>
+                                                                            )}
+
                                                                         </span >)
                                                             }
                                                         </div>
@@ -278,12 +278,35 @@ export default function Table(
                                                                 }</small>
                                                             </div>
                                                         )} */}
-                                                        {row.original.aggregate && (
+                                                        {pickedComparisons?.map(c => row.original[c] && (
+                                                            <div key={c}>
+                                                                <small className="comparisson">{
+                                                                    cell.column.id === 'expander' ?
+                                                                        getComparisonOption(c) :
+                                                                        (row.original[c][cell.column.id] ?
+                                                                            <span
+                                                                                key={`${c}-${cell.column.id}-${row.cells[0].value}`}
+                                                                                // data-clicker="true"
+                                                                                // onClick={e => handleClick(e, {
+                                                                                //     title: `${getComparisonOption(c)} | ${row.cells[0].value} | ${cell.column.id}`,
+                                                                                //     companies: row.original[c][cell.column.id].companies
+                                                                                // })}
+                                                                                title="μ (average) | Σ (sum) | #/n (rank / number of companies)"
+                                                                            >
+                                                                                μ<span className="number">{numeral(row.original[c][cell.column.id].avg?.$numberDecimal).format('(0a)')}</span>{' '}
+                                                                                Σ<span className="number">{numeral(row.original[c][cell.column.id].sum?.$numberDecimal).format('(0a)')}</span>{' '}
+                                                                                #<span className="number">{row.original[c][cell.column.id].rank}/{row.original[c][cell.column.id].count}</span>
+                                                                            </span> : '-'
+                                                                        )
+                                                                }</small>
+                                                            </div>
+                                                        ))}
+                                                        {/* {row.original.aggregate && (
                                                             <div>
                                                                 <small className="comparisson">{
                                                                     cell.column.id === 'expander' ?
-                                                                        '[industry] Internet Content & Information' :
-                                                                        row.original.aggregate[cell.column.id] ?
+                                                                        ('[industry] Internet Content & Information') :
+                                                                        (row.original.aggregate[cell.column.id] ?
                                                                             <span
                                                                                 data-clicker="true"
                                                                                 onClick={e => handleClick(e, {
@@ -297,9 +320,10 @@ export default function Table(
                                                                                 #<span className="number">{row.original.aggregate[cell.column.id].rank}/{row.original.aggregate[cell.column.id].count}</span>
                                                                             </span> :
                                                                             '-'
+                                                                        )
                                                                 }</small>
                                                             </div>
-                                                        )}
+                                                        )} */}
                                                     </div>
                                                 </div>
                                             ))}
@@ -312,41 +336,7 @@ export default function Table(
                 </Box>
             </Paper>
 
-            <Popper open={open} anchorEl={anchorEl} style={{ zIndex: 1 }}>
-                <ClickAwayListener onClickAway={handleClickAway}>
-                    <Paper>
-                        <Box overflow="auto" height="300px">
-                            <Box paddingX={2} pt={2}>
-                                <Typography variant="h5">
-                                    {companyList.title}
-                                </Typography>
-                            </Box>
-                            <MenuList>
-                                {companyList.companies.map((c: any, i: number) =>
-                                    <Link
-                                        component={Link_}
-                                        color="inherit"
-                                        key={c.code + " " + i}
-                                        to={`/stock/${c.code}`}
-                                        target="_blank"
-                                    >
-                                        <MenuItem key={i}>
-                                            <Box display="flex" justifyContent="space-between" width="100%">
-                                                <span>{c.company}</span>
-                                                <span>{numeral(c.v.$numberDecimal).format('(0.00a)')}</span>
-                                            </Box>
-                                        </MenuItem>
-                                    </Link>
-                                )}
-                            </MenuList>
-                        </Box>
-                    </Paper>
-                </ClickAwayListener>
-            </Popper>
-
-
             {newCalcCollection && <NewCalcRowButton title={title} ticker={ticker || ''} newCalcCollection={newCalcCollection} />}
-
         </Box>
 
     );
