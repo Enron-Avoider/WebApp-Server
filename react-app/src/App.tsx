@@ -33,8 +33,7 @@ function App() {
                             component={loadable(() => import('./components/routes/Ranking'))}
                         />
 
-                        <Redirect from="/" to="/stock/BRK-B" />
-
+                        <Redirect from="/" to="/stock/BRK-B?comparisons=Stock_Related__industry&ratioCollections=Valuation.9PJQ" />
                     </Switch>
                     <Footer />
                 </Container>

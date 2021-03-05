@@ -4,14 +4,18 @@ import MenuIcon from '@material-ui/icons/Menu';
 import { Grid, Box, Link, Badge } from '@material-ui/core';
 import { useTheme, makeStyles } from '@material-ui/core/styles';
 import { useQuery } from "react-apollo";
+import { Link as Link_ } from "react-router-dom";
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import logoImg from '@assets/e-transparent.png';
 import StockSearcher from '@components/shared/StockSearcher';
+import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 
 import './style.sass';
 
 export default function Header() {
+
+    const { getNewSearchParamsString } = useSearchParams();
 
     return (
         <>
@@ -48,6 +52,44 @@ export default function Header() {
                                 </Grid>
                             </>
                         </Badge>
+
+                        <Box
+                            display="flex"
+                            flexDirection="row"
+                            justifyContent="center"
+                            alignItems="center"
+                            ml={3}
+                        >
+                            <Link
+                                component={Link_}
+                                color="inherit"
+                                variant="subtitle1"
+                                to={
+                                    {
+                                        pathname: `/stock`,
+                                        search: (getNewSearchParamsString({ keysToRemove: ['ticker'] }) as string)
+                                    }
+                                }
+                                target="_blank"
+                            >
+                                Stock
+                            </Link>
+                            <Link
+                                style={{ fontWeight: 'bold', marginLeft: '5px' }}
+                                component={Link_}
+                                color="inherit"
+                                variant="subtitle1"
+                                to={
+                                    {
+                                        pathname: `/stock`,
+                                        search: (getNewSearchParamsString({ keysToRemove: ['ticker'] }) as string)
+                                    }
+                                }
+                                target="_blank"
+                            >
+                                Stock
+                            </Link>
+                        </Box>
 
                         <Box display="flex" overflow="visible" alignItems="center">
                             <StockSearcher />

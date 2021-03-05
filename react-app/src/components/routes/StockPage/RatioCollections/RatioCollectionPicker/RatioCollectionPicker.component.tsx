@@ -52,13 +52,13 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
 
     return (
         <>
-            <Box width={350}>
+            <Box width={450}>
                 <Autocomplete
                     multiple
                     autoComplete
                     autoHighlight
                     // autoSelect
-                    limitTags={1}
+                    limitTags={2}
                     disableListWrap
                     options={options}
                     getOptionLabel={option => option ? option?.title : ''}

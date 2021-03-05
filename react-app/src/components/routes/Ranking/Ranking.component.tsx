@@ -41,7 +41,6 @@ export const Ranking: FunctionComponent<{}> = ({ }) => {
     return (
         <ScrollSync>
             <>
-
                 <Box position="fixed" top={63} width="100%" left={0} zIndex={2}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>

@@ -168,7 +168,7 @@ export const RankingItem: FunctionComponent<{
                                 }
                             }
                             target="_blank"
-                        >{y.companies[i]?.company}</Link>:
+                        >{y.companies[i]?.company}</Link>:{' '}
                         {numeral(y.companies[i]?.v.$numberDecimal).format('(0.00a)')}
                     </>) :
                     null
@@ -189,12 +189,13 @@ export const RankingItem: FunctionComponent<{
                 {
                     Header: 'Rank #',
                     accessor: (row: any, i: number) => i,
+                    width: 80
                 },
                 ...aggregationsPerYear ? aggregationsPerYear.map((y: any) => ({
                     Header: y._id.year,
                     accessor: y._id.year,
-                    width: 400
-                })).reverse() : []
+                    width: 420
+                })) : []
             ],
             [loading_aggregatesForFinancialRows]
         )

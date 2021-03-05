@@ -47,13 +47,13 @@ export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
 
     return (
         <>
-            <Box width={350}>
+            <Box width={450}>
                 <Autocomplete
                     multiple
                     autoComplete
                     autoHighlight
                     // autoSelect
-                    limitTags={1}
+                    limitTags={2}
                     disableListWrap
                     options={comparisonOptions}
                     getOptionLabel={option => option ? option?.title : ''}

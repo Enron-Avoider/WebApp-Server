@@ -96,23 +96,43 @@ module.exports = {
       };
     };
 
+    getAggregationThroughCacheIfPossible = async ({
+      cacheQuery,
+      getUncachedAggregationFn,
+      getUncachedAggregationParameters,
+    }) => {
+      const aggregationInDB = (
+        await this.mongoDBAggregationsCacheTable
+          .find({
+            cacheQuery,
+          })
+          .toArray()
+      )[0];
+
+      if (!!aggregationInDB) {
+        console.log("in db", { cacheQuery });
+        return aggregationInDB.object;
+      } else {
+        console.log("not in db", { cacheQuery });
+        const object = await getUncachedAggregationFn(
+          getUncachedAggregationParameters
+        );
+        const inserted = await this.mongoDBAggregationsCacheTable.insertOne({
+          cacheQuery,
+          object,
+          retrieved_at: Date.now(),
+        });
+        return object;
+      }
+    };
+
     getAggregateForFinancialRows = async ({
       query,
       stockToRank,
       companiesForRow,
     }) => {
-      console.log({ query, stockToRank, companiesForRow });
-      const lastYear = new Date().getFullYear() - 1;
 
-      const rowKeysPathsBatches = chunkUp(
-        EODDataMaps.rowKeysPaths.filter(
-          (k) => !companiesForRow || companiesForRow === k
-        ),
-        1
-      );
-      // TODO: consider batching by year intervals as well
-
-      const getSomeFinancialRows = async (rowKeysPathsBatch) =>
+      const getSomeFinancialRows = async ({ rowKeysPathsBatch }) =>
         (
           await this.mongoDBStocksTable
             .aggregate(
@@ -192,79 +212,80 @@ module.exports = {
             .toArray()
         )[0];
 
-      const getSomeFinancialRowsThroughCacheIfPossible = async (
-        rowKeysPathsBatch
-      ) => {
-        const aggregationInDB = (
-          await this.mongoDBAggregationsCacheTable
-            .find({
-              type: "someFinancialRows",
-              query,
-              rowKeysPathsBatch,
-            })
-            .toArray()
-        )[0];
+      const getAllFinancialRows = async ({
+        query,
+        stockToRank,
+        companiesForRow,
+      }) => {
+        const rowKeysPathsBatches = chunkUp(
+          EODDataMaps.rowKeysPaths.filter(
+            (k) => !companiesForRow || companiesForRow === k
+          ),
+          1
+        );
 
-        if (!!aggregationInDB) {
-          console.log("in db", { rowKeysPathsBatch });
-          return aggregationInDB.financialRows;
-        } else {
-          console.log("not in db", { rowKeysPathsBatch});
-          const financialRows = await getSomeFinancialRows(rowKeysPathsBatch);
-          const inserted = await this.mongoDBAggregationsCacheTable.insertOne({
-            type: "someFinancialRows",
-            query,
-            rowKeysPathsBatch,
-            financialRows,
-            retrieved_at: Date.now(),
-          });
-          return financialRows;
-        }
+        return await rowKeysPathsBatches.reduce(
+          async (accUnresolved, batch, i) => {
+            const accResolved = await accUnresolved;
+
+            const batchResults = await this.getAggregationThroughCacheIfPossible(
+              {
+                cacheQuery: {
+                  type: "someFinancialRows",
+                  query,
+                  rowKeysPathsBatch: batch,
+                },
+                getUncachedAggregationFn: getSomeFinancialRows,
+                getUncachedAggregationParameters: { rowKeysPathsBatch: batch },
+              }
+            );
+
+            return {
+              ...accResolved,
+              // ...batchResults,
+              ...Object.entries(batchResults).reduce(
+                (p, [k, v]) => ({
+                  ...p,
+                  [k]: v.map((v_) => ({
+                    ...v_,
+                    companies: companiesForRow
+                      ? v_.companies
+                      : v_.companies.length,
+                    ...(stockToRank && {
+                      rank: ((r) => (r > -1 ? r + 1 : "-"))(
+                        v_.companies.findIndex(
+                          (company) => company.company === stockToRank
+                        )
+                      ),
+                    }),
+                  })),
+                }),
+                {}
+              ),
+            };
+          },
+          {}
+        );
       };
 
-      const getAllFinancialRows = async () =>
-        await rowKeysPathsBatches.reduce(async (accUnresolved, batch, i) => {
-          const accResolved = await accUnresolved;
-
-        //   await new Promise((t) => setTimeout(t, 1));
-          const batchResults = await getSomeFinancialRowsThroughCacheIfPossible(
-            batch
-          );
-
-          //   console.log(batchResults);
-
-          return {
-            ...accResolved,
-            // ...batchResults,
-            ...Object.entries(batchResults).reduce(
-              (p, [k, v]) => ({
-                ...p,
-                [k]: v.map((v_) => ({
-                  ...v_,
-                  companies: companiesForRow
-                    ? v_.companies
-                    : v_.companies.length,
-                  ...(stockToRank && {
-                    rank: ((r) => (r > -1 ? r + 1 : "-"))(
-                      v_.companies.findIndex(
-                        (company) => company.company === stockToRank
-                      )
-                    ),
-                  }),
-                })),
-              }),
-              {}
-            ),
-          };
-        }, {});
-
       const financialRows = Object.keys(query).length
-        ? await getAllFinancialRows()
+        ? await this.getAggregationThroughCacheIfPossible({
+            cacheQuery: {
+              type: "allFinancialRows",
+              query,
+              stockToRank,
+              companiesForRow,
+            },
+            getUncachedAggregationFn: getAllFinancialRows,
+            getUncachedAggregationParameters: {
+              query,
+              stockToRank,
+              companiesForRow,
+            },
+          })
         : {};
 
       return {
-        companiesForRow,
-        // keys: EODDataMaps.rowKeysPaths,
         query,
         financialRows,
       };

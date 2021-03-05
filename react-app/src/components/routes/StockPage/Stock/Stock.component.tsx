@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { useQuery } from "react-apollo";
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation, useHistory, Link as Link_ } from "react-router-dom";
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
@@ -70,6 +70,13 @@ export const Stock: FunctionComponent<{
             mergedStockAndAggregatesYearlyFinancials
         });
 
+        const paramsToAddForStockRelatedStuff = {
+            paramsToAdd: {
+                comparisons: 'Stock_Related__industry-Stock_Related__sector-Stock_Related__country-Stock_Related__exchange&ratioCollections-Stock_Related__exchange',
+                ticker
+            }
+        };
+
         return <>
             {
                 stock ? (
@@ -82,56 +89,96 @@ export const Stock: FunctionComponent<{
                                         <Container>
                                             <Box display="flex" flexDirection="row" p={2}>
                                                 <Box flex="1" maxWidth="100%">
-                                                    <Box display="flex" flexDirection="column" justifyContent="space-between">
-                                                        <Box display="flex" flexDirection="row" >
-                                                            <Box display="flex" alignItems="center" mr={2}>
-                                                                <Typography variant="h5">
-                                                                    {stock.name}
-                                                                </Typography>
-                                                                <Box ml={1}>
-                                                                    <Typography variant="h5">
-                                                                        <b>({ticker})</b>
+                                                    <Box display="flex" flexDirection="row" justifyContent="space-between">
+                                                        <Box display="flex" flexDirection="row">
+                                                            <Box
+                                                                display="flex"
+                                                                alignItems="center"
+                                                                justifyContent="center"
+                                                                mr={2}
+                                                            >
+                                                                <Avatar variant="rounded" src={`//${stock.logo}`} />
+                                                            </Box>
+                                                            <Box display="flex" flexDirection="column" >
+                                                                <Box display="flex" alignItems="center" mr={2}>
+                                                                    <Typography variant="h6">
+                                                                        {stock.name}
+                                                                    </Typography>
+                                                                    <Box ml={1}>
+                                                                        <Typography variant="h6">
+                                                                            <b>({ticker})</b>
+                                                                        </Typography>
+                                                                    </Box>
+                                                                </Box>
+                                                                <Box display="flex" flex="auto" alignItems="flex-start" flexDirection="column">
+                                                                    <Typography
+                                                                        display="block"
+                                                                        noWrap={true}
+                                                                        variant="body1"
+                                                                    >
+                                                                        <Link
+                                                                            component={Link_}
+                                                                            color="primary"
+                                                                            target="_blank"
+                                                                            to={{
+                                                                                pathname: `/Ranking/pl.Total Revenue`,
+                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuff)
+                                                                            }}
+                                                                        >
+                                                                            <span title="sector">{stock.sector}</span>
+                                                                        </Link>
+                                                                        {" "}・{" "}
+                                                                        <Link
+                                                                            component={Link_}
+                                                                            color="primary"
+                                                                            target="_blank"
+                                                                            to={{
+                                                                                pathname: `/Ranking/pl.Total Revenue`,
+                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuff)
+                                                                            }}
+                                                                        >
+                                                                            <span title="industry">{stock.industry}</span>
+                                                                        </Link>
+                                                                        {" "}・{" "}
+                                                                        <Link
+                                                                            component={Link_}
+                                                                            color="primary"
+                                                                            target="_blank"
+                                                                            to={{
+                                                                                pathname: `/Ranking/pl.Total Revenue`,
+                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuff)
+                                                                            }}
+                                                                        >
+                                                                            <span title="exchange">{stock.exchange}</span>
+                                                                        </Link>
+                                                                        {" "}・{" "}
+                                                                        <Link
+                                                                            component={Link_}
+                                                                            color="primary"
+                                                                            target="_blank"
+                                                                            to={{
+                                                                                pathname: `/Ranking/pl.Total Revenue`,
+                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuff)
+                                                                            }}
+                                                                        >
+                                                                            <span title="country">{stock.country}</span>
+                                                                        </Link>
                                                                     </Typography>
                                                                 </Box>
                                                             </Box>
+                                                        </Box>
+                                                        <Box display="flex" flexDirection="row">
                                                             <Box
                                                                 display="flex"
                                                                 alignItems="center"
                                                                 justifyContent="center"
                                                                 mr={3}
                                                             >
-                                                                <Avatar variant="rounded" src={`//${stock.logo}`} />
-                                                            </Box>
-                                                            <Box display="flex" flex="auto" alignItems="flex-start" flexDirection="column">
-                                                                <Typography
-                                                                    display="block"
-                                                                    noWrap={true}
-                                                                    variant="body1"
-                                                                >
-                                                                    <Link href="#" color="primary" target="_blank">
-                                                                        <span title="sector">{stock.sector}</span>
-                                                                    </Link>
-                                                                    {" "}・{" "}
-                                                                    <Link href="#" color="primary" target="_blank">
-                                                                        <span title="industry">{stock.industry}</span>
-                                                                    </Link>
-                                                                </Typography>
-                                                                <Typography
-                                                                    display="block"
-                                                                    noWrap={true}
-                                                                    variant="body1"
-                                                                >
-                                                                    <Link href="#" color="primary" target="_blank">
-                                                                        <span title="exchange">{stock.exchange}</span>
-                                                                    </Link>
-                                                                    {" "}・{" "}
-                                                                    <Link href="#" color="primary" target="_blank">
-                                                                        <span title="country">{stock.country}</span>
-                                                                    </Link>
-                                                                </Typography>
+                                                                {loading_aggregatesForFinancialRows && <CircularProgress />}
                                                             </Box>
                                                             <ComparisonsPicker />
                                                         </Box>
+
                                                     </Box>
                                                 </Box>
                                             </Box>
@@ -146,6 +193,20 @@ export const Stock: FunctionComponent<{
                             stock={stock}
                             ticker={ticker}
                         />
+
+                        <Paper>
+                            <Box display="flex" flexDirection="row" p={2} mt={2}>
+                                <div>
+                                    <Typography variant="h5">
+                                        Analysis Ratings & Checks
+                                    </Typography>
+                                    <Typography
+                                        display="block"
+                                        variant="body1"
+                                    >[ In Development ]</Typography>
+                                </div>
+                            </Box>
+                        </Paper>
 
                         <Paper>
                             <Table
