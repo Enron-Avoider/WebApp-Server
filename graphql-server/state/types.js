@@ -69,7 +69,13 @@ const typeDefs = gql`
         stockToRank: String,
         companiesForRow: String
     ): JSON
-    getAggregateForCalcRows(query: AggregationInputQuery, calcs: [JSON]): JSON
+    getAggregateForCalcRows(
+        query: AggregationInputQuery,
+        collectionId: String,
+        calcs: [JSON],
+        stockToRank: String,
+        companiesForRow: String
+    ): JSON
 
     getAllExchanges: JSON
     saveIndustriesToDB: JSON

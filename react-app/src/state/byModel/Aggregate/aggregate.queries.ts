@@ -1,5 +1,7 @@
 import { gql } from "apollo-boost";
 
+import { stringifyWithoutQuotesOnKeys } from "@utils/stringifyWithoutQuotesOnKeys";
+
 export const GET_LAST_YEAR_COUNTS = gql`
     query($query: AggregationInputQuery ) { 
         getLastYearCounts(
@@ -36,6 +38,37 @@ export const GET_AGGREGATES_FOR_FINANCIAL_ROWS = (aggregatesList: string[], stoc
         }`;
 
     // console.log({ uglyness: uglyness(aggregatesList, stock) });
+
+    return gql`${uglyness(aggregatesList)}`;
+}
+
+export const GET_AGGREGATES_FOR_CALC_ROWS = ({
+    aggregatesList,
+    stock,
+    collectionId,
+    calcs,
+}: {
+    aggregatesList: string[],
+    stock?: any,
+    collectionId?: string,
+    calcs?: any[]
+}) => {
+    const uglyness = (aggregatesList: string[]) => `${JSON.stringify(aggregatesList.reduce(
+        (p, v) => ({
+            ...p,
+            [v]:
+                (v => `getAggregateForCalcRows(stockToRank:"${stock.name}", collectionId:"${collectionId}", calcs:${stringifyWithoutQuotesOnKeys(calcs) }, query: { ${v[0] === 'Stock_Related' ? v[1].replaceAll("_", " ") : v[0]
+                    }: "${v[0] === 'Stock_Related' ? stock[v[1]] : v[1]?.replaceAll("_", " ")
+                    }"})`)
+                    (v.split('__'))
+        }),
+        {
+            all: `getAggregateForCalcRows(query: {})`
+        }))
+        .replaceAll('\\"', '+')
+        .replaceAll('"', '')
+        .replaceAll('+', '"')
+        }`;
 
     return gql`${uglyness(aggregatesList)}`;
 }

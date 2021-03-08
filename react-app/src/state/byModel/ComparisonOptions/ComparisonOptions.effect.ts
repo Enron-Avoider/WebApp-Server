@@ -78,6 +78,7 @@ export default function getComparisonOptions() {
     return {
         comparisonOptions,
         getComparisonOption,
+        pickedComparisons,
         pickedComparisonsOptions
     };
 }

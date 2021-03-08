@@ -122,6 +122,7 @@ module.exports = {
           object,
           retrieved_at: Date.now(),
         });
+        await new Promise((t) => setTimeout(t, 1000));
         return object;
       }
     };
@@ -131,7 +132,6 @@ module.exports = {
       stockToRank,
       companiesForRow,
     }) => {
-
       const getSomeFinancialRows = async ({ rowKeysPathsBatch }) =>
         (
           await this.mongoDBStocksTable
@@ -291,8 +291,14 @@ module.exports = {
       };
     };
 
-    getAggregateForCalcRows = async ({ query, calcs }) => {
-      const calcRows = async () => {
+    getAggregateForCalcRows = async ({
+      query,
+      collectionId,
+      calcs,
+      stockToRank,
+      companiesForRow,
+    }) => {
+      const getCalcRows = async ({ query, stockToRank, companiesForRow }) => {
         const calcs_ = calcs.map((c) => {
           const paths = Object.values(c.scope).map(
             (v) => `yearlyFinancialsByYear.${v}.v`
@@ -308,7 +314,7 @@ module.exports = {
           };
         });
 
-        return await this.mongoDBStocksTable
+        return (await this.mongoDBStocksTable
           .aggregate([
             {
               $match: query,
@@ -386,12 +392,52 @@ module.exports = {
               },
             },
           ])
-          .toArray();
+          .toArray())
+          .map((c) =>
+            Object.entries(c).reduce(
+              (p, [k, v]) => ({
+                ...p,
+                [k]: v.map((v_) => ({
+                  ...v_,
+                  companies: companiesForRow
+                    ? v_.companies
+                    : v_.companies.length,
+                  ...(stockToRank && {
+                    rank: ((r) => (r > -1 ? r + 1 : "-"))(
+                      v_.companies.findIndex(
+                        (company) => company.company === stockToRank
+                      )
+                    ),
+                  }),
+                })),
+              }),
+              {}
+            )
+          );
       };
+
+      const calcRows = Object.keys(query).length
+        ? await this.getAggregationThroughCacheIfPossible({
+            cacheQuery: {
+              type: "calcRows",
+              query,
+                stockToRank,
+                companiesForRow,
+            },
+            getUncachedAggregationFn: getCalcRows,
+            getUncachedAggregationParameters: {
+              query,
+                stockToRank,
+                companiesForRow,
+            },
+          })
+        : {};
 
       return {
         query,
-        ...(calcs && { calcRows: (await calcRows())[0] }),
+        collectionId,
+        calcs,
+        calcRows,
       };
     };
 

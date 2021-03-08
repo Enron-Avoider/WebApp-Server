@@ -78,7 +78,7 @@ export default function Table(
     }
 ) {
 
-    console.log({ data });
+    // console.log({ data });
 
     const location = useLocation();
     const history = useHistory();

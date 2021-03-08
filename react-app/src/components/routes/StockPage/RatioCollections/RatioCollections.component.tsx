@@ -15,36 +15,13 @@ import RatioCollectionPicker from './RatioCollectionPicker';
 import RatioCollection from './RatioCollection';
 import { GET_RATIO_COLLECTIONS, GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
+import getCalculations from '@state/byModel/Calculations/getCalculations.effect';
 
 export const RatioCollections: FunctionComponent<{
     ticker: string, stock: any
 }> = ({ ticker, stock }) => {
-    const { allSearchParams } = useSearchParams();
 
-    const { loading: ratioCollections_loading, error: ratioCollections_error, data: ratioCollectionsQ } = useQuery(GET_RATIO_COLLECTIONS, {
-        variables: { ticker },
-        skip: !ticker
-    });
-
-    const ratioCollections = ratioCollectionsQ?.getRatioCollections;
-
-    const pickedCollections = ratioCollections ? (
-        ids => ids?.map(
-            (n: any) => ratioCollections.find((c: any) => c.id === n)
-        )
-            .filter((o: any) => typeof o !== 'undefined')
-    )(allSearchParams.ratioCollections?.split('-').map(c => c.split('.')[1])) : [];
-
-    const pickedCollectionsWithCalculations = pickedCollections?.map(c => ({
-        ...c,
-        calculationResults: doCalculations(c.calcs, stock.yearlyFinancials.years, stock)
-    }));
-
-    // console.log({
-    //     // ratioCollections,
-    //     // pickedCollections,
-    //     pickedCollectionsWithCalculations
-    // });
+    const { ratioCollections, pickedCollectionsWithCalculations } = getCalculations({ stock });
 
     return (
         <Paper>

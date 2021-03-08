@@ -16,7 +16,7 @@ import {
 } from '@material-ui/core';
 
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
-import { GET_AGGREGATE_FOR_FINANCIAL_ROWS, GET_AGGREGATES_FOR_FINANCIAL_ROWS } from '@state/byModel/Aggregate/aggregate.queries';
+import { GET_AGGREGATES_FOR_FINANCIAL_ROWS } from '@state/byModel/Aggregate/aggregate.queries';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 
 import './style.sass';
@@ -24,6 +24,7 @@ import Table from '../Table';
 import { mergeStockAndAggregateYearlyFinancials, mergeStockAndAggregatesForYearlyFinancials } from './Stock.map';
 import RatioCollections from '../RatioCollections';
 import ComparisonsPicker from '@components/shared/ComparisonsPicker';
+import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
 
 export const Stock: FunctionComponent<{
     ticker: string,
@@ -35,6 +36,7 @@ export const Stock: FunctionComponent<{
         const history = useHistory();
         const { allSearchParams, getNewSearchParamsString } = useSearchParams();
         const { visibleFinancials } = allSearchParams;
+        const { pickedComparisons } = getComparisonOptions();
 
         const handleVisibleFinancials = (_: any, newFin: string) => history.push({
             pathname: location.pathname,
@@ -50,11 +52,10 @@ export const Stock: FunctionComponent<{
 
         const stock = data && data.getStockByCode;
 
-        const pickedComparisons = allSearchParams.comparisons?.split('-')
-            .filter((c: any) => typeof c !== 'undefined')
-
         const {
-            loading: loading_aggregatesForFinancialRows, error: error_aggregatesForFinancialRows, data: aggregatesForFinancialRows
+            loading: loading_aggregatesForFinancialRows,
+            error: error_aggregatesForFinancialRows,
+            data: aggregatesForFinancialRows
         } = useQuery(GET_AGGREGATES_FOR_FINANCIAL_ROWS(stock && pickedComparisons || [], stock), {
             skip: !stock || !pickedComparisons
         });
@@ -70,7 +71,7 @@ export const Stock: FunctionComponent<{
             mergedStockAndAggregatesYearlyFinancials
         });
 
-        const paramsToAddForStockRelatedStuff = {
+        const paramsToAddForStockRelatedStuffLink = {
             paramsToAdd: {
                 comparisons: 'Stock_Related__industry-Stock_Related__sector-Stock_Related__country-Stock_Related__exchange&ratioCollections-Stock_Related__exchange',
                 ticker
@@ -122,7 +123,7 @@ export const Stock: FunctionComponent<{
                                                                             target="_blank"
                                                                             to={{
                                                                                 pathname: `/Ranking/pl.Total Revenue`,
-                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuff)
+                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuffLink)
                                                                             }}
                                                                         >
                                                                             <span title="sector">{stock.sector}</span>
@@ -134,7 +135,7 @@ export const Stock: FunctionComponent<{
                                                                             target="_blank"
                                                                             to={{
                                                                                 pathname: `/Ranking/pl.Total Revenue`,
-                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuff)
+                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuffLink)
                                                                             }}
                                                                         >
                                                                             <span title="industry">{stock.industry}</span>
@@ -146,7 +147,7 @@ export const Stock: FunctionComponent<{
                                                                             target="_blank"
                                                                             to={{
                                                                                 pathname: `/Ranking/pl.Total Revenue`,
-                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuff)
+                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuffLink)
                                                                             }}
                                                                         >
                                                                             <span title="exchange">{stock.exchange}</span>
@@ -158,7 +159,7 @@ export const Stock: FunctionComponent<{
                                                                             target="_blank"
                                                                             to={{
                                                                                 pathname: `/Ranking/pl.Total Revenue`,
-                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuff)
+                                                                                search: getNewSearchParamsString(paramsToAddForStockRelatedStuffLink)
                                                                             }}
                                                                         >
                                                                             <span title="country">{stock.country}</span>
