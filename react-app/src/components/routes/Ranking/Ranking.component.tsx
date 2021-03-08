@@ -22,7 +22,7 @@ import './style.sass';
 
 export const Ranking: FunctionComponent<{}> = ({ }) => {
 
-    const { row } = useParams<{ row: string }>();
+    const { row, collectionId } = useParams<{ row: string }>();
     const { pickedComparisonsOptions } = getComparisonOptions();
     const { allSearchParams } = useSearchParams();
 
@@ -35,6 +35,7 @@ export const Ranking: FunctionComponent<{}> = ({ }) => {
 
     console.log({
         stock,
+        collectionId,
         ticker: allSearchParams?.ticker
     });
 
@@ -70,6 +71,7 @@ export const Ranking: FunctionComponent<{}> = ({ }) => {
                         key={c?.title}
                         comparison={c}
                         row={row}
+                        collectionId={collectionId}
                         stock={stock}
                         ticker={allSearchParams?.ticker}
                     />

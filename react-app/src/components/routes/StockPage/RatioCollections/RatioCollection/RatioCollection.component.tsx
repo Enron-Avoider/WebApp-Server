@@ -15,6 +15,7 @@ import Table from '../../Table';
 import { SAVE_RATIO_COLLECTION } from '@state/byModel/Calculations/calculations.queries';
 import { GET_AGGREGATES_FOR_CALC_ROWS } from '@state/byModel/Aggregate/aggregate.queries';
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
+import { mergeCalculationsAndAggregates } from '@state/byModel/Stocks/stock.map';
 
 export const RatioCollection: FunctionComponent<{
     ticker: string,
@@ -64,29 +65,27 @@ export const RatioCollection: FunctionComponent<{
             skip: !stock || !pickedComparisons
         });
 
-        console.log({
-            aggregatesList: stock && pickedComparisons || [],
-            stock,
-            collectionId: collection.id,
-            calcs: collection.calcs,
-            q: useQuery(GET_AGGREGATES_FOR_CALC_ROWS({
-                aggregatesList: stock && pickedComparisons || [],
-                stock,
-                collectionId: collection.id,
-                calcs: collection.calcs
-            })),
-            aggregatesForCalcRows
-        });
+        const mergedCalculationsAndAggregates = mergeCalculationsAndAggregates({
+            calculations: collection.calculationResults,
+            aggregates: aggregatesForCalcRows,
+            collectionId: collection.id
+        })
 
-        // const { loading: loading__, error: error__, data: aggregate_for_todo } = useQuery(GET_AGGREGATE_FOR_FINANCIAL_ROWS, {
-        //     variables: {
-        //         // sector: stock.sector,
-        //         industry: stock && stock.industry,
-        //         // country: stock.country,
-        //         // exchange: stock.exchange,
-        //         ...calculations?.calculations.length && { calcs: calculations?.calculations }
-        //     },
-        //     skip: !stock
+        // console.log({
+        //     // aggregatesList: stock && pickedComparisons || [],
+        //     // stock,
+        //     // collectionId: collection.id,
+        //     // calcs: collection.calcs,
+        //     // q: useQuery(GET_AGGREGATES_FOR_CALC_ROWS({
+        //     //     aggregatesList: stock && pickedComparisons || [],
+        //     //     stock,
+        //     //     collectionId: collection.id,
+        //     //     calcs: collection.calcs
+        //     // })),
+        //     // stock,
+        //     // collection,
+        //     // aggregatesForCalcRows,
+        //     // mergedCalculationsAndAggregates
         // });
 
         return (
@@ -97,7 +96,11 @@ export const RatioCollection: FunctionComponent<{
                             ticker={ticker}
                             title={title}
                             years={stock.yearlyFinancials.years}
-                            data={collection.calculationResults}
+                            // data={collection.calculationResults}
+                            data={
+                                mergedCalculationsAndAggregates ||
+                                collection.calculationResults
+                            }
                             onTitleEdit={onTitleEdit}
                             newCalcCollection={`${collection.name}.${collection.id}`}
                         />

@@ -21,7 +21,7 @@ import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 
 import './style.sass';
 import Table from '../Table';
-import { mergeStockAndAggregateYearlyFinancials, mergeStockAndAggregatesForYearlyFinancials } from './Stock.map';
+import { mergeStockAndAggregatesForYearlyFinancials } from '@state/byModel/Stocks/stock.map';
 import RatioCollections from '../RatioCollections';
 import ComparisonsPicker from '@components/shared/ComparisonsPicker';
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
@@ -64,12 +64,12 @@ export const Stock: FunctionComponent<{
             stock, aggregates: aggregatesForFinancialRows
         });
 
-        console.log({
-            stock,
-            pickedComparisons,
-            aggregatesForFinancialRows,
-            mergedStockAndAggregatesYearlyFinancials
-        });
+        // console.log({
+        //     // stock,
+        //     // pickedComparisons,
+        //     // aggregatesForFinancialRows,
+        //     mergedStockAndAggregatesYearlyFinancials
+        // });
 
         const paramsToAddForStockRelatedStuffLink = {
             paramsToAdd: {

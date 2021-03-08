@@ -10,7 +10,7 @@ export const GET_LAST_YEAR_COUNTS = gql`
     }
 `;
 
-export const GET_AGGREGATE_FOR_FINANCIAL_ROWS = gql`
+export const GET_AGGREGATE_FOR_FINANCIAL_ROW = gql`
     query($query: AggregationInputQuery, $companiesForRow: String ) {
         getAggregateForFinancialRows(
             query: $query,
@@ -42,6 +42,16 @@ export const GET_AGGREGATES_FOR_FINANCIAL_ROWS = (aggregatesList: string[], stoc
     return gql`${uglyness(aggregatesList)}`;
 }
 
+export const GET_AGGREGATE_FOR_CALC_ROW = gql`
+    query($query: AggregationInputQuery, $companiesForRow: String, $collectionId: String ) {
+        getAggregateForCalcRows(
+            query: $query,
+            companiesForRow: $companiesForRow,
+            collectionId: $collectionId
+        )
+    }
+`;
+
 export const GET_AGGREGATES_FOR_CALC_ROWS = ({
     aggregatesList,
     stock,
@@ -72,35 +82,6 @@ export const GET_AGGREGATES_FOR_CALC_ROWS = ({
 
     return gql`${uglyness(aggregatesList)}`;
 }
-
-
-// ${aggregatesList.reduce(
-//     (p, v) => ({
-//         ...p,
-//         [v]:
-//             (v => ({
-//                 [v[0]]: `${queryString(
-//                     v[0],
-//                     v[1]
-//                 )}`
-//             }) )
-//                 (v.split('__'))
-//     }),
-//     {})
-//     }
-
-// {
-//     ${`Stock_Related__Industry`}: getAggregateForFinancialRows(
-//         query: {
-//             industry: "Medical Devices"
-//         }
-//     ),
-//     b: getAggregateForFinancialRows(
-//         query: {
-//             industry: "Internet Content & Information"
-//         }
-//     )
-// }
 
 export const GET_AGGREGATE_FOR_CALC_ROWS = gql`
     query($sector: String, $industry: String, $country: String, $exchange: String, $calcs: [JSON] ) { 

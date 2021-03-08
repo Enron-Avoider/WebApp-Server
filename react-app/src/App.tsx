@@ -29,6 +29,10 @@ function App() {
                             component={loadable(() => import('./components/routes/StockPage'))}
                         />
                         <Route
+                            path="/ranking/:collectionId/:row"
+                            component={loadable(() => import('./components/routes/Ranking'))}
+                        />
+                        <Route
                             path="/ranking/:row"
                             component={loadable(() => import('./components/routes/Ranking'))}
                         />

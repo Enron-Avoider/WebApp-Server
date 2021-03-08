@@ -15,7 +15,7 @@ import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
 import { useTable, useBlockLayout } from 'react-table';
 import { FixedSizeList } from 'react-window';
 
-import { GET_AGGREGATE_FOR_FINANCIAL_ROWS } from '@state/byModel/Aggregate/aggregate.queries';
+import { GET_AGGREGATE_FOR_CALC_ROW, GET_AGGREGATE_FOR_FINANCIAL_ROW } from '@state/byModel/Aggregate/aggregate.queries';
 import './style.sass';
 import scrollbarWidth from './scrollbarWidth';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
@@ -105,32 +105,26 @@ function Table({ columns, data }: any) {
 
 
 
-
-
-
-
-
-
-
-
-
-
 export const RankingItem: FunctionComponent<{
     comparison: any,
     row: string,
+    collectionId?: string,
     stock: any,
     ticker?: string,
 }> = ({
     comparison,
     row,
+    collectionId,
     stock,
     ticker
 }) => {
         const { getNewSearchParamsString } = useSearchParams();
 
         const {
-            loading: loading_aggregatesForFinancialRows, error: error_aggregatesForFinancialRows, data: aggregateForFinancialRow
-        } = useQuery(GET_AGGREGATE_FOR_FINANCIAL_ROWS, {
+            loading: loading_aggregatesForFinancialRows,
+            error: error_aggregatesForFinancialRows,
+            data: aggregateRes
+        } = useQuery(collectionId ? GET_AGGREGATE_FOR_CALC_ROW : GET_AGGREGATE_FOR_FINANCIAL_ROW, {
             variables: {
                 query: {
                     ...((v: any) => v ? ({
@@ -142,12 +136,18 @@ export const RankingItem: FunctionComponent<{
 
                     }) : {})(comparison?.value.split('__'))
                 },
-                companiesForRow: row
+                companiesForRow: row,
+                ...collectionId ? { collectionId } : {}
             },
             skip: (!comparison || !!ticker && !stock)
         });
 
-        const aggregationsPerYear = aggregateForFinancialRow?.getAggregateForFinancialRows?.financialRows[row.replace('.', '_')];
+        const aggregationsPerYear = aggregateRes && (
+            collectionId ?
+                aggregateRes?.getAggregateForCalcRows?.calcRows[`calc_${row}`] : 
+                aggregateRes?.getAggregateForFinancialRows?.financialRows[row.replace('.', '_')]
+            )
+            //[row.replace('.', '_')];
 
         const maxCompanyYearlyLength = aggregationsPerYear ?
             aggregationsPerYear.reduce((p: number, c: any) => c.companies.length > p ? c.companies.length : p, 0) :
@@ -176,12 +176,14 @@ export const RankingItem: FunctionComponent<{
         }));
 
         console.log({
-            row,
-            comparison,
-            aggregationsPerYear,
-            agg: aggregateForFinancialRow?.getAggregateForFinancialRows?.financialRows[row.replace('.', '_')],
-            maxCompanyYearlyLength,
-            rankTable
+            aggregateRes,
+            aggregationsPerYear
+            // row,
+            // comparison,
+            // aggregationsPerYear,
+            // agg: aggregateRes?.getAggregateForFinancialRows?.financialRows[row.replace('.', '_')],
+            // maxCompanyYearlyLength,
+            // rankTable
         });
 
         const columns = React.useMemo(
@@ -225,31 +227,18 @@ export const RankingItem: FunctionComponent<{
                         {loading_aggregatesForFinancialRows ? (
                             <CircularProgress size={100} />
                         ) : (
-                                <Paper elevation={3}>
-                                    <Box bgcolor="grey.800">
-                                        <ScrollSyncPane>
-                                            <div className="table-wrapper">
-                                                <Table columns={columns} data={data} />
-                                            </div>
-                                        </ScrollSyncPane>
-                                    </Box>
-                                </Paper>
-                            )}
+                            <Paper elevation={3}>
+                                <Box bgcolor="grey.800">
+                                    <ScrollSyncPane>
+                                        <div className="table-wrapper">
+                                            <Table columns={columns} data={data} />
+                                        </div>
+                                    </ScrollSyncPane>
+                                </Box>
+                            </Paper>
+                        )}
                     </Box>
                 </Box>
             </Paper>
         );
     }
-
-
-
-
-
-
-
-
-
-
-
-
-

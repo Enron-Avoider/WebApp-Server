@@ -293,127 +293,145 @@ module.exports = {
 
     getAggregateForCalcRows = async ({
       query,
-      collectionId,
       calcs,
       stockToRank,
+      collectionId,
       companiesForRow,
     }) => {
-      const getCalcRows = async ({ query, stockToRank, companiesForRow }) => {
-        const calcs_ = calcs.map((c) => {
-          const paths = Object.values(c.scope).map(
-            (v) => `yearlyFinancialsByYear.${v}.v`
-          );
+      console.log("yeeeep", {
+        collectionId
+      });
 
-          return {
-            fieldName: c.title.replace(/\./g, "_"),
-            calc: mathToMongo(
-              c.calc,
-              paths.map((p) => `$${p}`)
-            ),
-            paths,
-          };
-        });
+      const collection = (
+        await this.mongoDBRatioCollectionTable
+          .find({
+            id: collectionId,
+          })
+          .toArray()
+      )[0];
 
-        return (await this.mongoDBStocksTable
-          .aggregate([
-            {
-              $match: query,
-            },
-            {
-              $unwind: {
-                path: "$yearlyFinancialsByYear",
+      const getCalcRows = async ({
+        query,
+        stockToRank,
+        companiesForRow,
+        calcs,
+      }) => {
+        const calcs_ = calcs
+          .filter((c) => !companiesForRow || companiesForRow === c.title)
+          .map((c) => {
+            const paths = Object.values(c.scope).map(
+              (v) => `yearlyFinancialsByYear.${v}.v`
+            );
+
+            return {
+              fieldName: c.title.replace(/\./g, "_"),
+              calc: mathToMongo(
+                c.calc,
+                paths.map((p) => `$${p}`)
+              ),
+              paths,
+            };
+          });
+
+        return (
+          await this.mongoDBStocksTable
+            .aggregate([
+              {
+                $match: query,
               },
-            },
-            {
-              $addFields: {
-                ...calcs_.reduce(
-                  (p, { fieldName, calc, paths }) => ({
-                    ...p,
-                    [`calc_${fieldName}`]: calc,
-                  }),
-                  {}
-                ),
+              {
+                $unwind: {
+                  path: "$yearlyFinancialsByYear",
+                },
               },
-            },
-            {
-              $facet: {
-                ...calcs_.reduce(
-                  (p, { fieldName, calc, paths }) => ({
-                    ...p,
-                    [`calc_${fieldName}`]: [
-                      {
-                        $project: {
-                          name: 1,
-                          code: 1,
-                          "yearlyFinancialsByYear.year": 1,
-                          [`calc_${fieldName}`]: {
-                            $toDecimal: `$calc_${fieldName}`,
+              {
+                $addFields: {
+                  ...calcs_.reduce(
+                    (p, { fieldName, calc, paths }) => ({
+                      ...p,
+                      [`calc_${fieldName}`]: calc,
+                    }),
+                    {}
+                  ),
+                },
+              },
+              {
+                $facet: {
+                  ...calcs_.reduce(
+                    (p, { fieldName, calc, paths }) => ({
+                      ...p,
+                      [`calc_${fieldName}`]: [
+                        {
+                          $project: {
+                            name: 1,
+                            code: 1,
+                            "yearlyFinancialsByYear.year": 1,
+                            [`calc_${fieldName}`]: {
+                              $toDecimal: `$calc_${fieldName}`,
+                            },
+                            //   [path]: { $toDecimal: `$${path}` },
                           },
-                          //   [path]: { $toDecimal: `$${path}` },
                         },
-                      },
-                      {
-                        $sort: {
-                          [`calc_${fieldName}`]: -1,
+                        {
+                          $sort: {
+                            [`calc_${fieldName}`]: -1,
+                          },
                         },
-                      },
-                      {
-                        $group: {
-                          _id: {
-                            year: "$yearlyFinancialsByYear.year",
-                          },
-                          [`count`]: {
-                            $sum: 1,
-                          },
-                          [`sum`]: {
-                            $sum: `$${`calc_${fieldName}`}`,
-                          },
-                          [`avg`]: {
-                            $avg: `$${`calc_${fieldName}`}`,
-                          },
-                          [`companies`]: {
-                            $push: {
-                              company: "$name",
-                              code: "$code",
-                              v: `$${`calc_${fieldName}`}`,
+                        {
+                          $group: {
+                            _id: {
+                              year: "$yearlyFinancialsByYear.year",
+                            },
+                            [`count`]: {
+                              $sum: 1,
+                            },
+                            [`sum`]: {
+                              $sum: `$${`calc_${fieldName}`}`,
+                            },
+                            [`avg`]: {
+                              $avg: `$${`calc_${fieldName}`}`,
+                            },
+                            [`companies`]: {
+                              $push: {
+                                company: "$name",
+                                code: "$code",
+                                v: `$${`calc_${fieldName}`}`,
+                              },
                             },
                           },
                         },
-                      },
-                      {
-                        $sort: {
-                          "_id.year": -1,
+                        {
+                          $sort: {
+                            "_id.year": -1,
+                          },
                         },
-                      },
-                    ],
-                  }),
-                  {}
-                ),
+                      ],
+                    }),
+                    {}
+                  ),
+                },
               },
-            },
-          ])
-          .toArray())
-          .map((c) =>
-            Object.entries(c).reduce(
-              (p, [k, v]) => ({
-                ...p,
-                [k]: v.map((v_) => ({
-                  ...v_,
-                  companies: companiesForRow
-                    ? v_.companies
-                    : v_.companies.length,
-                  ...(stockToRank && {
-                    rank: ((r) => (r > -1 ? r + 1 : "-"))(
-                      v_.companies.findIndex(
-                        (company) => company.company === stockToRank
-                      )
-                    ),
-                  }),
-                })),
-              }),
-              {}
-            )
-          );
+            ])
+            .toArray()
+        ).map((c) =>
+          Object.entries(c).reduce(
+            (p, [k, v]) => ({
+              ...p,
+              [k]: v.map((v_) => ({
+                ...v_,
+                companies: companiesForRow ? v_.companies : v_.companies.length,
+                ...(stockToRank && {
+                  rank: ((r) => (r > -1 ? r + 1 : "-"))(
+                    v_.companies.findIndex(
+                      (company) => company.company === stockToRank
+                    )
+                  ),
+                }),
+              })),
+            }),
+            {}
+          )
+        )[0];
       };
 
       const calcRows = Object.keys(query).length
@@ -421,14 +439,16 @@ module.exports = {
             cacheQuery: {
               type: "calcRows",
               query,
-                stockToRank,
-                companiesForRow,
+              stockToRank,
+              companiesForRow,
+              collectionId,
             },
             getUncachedAggregationFn: getCalcRows,
             getUncachedAggregationParameters: {
               query,
-                stockToRank,
-                companiesForRow,
+              stockToRank,
+              companiesForRow,
+              calcs: collection.calcs,
             },
           })
         : {};
@@ -436,7 +456,7 @@ module.exports = {
       return {
         query,
         collectionId,
-        calcs,
+        // calcs: collection.calcs,
         calcRows,
       };
     };
@@ -654,7 +674,7 @@ module.exports = {
       const nanoidInDB = (
         await table
           .find({
-            nanoid,
+            id: nanoid,
           })
           .toArray()
       )[0];
