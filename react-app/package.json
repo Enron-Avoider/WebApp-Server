@@ -28,6 +28,7 @@
     "bootstrap": "^4.4.1",
     "deep-find": "^1.1.0",
     "graphql": "^15.0.0",
+    "i18n-iso-countries": "^6.5.0",
     "local-storage": "^2.0.0",
     "localforage": "^1.9.0",
     "mathjs": "^6.6.4",

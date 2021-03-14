@@ -176,6 +176,8 @@ export const RankingItem: FunctionComponent<{
         }));
 
         console.log({
+            ticker,
+            stock,
             aggregateRes,
             aggregationsPerYear
             // row,

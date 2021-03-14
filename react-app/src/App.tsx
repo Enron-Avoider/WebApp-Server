@@ -36,8 +36,12 @@ function App() {
                             path="/ranking/:row"
                             component={loadable(() => import('./components/routes/Ranking'))}
                         />
+                        <Route
+                            path="/home"
+                            component={loadable(() => import('./components/routes/Home'))}
+                        />
 
-                        <Redirect from="/" to="/stock/BRK-B?comparisons=Stock_Related__industry&ratioCollections=Valuation.9PJQ" />
+                        <Redirect from="/" to="/stock/BRK-A?comparisons=Stock_Related__industry&ratioCollections=Valuation.9PJQ" />
                     </Switch>
                     <Footer />
                 </Container>

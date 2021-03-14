@@ -1,6 +1,9 @@
 const { RESTDataSource } = require("apollo-datasource-rest");
 const parse = require("csv-parse");
 const { ObjectId } = require("mongodb");
+const regionNamesInEnglish = new Intl.DisplayNames(["en"], { type: "region" });
+const fs = require("fs");
+const fetch = require("node-fetch");
 
 const { EODDataMaps } = require("../data-maps");
 const mathToMongo = require("../utils/mathToMongo");
@@ -8,18 +11,19 @@ const chunkUp = require("../utils/chunkUp");
 
 module.exports = {
   EODDataAPI: class extends RESTDataSource {
-    constructor(mongoDB) {
+    constructor(mongoDB, s3) {
       super();
 
       this.keys = {
         eodhistoricaldata: "5f80d8849f6b13.09550863",
-        googlePlaces: "AIzaSyAMIu4lJGH969CHlLdKj3Uc_AMoUntOWsM",
+        // googlePlaces: "AIzaSyAMIu4lJGH969CHlLdKj3Uc_AMoUntOWsM",
       };
 
       this.mongoDBStocksTable = mongoDB.collection("Stocks");
+      this.s3 = s3;
     }
 
-    getStockByCode = async ({ code }) => {
+    getStockByCode = async ({ code }, getAggregationThroughCacheIfPossible) => {
       const fundamentalData = await this.get(
         `
           https://eodhistoricaldata.com/api/fundamentals/${code}?
@@ -27,40 +31,28 @@ module.exports = {
         `.replace(/\s/g, "")
       );
 
+      //   console.log({
+      //     c: fundamentalData.General.AddressData.Country.toLowerCase(),
+      //     cc: fundamentalData.General.CountryISO.toLowerCase(),
+      //     ccc: regionNamesInEnglish
+      //       .of(fundamentalData.General.CountryISO)
+      //       .toLowerCase(),
+      //     a: fundamentalData.General.Address.toLowerCase(),
+      //   });
+
       const is_in_exchange_country =
-        fundamentalData.General &&
-        (await (async () => {
-          const AddressGoogleCountry = await this.get(
-            `https://maps.googleapis.com/maps/api/geocode/json?&address=${encodeURIComponent(
-              fundamentalData.General.Address
-            )}&key=${this.keys.googlePlaces}`
-          );
-
-          const CountryGoogleCountry = await this.get(
-            `https://maps.googleapis.com/maps/api/geocode/json?&address=${fundamentalData.General.CountryName}&key=${this.keys.googlePlaces}`
-          );
-
-          if (
-            AddressGoogleCountry.results &&
-            CountryGoogleCountry.results &&
-            AddressGoogleCountry.results[0] &&
-            CountryGoogleCountry.results[0] &&
-            AddressGoogleCountry.results[0].address_components.find((c) =>
-              c.types.includes("country")
-            )
-          ) {
-            return (
-              AddressGoogleCountry.results[0].address_components.find((c) =>
-                c.types.includes("country")
-              ).short_name ===
-              CountryGoogleCountry.results[0].address_components.find((c) =>
-                c.types.includes("country")
-              ).short_name
+        fundamentalData.General && fundamentalData.General.AddressData
+          ? regionNamesInEnglish
+              .of(fundamentalData.General.CountryISO)
+              .toLowerCase()
+              .includes(
+                fundamentalData.General.AddressData.Country.toLowerCase()
+              )
+          : fundamentalData.General.Address.toLowerCase().includes(
+              regionNamesInEnglish
+                .of(fundamentalData.General.CountryISO)
+                .toLowerCase()
             );
-          } else {
-            return false;
-          }
-        })());
 
       const priceData = await this.get(
         `
@@ -75,12 +67,27 @@ module.exports = {
         fundamentalData.Financials &&
         fundamentalData.Financials.Balance_Sheet.currency_symbol;
 
+      //   const yearlyCurrencyPairs =
+      //     fundamentalsCurrency &&
+      //     (await this.getCurrencyToCurrencyTimeseries({
+      //       currency: fundamentalsCurrency,
+      //       toCurrency: "USD",
+      //     }).catch((e) => null));
+
       const yearlyCurrencyPairs =
         fundamentalsCurrency &&
-        (await this.getCurrencyToCurrencyTimeseries({
-          currency: fundamentalsCurrency,
-          toCurrency: "USD",
-        }).catch((e) => null));
+        (await getAggregationThroughCacheIfPossible({
+          cacheQuery: {
+            type: "yearlyCurrencyPair",
+            currency: fundamentalsCurrency,
+            toCurrency: "USD",
+          },
+          getUncachedAggregationFn: this.getCurrencyToCurrencyTimeseries,
+          getUncachedAggregationParameters: {
+            currency: fundamentalsCurrency,
+            toCurrency: "USD",
+          },
+        }));
 
       // EODFundamentals > yearlyFinancials
       const yearlyFinancials =
@@ -107,6 +114,44 @@ module.exports = {
       // EODFundamentals > yearlyFinancialsByYear
       // yearlyFinancialsByYear > yearlyFinancialsWithKeys
 
+      const getUploadedImg = async (logoUrl) => {
+        const logoMimeType = logoUrl.split(/\.(?=[^\.]+$)/)[1];
+
+        const existingUpload = await fetch(
+          `http://enronavoider-logos.s3.amazonaws.com/${fundamentalData.General.Code}.${logoMimeType}`
+        ).then((r) =>
+          r.status === 200
+            ? `enronavoider-logos.s3.amazonaws.com/${fundamentalData.General.Code}.${logoMimeType}`
+            : false
+        );
+
+        return (
+          existingUpload ||
+          (await fetch(`http://${logoUrl}`)
+            .then((res) => {
+              return this.s3
+                .upload({
+                  Bucket: "enronavoider-logos",
+                  Key: `${fundamentalData.General.Code}.${logoMimeType}`,
+                  Body: res.body,
+                })
+                .promise();
+            })
+            .then((res) => {
+              return res.Location.replace("https://", "");
+            })
+            .catch((err) => {
+              return null;
+            }))
+        );
+      };
+
+      const logoUrl = fundamentalData.General.LogoURL
+        ? getUploadedImg(
+            "eodhistoricaldata.com" + fundamentalData.General.LogoURL
+          )
+        : null;
+
       return Object.keys(fundamentalData).length && fundamentalData.Highlights
         ? {
             code: fundamentalData.General.Code,
@@ -128,14 +173,13 @@ module.exports = {
             sector: fundamentalData.General.Sector,
             industry: fundamentalData.General.Industry,
             description: fundamentalData.General.Description,
-            logo: fundamentalData.General.LogoURL
-              ? "eodhistoricaldata.com" + fundamentalData.General.LogoURL
-              : null,
+            logo: logoUrl,
             yearlyFinancials,
             yearlyFinancialsWithKeys,
             yearlyFinancialsByYear,
             retrieved_at: Date.now(),
             is_in_exchange_country,
+            // has_biggest_last_year_market_cap
           }
         : {};
     };
@@ -146,20 +190,19 @@ module.exports = {
       `);
     };
 
+    // Deprecated
     getAllIndustries = async () => {
-      const csv = await this.get(
-        `http://eodhistoricaldata.com/download/SectorIndustries.csv`
-      );
-
-      const json = (
-        await new Promise((r) =>
-          parse(csv, { columns: true, trim: true }, (err, output) => r(output))
-        )
-      )
-        .filter((item) => item.industry !== "\\N")
-        .filter((item) => item.industry.length);
-
-      return json;
+      //   const csv = await this.get(
+      //     `http://eodhistoricaldata.com/download/SectorIndustries.csv`
+      //   );
+      //   const json = (
+      //     await new Promise((r) =>
+      //       parse(csv, { columns: true, trim: true }, (err, output) => r(output))
+      //     )
+      //   )
+      //     .filter((item) => item.industry !== "\\N")
+      //     .filter((item) => item.industry.length);
+      //   return json;
     };
 
     getExchangeStocks = async ({ code }) => {
@@ -294,7 +337,7 @@ module.exports = {
         async (accUnresolved, exchange, j) => {
           const accResolved = await accUnresolved;
 
-        //   console.log(`working on exchange`, { exchange: exchange.Name });
+          //   console.log(`working on exchange`, { exchange: exchange.Name });
 
           await new Promise((t) => setTimeout(t, 1000));
 
@@ -311,14 +354,20 @@ module.exports = {
             async (accUnresolved, stockBatch, i) => {
               const accResolved = await accUnresolved;
 
-            //   await new Promise((t) => setTimeout(t, 100));
+              //   await new Promise((t) => setTimeout(t, 100));
               const savedStocks = await this.saveBatchOfStocksToDB({
                 stockBatch,
               });
 
-              const onlySkippedStocks = savedStocks.reduce((p, c) => c.includes('Skipped') ? p + 1 : p, 0) === 10;
+              const onlySkippedStocks =
+                savedStocks.reduce(
+                  (p, c) => (c.includes("Skipped") ? p + 1 : p),
+                  0
+                ) === 10;
 
-              await new Promise((t) => setTimeout(t, onlySkippedStocks ? 10 : 100 ));
+              await new Promise((t) =>
+                setTimeout(t, onlySkippedStocks ? 10 : 100)
+              );
 
               console.log({
                 onlySkippedStocks,

@@ -64,13 +64,6 @@ export const Stock: FunctionComponent<{
             stock, aggregates: aggregatesForFinancialRows
         });
 
-        // console.log({
-        //     // stock,
-        //     // pickedComparisons,
-        //     // aggregatesForFinancialRows,
-        //     mergedStockAndAggregatesYearlyFinancials
-        // });
-
         const paramsToAddForStockRelatedStuffLink = {
             paramsToAdd: {
                 comparisons: 'Stock_Related__industry-Stock_Related__sector-Stock_Related__country-Stock_Related__exchange&ratioCollections-Stock_Related__exchange',
@@ -98,7 +91,7 @@ export const Stock: FunctionComponent<{
                                                                 justifyContent="center"
                                                                 mr={2}
                                                             >
-                                                                <Avatar variant="rounded" src={`//${stock.logo}`} />
+                                                                <Avatar className="avatar" variant="rounded" src={`//${stock.logo}`} />
                                                             </Box>
                                                             <Box display="flex" flexDirection="column" >
                                                                 <Box display="flex" alignItems="center" mr={2}>
@@ -122,7 +115,7 @@ export const Stock: FunctionComponent<{
                                                                             color="primary"
                                                                             target="_blank"
                                                                             to={{
-                                                                                pathname: `/Ranking/pl.Total Revenue`,
+                                                                                pathname: `/ranking/pl.Total Revenue`,
                                                                                 search: getNewSearchParamsString(paramsToAddForStockRelatedStuffLink)
                                                                             }}
                                                                         >
@@ -134,7 +127,7 @@ export const Stock: FunctionComponent<{
                                                                             color="primary"
                                                                             target="_blank"
                                                                             to={{
-                                                                                pathname: `/Ranking/pl.Total Revenue`,
+                                                                                pathname: `/ranking/pl.Total Revenue`,
                                                                                 search: getNewSearchParamsString(paramsToAddForStockRelatedStuffLink)
                                                                             }}
                                                                         >
@@ -146,7 +139,7 @@ export const Stock: FunctionComponent<{
                                                                             color="primary"
                                                                             target="_blank"
                                                                             to={{
-                                                                                pathname: `/Ranking/pl.Total Revenue`,
+                                                                                pathname: `/ranking/pl.Total Revenue`,
                                                                                 search: getNewSearchParamsString(paramsToAddForStockRelatedStuffLink)
                                                                             }}
                                                                         >
@@ -158,7 +151,7 @@ export const Stock: FunctionComponent<{
                                                                             color="primary"
                                                                             target="_blank"
                                                                             to={{
-                                                                                pathname: `/Ranking/pl.Total Revenue`,
+                                                                                pathname: `/ranking/pl.Total Revenue`,
                                                                                 search: getNewSearchParamsString(paramsToAddForStockRelatedStuffLink)
                                                                             }}
                                                                         >

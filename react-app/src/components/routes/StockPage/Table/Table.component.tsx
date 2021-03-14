@@ -254,7 +254,7 @@ export default function Table(
                                                                                         component={Link_}
                                                                                         color="inherit"
                                                                                         to={{
-                                                                                            pathname: `/Ranking/${row.original.key}`,
+                                                                                            pathname: `/ranking/${row.original.key}`,
                                                                                             search: getNewSearchParamsString({
                                                                                                 paramsToAdd: { ticker }
                                                                                             })

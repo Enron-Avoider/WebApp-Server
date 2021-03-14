@@ -110,10 +110,10 @@ module.exports = {
       )[0];
 
       if (!!aggregationInDB) {
-        console.log("in db", { cacheQuery });
+        // console.log("in db", { cacheQuery });
         return aggregationInDB.object;
       } else {
-        console.log("not in db", { cacheQuery });
+        // console.log("not in db", { cacheQuery });
         const object = await getUncachedAggregationFn(
           getUncachedAggregationParameters
         );
@@ -132,7 +132,11 @@ module.exports = {
       stockToRank,
       companiesForRow,
     }) => {
-      const getSomeFinancialRows = async ({ rowKeysPathsBatch }) =>
+      const getSomeFinancialRows = async ({
+        rowKeysPathsBatch,
+        stockToRank,
+        companiesForRow,
+      }) =>
         (
           await this.mongoDBStocksTable
             .aggregate(
@@ -195,6 +199,29 @@ module.exports = {
                                 },
                               },
                             },
+                            ...(stockToRank
+                              ? [
+                                  {
+                                    $addFields: {
+                                      rank: {
+                                        $indexOfArray: [
+                                          "$companies.company",
+                                          stockToRank,
+                                        ],
+                                      },
+                                    },
+                                  },
+                                ]
+                              : []),
+                            ...(!companiesForRow
+                              ? [
+                                  {
+                                    $addFields: {
+                                      companies: { $size: "$companies" },
+                                    },
+                                  },
+                                ]
+                              : []),
                             {
                               $sort: {
                                 "_id.year": -1,
@@ -221,7 +248,7 @@ module.exports = {
           EODDataMaps.rowKeysPaths.filter(
             (k) => !companiesForRow || companiesForRow === k
           ),
-          1
+          5
         );
 
         return await rowKeysPathsBatches.reduce(
@@ -234,34 +261,40 @@ module.exports = {
                   type: "someFinancialRows",
                   query,
                   rowKeysPathsBatch: batch,
+                  stockToRank,
+                  companiesForRow
                 },
                 getUncachedAggregationFn: getSomeFinancialRows,
-                getUncachedAggregationParameters: { rowKeysPathsBatch: batch },
+                getUncachedAggregationParameters: {
+                  rowKeysPathsBatch: batch,
+                  stockToRank,
+                  companiesForRow,
+                },
               }
             );
 
             return {
               ...accResolved,
-              // ...batchResults,
-              ...Object.entries(batchResults).reduce(
-                (p, [k, v]) => ({
-                  ...p,
-                  [k]: v.map((v_) => ({
-                    ...v_,
-                    companies: companiesForRow
-                      ? v_.companies
-                      : v_.companies.length,
-                    ...(stockToRank && {
-                      rank: ((r) => (r > -1 ? r + 1 : "-"))(
-                        v_.companies.findIndex(
-                          (company) => company.company === stockToRank
-                        )
-                      ),
-                    }),
-                  })),
-                }),
-                {}
-              ),
+              ...batchResults,
+              //   ...Object.entries(batchResults).reduce(
+              //     (p, [k, v]) => ({
+              //       ...p,
+              //       [k]: v.map((v_) => ({
+              //         ...v_,
+              //         companies: companiesForRow
+              //           ? v_.companies
+              //           : v_.companies.length,
+              //         ...(stockToRank && {
+              //           rank: ((r) => (r > -1 ? r + 1 : "-"))(
+              //             v_.companies.findIndex(
+              //               (company) => company.company === stockToRank
+              //             )
+              //           ),
+              //         }),
+              //       })),
+              //     }),
+              //     {}
+              //   ),
             };
           },
           {}
@@ -298,10 +331,6 @@ module.exports = {
       collectionId,
       companiesForRow,
     }) => {
-      console.log("yeeeep", {
-        collectionId
-      });
-
       const collection = (
         await this.mongoDBRatioCollectionTable
           .find({
@@ -400,6 +429,29 @@ module.exports = {
                             },
                           },
                         },
+                        ...(stockToRank
+                          ? [
+                              {
+                                $addFields: {
+                                  rank: {
+                                    $indexOfArray: [
+                                      "$companies.company",
+                                      stockToRank,
+                                    ],
+                                  },
+                                },
+                              },
+                            ]
+                          : []),
+                        ...(!companiesForRow
+                          ? [
+                              {
+                                $addFields: {
+                                  companies: { $size: "$companies" },
+                                },
+                              },
+                            ]
+                          : []),
                         {
                           $sort: {
                             "_id.year": -1,
@@ -413,24 +465,6 @@ module.exports = {
               },
             ])
             .toArray()
-        ).map((c) =>
-          Object.entries(c).reduce(
-            (p, [k, v]) => ({
-              ...p,
-              [k]: v.map((v_) => ({
-                ...v_,
-                companies: companiesForRow ? v_.companies : v_.companies.length,
-                ...(stockToRank && {
-                  rank: ((r) => (r > -1 ? r + 1 : "-"))(
-                    v_.companies.findIndex(
-                      (company) => company.company === stockToRank
-                    )
-                  ),
-                }),
-              })),
-            }),
-            {}
-          )
         )[0];
       };
 
@@ -442,6 +476,7 @@ module.exports = {
               stockToRank,
               companiesForRow,
               collectionId,
+              calcs: collection.calcs,
             },
             getUncachedAggregationFn: getCalcRows,
             getUncachedAggregationParameters: {

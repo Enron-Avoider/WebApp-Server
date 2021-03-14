@@ -3,7 +3,7 @@ const { gql } = require("apollo-server");
 const typeDefs = gql`
   scalar JSON
 
-  type EODStock {
+  type Stock {
     code: String
     name: String
     adjusted_close: String
@@ -61,8 +61,8 @@ const typeDefs = gql`
   }
 
   type Query {
-    searchStocks(name: String): [EODStock]
-    getStockByCode(code: String): EODStock
+    searchStocks(name: String): [Stock]
+    getStockByCode(code: String): Stock
     getLastYearCounts(query: AggregationInputQuery): JSON
     getAggregateForFinancialRows(
         query: AggregationInputQuery,

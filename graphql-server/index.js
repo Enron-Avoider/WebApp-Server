@@ -1,5 +1,7 @@
 const { ApolloServer } = require("apollo-server");
 const MongoClient = require("mongodb").MongoClient;
+const AWS = require('aws-sdk');
+// const s3 = require('s3');
 
 const { typeDefs } = require("./state/types");
 const { EODDataAPI, Ours } = require("./state/data-sources");
@@ -12,6 +14,12 @@ const mongoClient = new MongoClient(
     useUnifiedTopology: true,
   }
 );
+ 
+const s3 = new AWS.S3({
+    accessKeyId: "AKIAT6OBIZ43ER6XOFZ7",
+    secretAccessKey: "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",
+    // region: "us-east-1"
+});
 
 mongoClient.connect(async (err) => {
   const mongoDB = mongoClient.db("Enron");
@@ -23,11 +31,12 @@ mongoClient.connect(async (err) => {
       ...mutation,
     },
     dataSources: () => ({
-      EODDataAPI: new EODDataAPI(mongoDB),
-      Ours: new Ours(mongoDB)
+      EODDataAPI: new EODDataAPI(mongoDB, s3),
+      Ours: new Ours(mongoDB, s3)
     }),
     context: async ({ req }) => ({
       mongoDB,
+      s3
     }),
     playground: true,
   });

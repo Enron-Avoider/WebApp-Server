@@ -15,7 +15,7 @@ import './style.sass';
 
 export default function Header() {
 
-    const { getNewSearchParamsString } = useSearchParams();
+    const { allSearchParams ,getNewSearchParamsString } = useSearchParams();
 
     return (
         <>
@@ -32,13 +32,23 @@ export default function Header() {
                         >
                             <>
                                 <Box mr={2}>
-                                    <img className="logo" src={logoImg} />
+                                    <Link_ color="inherit" to={{
+                                        pathname: `/home`,
+                                        search: (getNewSearchParamsString({ paramsToAdd: { ticker: allSearchParams.ticker || 'BRK-A' } }) as string)
+                                    }}>
+                                        <img className="logo" src={logoImg} />
+                                    </Link_>
                                 </Box>
                                 <Grid container direction="column" justify="center">
                                     <Grid item >
-                                        <Typography variant="h6">
-                                            Enron Avoider
-                                        </Typography>
+                                        <Link component={Link_} color="inherit" to={{
+                                            pathname: `/home`,
+                                            search: (getNewSearchParamsString({ keysToRemove: ['ticker'] }) as string)
+                                        }}>
+                                            <Typography variant="h6">
+                                                Enron Avoider
+                                            </Typography>
+                                        </Link>
                                     </Grid>
                                     <Grid item>
                                         <Box mt={-1}>
@@ -61,12 +71,16 @@ export default function Header() {
                             ml={3}
                         >
                             <Link
+                                style={{
+                                    ...window.location.pathname.includes('/stock/') && { fontWeight: 'bold' },
+                                    // marginLeft: '5px'
+                                }}
                                 component={Link_}
                                 color="inherit"
                                 variant="subtitle1"
                                 to={
                                     {
-                                        pathname: `/stock`,
+                                        pathname: `/stock/BRK-A`,
                                         search: (getNewSearchParamsString({ keysToRemove: ['ticker'] }) as string)
                                     }
                                 }
@@ -75,19 +89,39 @@ export default function Header() {
                                 Stock
                             </Link>
                             <Link
-                                style={{ fontWeight: 'bold', marginLeft: '5px' }}
+                                style={{
+                                    ...window.location.pathname.includes('/ranking/') && { fontWeight: 'bold' },
+                                    marginLeft: '15px'
+                                }}
                                 component={Link_}
                                 color="inherit"
                                 variant="subtitle1"
                                 to={
                                     {
-                                        pathname: `/stock`,
+                                        pathname: `/ranking/pl.Total Revenue`,
+                                        search: (getNewSearchParamsString({ paramsToAdd: { ticker: allSearchParams.ticker || 'BRK-A' } }) as string)
+                                    }
+                                }
+                                target="_blank"
+                            >
+                                Rank
+                            </Link>
+                            <Link
+                                style={{
+                                    marginLeft: '15px',
+                                }}
+                                component={Link_}
+                                color="inherit"
+                                variant="subtitle1"
+                                to={
+                                    {
+                                        pathname: `/home`,
                                         search: (getNewSearchParamsString({ keysToRemove: ['ticker'] }) as string)
                                     }
                                 }
                                 target="_blank"
                             >
-                                Stock
+                                Explore
                             </Link>
                         </Box>
 
