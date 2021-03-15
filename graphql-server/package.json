@@ -6,8 +6,7 @@
     "start": "nodemon index.js",
     "dev": "now dev --listen 3000",
     "stage": "now",
-    "prod": "now --prod",
-    "saveIndustries": "node -e 'require(\"./state/data-sources\").EODDataAPI.saveIndustriesToDB()'"
+    "update": "npx now --prod"
   },
   "author": "",
   "license": "ISC",

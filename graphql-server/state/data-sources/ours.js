@@ -275,26 +275,7 @@ module.exports = {
 
             return {
               ...accResolved,
-              ...batchResults,
-              //   ...Object.entries(batchResults).reduce(
-              //     (p, [k, v]) => ({
-              //       ...p,
-              //       [k]: v.map((v_) => ({
-              //         ...v_,
-              //         companies: companiesForRow
-              //           ? v_.companies
-              //           : v_.companies.length,
-              //         ...(stockToRank && {
-              //           rank: ((r) => (r > -1 ? r + 1 : "-"))(
-              //             v_.companies.findIndex(
-              //               (company) => company.company === stockToRank
-              //             )
-              //           ),
-              //         }),
-              //       })),
-              //     }),
-              //     {}
-              //   ),
+              ...batchResults
             };
           },
           {}

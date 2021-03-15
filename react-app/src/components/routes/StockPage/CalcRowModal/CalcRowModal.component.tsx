@@ -138,9 +138,9 @@ export default function NewCalcRowModal() {
             return ({
                 scope: {
                     ...acc.scope,
-                    ...(curr.type !== 'Math' ? { [letterIndex]: curr.value } : {})
+                    ...(curr?.type !== 'Math' ? { [letterIndex]: curr?.value } : {})
                 },
-                calc: `${acc?.calc}${(curr.type === 'Math' ? curr.value : letterIndex)}`
+                calc: `${acc?.calc}${(curr?.type === 'Math' ? curr?.value : letterIndex)}`
             })
         }, {
             scope: {},
@@ -298,14 +298,14 @@ export default function NewCalcRowModal() {
                             value.map((option: any, index: number) => {
                                 return (
                                     <Chip
-                                        variant={option.type === 'Math' ? 'default' : 'outlined'}
+                                        variant={option?.type === 'Math' ? 'default' : 'outlined'}
                                         label={`
-                                                    ${(option.type !== 'Math' && option.type !== 'Price') ? option.type + ' >' : ''}
-                                                    ${option.title}
+                                                    ${(option?.type !== 'Math' && option?.type !== 'Price') ? option?.type + ' >' : ''}
+                                                    ${option?.title}
                                                 `}
                                         {...getTagProps({ index })}
-                                        className={`${option.type}`}
-                                        color={option.type === 'Math' ? 'primary' : 'default'}
+                                        className={`${option?.type}`}
+                                        color={option?.type === 'Math' ? 'primary' : 'default'}
                                         onDelete={undefined}
                                         onClick={(getTagProps({ index }) as any).onDelete}
                                     />

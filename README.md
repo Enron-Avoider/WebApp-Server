@@ -14,7 +14,15 @@ cd graphql-server
 npm start
 ```
 
-## Tech experiment
+## Deploy
+### app
 ```
-cd cache-experiment
+cd react-app
+npm run build
+npm run update
+```
+### server
+```
+cd graphql-server
+npm run update
 ```

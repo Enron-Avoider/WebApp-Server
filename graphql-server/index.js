@@ -6,9 +6,11 @@ const AWS = require('aws-sdk');
 const { typeDefs } = require("./state/types");
 const { EODDataAPI, Ours } = require("./state/data-sources");
 const { query, mutation } = require("./state/resolvers");
+const atlasCredentials = require('./credentials/atlas-credentials.json');
+const awsCredentials = require('./credentials/aws-credentials.json');
 
 const mongoClient = new MongoClient(
-  "mongodb+srv://aiaiai:iaiaia@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority",
+  `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -16,8 +18,8 @@ const mongoClient = new MongoClient(
 );
  
 const s3 = new AWS.S3({
-    accessKeyId: "AKIAT6OBIZ43ER6XOFZ7",
-    secretAccessKey: "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",
+    accessKeyId: awsCredentials.accessKeyId,
+    secretAccessKey: awsCredentials.secretAccessKey,
 });
 
 mongoClient.connect(async (err) => {

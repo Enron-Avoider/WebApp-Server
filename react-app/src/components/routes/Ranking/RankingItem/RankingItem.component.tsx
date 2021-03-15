@@ -169,7 +169,7 @@ export const RankingItem: FunctionComponent<{
                             }
                             target="_blank"
                         >{y.companies[i]?.company}</Link>:{' '}
-                        {numeral(y.companies[i]?.v.$numberDecimal).format('(0.00a)')}
+                        {numeral(y.companies[i]?.v?.$numberDecimal).format('(0.00a)')}
                     </>) :
                     null
             }), {}) : {}

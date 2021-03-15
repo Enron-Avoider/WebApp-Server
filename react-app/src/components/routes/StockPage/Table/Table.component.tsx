@@ -33,26 +33,29 @@ import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOpt
 import "./style.sass";
 
 const getRowPercentages = (row: any, years: any) =>
-    years.map((y: any, i: number) => (
-        (i === 0 || !row[y] || !row[y - 1])
-            ? 0
-            : ((row[y] - row[y - 1]) / Math.abs(row[y - 1])) * 100
-    )).reduce(
-        (acc, value, i, array) => ({
-            ...(i === 0
-                ? {
-                    max: Math.max(...array.filter((v, i) => i > 0)).toFixed(0),
-                    min: Math.min(...array.filter((v, i) => i > 0)).toFixed(0),
-                    quartiles: math
-                        .quantileSeq(array, [1 / 4, 1 / 2, 3 / 4, 1])
-                        .map((x: any) => x.toFixed(1)),
-                }
-                : {}),
-            ...acc,
-            [`${years[i]}`]: value.toFixed(0),
-        }),
-        {}
-    );
+    years
+        .reverse()
+        .map((y: any, i: number) =>
+        (
+            (i === 0 || !row[y] || !row[y - 1])
+                ? 0
+                : ((row[y] - row[y - 1]) / Math.abs(row[y - 1])) * 100
+        )).reduce(
+            (acc, value, i, array) => ({
+                ...(i === 0
+                    ? {
+                        max: Math.max(...array.filter((v, i) => i > 0)).toFixed(0),
+                        min: Math.min(...array.filter((v, i) => i > 0)).toFixed(0),
+                        quartiles: math
+                            .quantileSeq(array, [1 / 4, 1 / 2, 3 / 4, 1])
+                            .map((x: any) => x.toFixed(1)),
+                    }
+                    : {}),
+                ...acc,
+                [`${years[i]}`]: value.toFixed(0),
+            }),
+            {}
+        );
 
 const getQuartile = (v: number, quartiles: number[]) =>
     (v < quartiles[0]) ? 'q1' :
@@ -96,7 +99,7 @@ export default function Table(
         search: getNewSearchParamsString({
             ...showPercentage && { keysToRemove: ['showPercentage'] },
             ...!showPercentage && { paramsToAdd: { showPercentage: true } }
-        }),
+        })
     })
 
     const columns = React.useMemo(() => [

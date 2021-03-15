@@ -5,19 +5,6 @@ const pipe = require("../utils/pipe");
 
 const rowKeys = {
   pl: [
-    // "effectOfAccountingCharges": null,
-    // "minorityInterest": null,
-    // "nonOperatingIncomeNetOther": "2942000000.00",
-    // "interestExpense": "1647000000.00", !!
-    // "interestIncome": "555000000.00", !!
-    // "netInterestIncome": "-1092000000.00", !!
-    // "extraordinaryItems": null,
-    // "nonRecurring": null,
-    // "otherItems": null,
-    // "incomeTaxExpense": "2863000000.00",
-    // "discontinuedOperations": null,
-    // "preferredStockAndOtherAdjustments": null
-
     {
       title: "Total Revenue",
       oldTitle: "totalRevenue",
@@ -94,8 +81,8 @@ const rowKeys = {
       oldTitle: "netIncomeApplicableToCommonShares",
     },
     {
-        title: "Net Income",
-        oldTitle: "netIncome",
+      title: "Net Income",
+      oldTitle: "netIncome",
     },
     {
       title: "EBIT",
@@ -105,10 +92,62 @@ const rowKeys = {
       title: "Net Income from Continuing Operations",
       oldTitle: "netIncomeFromContinuingOps",
     },
+    {
+      title: "TODO: Not Organized Yet",
+      subRows: [
+        {
+          title: "effectOfAccountingCharges",
+          oldTitle: "effectOfAccountingCharges",
+        },
+        {
+          title: "minorityInterest",
+          oldTitle: "minorityInterest",
+        },
+        {
+          title: "nonOperatingIncomeNetOther",
+          oldTitle: "nonOperatingIncomeNetOther",
+        },
+        {
+          title: "interestExpense",
+          oldTitle: "interestExpense",
+        },
+        {
+          title: "interestIncome",
+          oldTitle: "interestIncome",
+        },
+        {
+          title: "netInterestIncome",
+          oldTitle: "netInterestIncome",
+        },
+        {
+          title: "extraordinaryItems",
+          oldTitle: "extraordinaryItems",
+        },
+        {
+          title: "nonRecurring",
+          oldTitle: "nonRecurring",
+        },
+        {
+          title: "otherItems",
+          oldTitle: "otherItems",
+        },
+        {
+          title: "incomeTaxExpense",
+          oldTitle: "incomeTaxExpense",
+        },
+        {
+          title: "discontinuedOperations",
+          oldTitle: "discontinuedOperations",
+        },
+        {
+          title: "preferredStockAndOtherAdjustments",
+          oldTitle: "preferredStockAndOtherAdjustments",
+        },
+      ],
+    },
     // netIncomeFromContinuingOps
   ],
   bs: [
-
     // "intangibleAssets": "4981000000.00",
     // "earningAssets": null,
     // "otherCurrentAssets": "233000000.00",
@@ -162,8 +201,6 @@ const rowKeys = {
     // "accumulatedDepreciation": null,
     // "commonStockSharesOutstanding": "503000000.00"
 
-
-
     {
       title: "Assets",
       oldTitle: "totalAssets",
@@ -198,7 +235,6 @@ const rowKeys = {
     },
   ],
   cf: [
-
     // "investments": "-22242000000.00",
     // "changeToLiabilities": "23234000000.00",
     // "totalCashflowsFromInvestingActivities": "-59611000000.00",
@@ -224,7 +260,6 @@ const rowKeys = {
     // "exchangeRateChanges": "618000000.00",
     // "cashAndCashEquivalentsChanges": "5967000000.00"
 
-
     {
       title: "Operating Cash Flow",
       oldTitle: "totalCashFromOperatingActivities",
@@ -240,13 +275,13 @@ const rowKeys = {
   ],
   aggregatedShares: [
     {
-      title: "outstandingShares",
+      title: "Diluted Shares",
       oldTitle: "",
     },
   ],
   price: [
     {
-      title: "price",
+      title: "Price",
       oldTitle: "",
     },
   ],
@@ -287,8 +322,8 @@ const convertEODFundamentalsToEarlyFinancials = (
     ? Object.keys(fundamentalData.Financials.Balance_Sheet.yearly)
         .map((y) => y.substring(0, 4))
         .filter((value, index, self) => self.indexOf(value) === index)
-        .reverse()
-    : [];
+    : // .reverse()
+      [];
 
   const convertStatementToTable = (statement, yearRange) => {
     const yearFormat = Object.entries(statement).reduce(
@@ -354,32 +389,7 @@ const convertEODFundamentalsToEarlyFinancials = (
             EODTitle: row3.oldTitle,
           })),
         }),
-      })),
-      {
-        title: "Not Organized Yet",
-        ...yearRange.reduce(
-          (acc, y) => ({
-            ...acc,
-            [y]: null,
-          }),
-          {}
-        ),
-        subRows: [
-          ...statement.filter(
-            (row) =>
-              !rowKeys[statementKey]
-                .reduce(
-                  (acc, row2) => [
-                    ...acc,
-                    { ...row2 },
-                    ...(row2.subRows ? row2.subRows : []),
-                  ],
-                  []
-                )
-                .find((row2) => row2.oldTitle === row.tile)
-          ),
-        ],
-      },
+      }))
     ];
   };
 
@@ -398,7 +408,7 @@ const convertEODFundamentalsToEarlyFinancials = (
         return yearPrices.length ? lastYearPrice.close : null;
       })(),
     }),
-    { title: "price" }
+    { title: "Price" }
   );
 
   const aggregatedShares = (() => {
@@ -425,7 +435,7 @@ const convertEODFundamentalsToEarlyFinancials = (
       };
     } else {
       return {
-        title: "outstandingShares",
+        title: "Diluted Shares",
         warning: "value for last year only, past years are incorrect",
         ...yearRange.reduce(
           (acc, y) => ({
@@ -436,9 +446,6 @@ const convertEODFundamentalsToEarlyFinancials = (
         ),
       };
     }
-    // .outstandingShares
-    // Financials.commonStockSharesOutstanding
-    // Financials.commonStockSharesOutstanding
   })();
 
   const marketCap = yearRange.reduce(

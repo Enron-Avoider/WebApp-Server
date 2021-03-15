@@ -99,8 +99,8 @@ export const Stock: FunctionComponent<{
                                                                         {stock.name}
                                                                     </Typography>
                                                                     <Box ml={1}>
-                                                                        <Typography variant="h6">
-                                                                            <b>({ticker})</b>
+                                                                        <Typography variant="body2">
+                                                                            ({ticker})
                                                                         </Typography>
                                                                     </Box>
                                                                 </Box>
@@ -216,8 +216,9 @@ export const Stock: FunctionComponent<{
                                 years={stock.yearlyFinancials.years}
                                 data={
                                     [
-                                        ...(mergedStockAndAggregatesYearlyFinancials?.price || stock.yearlyFinancials.price),
+                                        ...(mergedStockAndAggregatesYearlyFinancials?.marketCap || stock.yearlyFinancials.marketCap),
                                         ...(mergedStockAndAggregatesYearlyFinancials?.aggregatedShares || stock.yearlyFinancials.aggregatedShares),
+                                        ...(mergedStockAndAggregatesYearlyFinancials?.price || stock.yearlyFinancials.price),
                                     ]
                                 }
                                 ticker={ticker}
