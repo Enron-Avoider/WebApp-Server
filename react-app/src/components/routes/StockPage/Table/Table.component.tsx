@@ -33,11 +33,10 @@ import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOpt
 import "./style.sass";
 
 const getRowPercentages = (row: any, years: any) =>
-    years
-        .reverse()
+    [...years]
         .map((y: any, i: number) =>
         (
-            (i === 0 || !row[y] || !row[y - 1])
+            (!row[y] || !row[y - 1])
                 ? 0
                 : ((row[y] - row[y - 1]) / Math.abs(row[y - 1])) * 100
         )).reduce(
@@ -189,7 +188,6 @@ export default function Table(
                                     prepareRow(row);
 
                                     const changePercentage: any = getRowPercentages(row.original, years);
-                                    // console.log({ row });
 
                                     return (
                                         <div {...row.getRowProps()} className={`

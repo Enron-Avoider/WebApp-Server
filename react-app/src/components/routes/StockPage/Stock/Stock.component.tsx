@@ -178,7 +178,6 @@ export const Stock: FunctionComponent<{
                                             </Box>
                                             <Box mt={-4}>
                                                 <Table
-                                                    // title={'Shares'}
                                                     years={stock.yearlyFinancials.years}
                                                     data={[]}
                                                     ticker={ticker}
@@ -234,7 +233,7 @@ export const Stock: FunctionComponent<{
                                     justifyContent="space-between"
                                 >
                                     <Typography variant="h5">
-                                        Fin. Statements
+                                        Financial Statements
                                     </Typography>
 
                                     <ToggleButtonGroup size="small" exclusive value={visibleFinancials || 'pl'} onChange={handleVisibleFinancials} color="primary">

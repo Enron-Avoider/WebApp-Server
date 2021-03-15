@@ -322,8 +322,7 @@ const convertEODFundamentalsToEarlyFinancials = (
     ? Object.keys(fundamentalData.Financials.Balance_Sheet.yearly)
         .map((y) => y.substring(0, 4))
         .filter((value, index, self) => self.indexOf(value) === index)
-    : // .reverse()
-      [];
+    : [];
 
   const convertStatementToTable = (statement, yearRange) => {
     const yearFormat = Object.entries(statement).reduce(
@@ -389,7 +388,7 @@ const convertEODFundamentalsToEarlyFinancials = (
             EODTitle: row3.oldTitle,
           })),
         }),
-      }))
+      })),
     ];
   };
 
