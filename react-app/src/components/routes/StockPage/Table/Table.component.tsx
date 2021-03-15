@@ -148,10 +148,10 @@ export default function Table(
                             }}
                         />
                     ) : (
-                            <Typography variant="h5">
-                                {title}
-                            </Typography>
-                        )}
+                        <Typography variant="h5">
+                            {title}
+                        </Typography>
+                    )}
 
                     <Box>
                         <IconButton color={showPercentage ? 'secondary' : 'primary'} onClick={toggleShowPercentage}>
@@ -223,7 +223,7 @@ export default function Table(
                                                             {showPercentage && changePercentage && cell.column.id !== 'expander' ?
                                                                 `${changePercentage[cell.column.id]}%` :
                                                                 cell.column.id !== 'expander' ?
-                                                                    numeral(cell.value).format('(0.00a)') :
+                                                                    <span title={numeral(cell.value).format('0,0[.]00')}>{numeral(cell.value).format('(0.00a)')}</span> :
                                                                     (
                                                                         <span
                                                                             {...row.getToggleRowExpandedProps()}

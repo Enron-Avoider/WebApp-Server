@@ -18,7 +18,6 @@ const mongoClient = new MongoClient(
 const s3 = new AWS.S3({
     accessKeyId: "AKIAT6OBIZ43ER6XOFZ7",
     secretAccessKey: "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",
-    // region: "us-east-1"
 });
 
 mongoClient.connect(async (err) => {

@@ -5,6 +5,19 @@ const pipe = require("../utils/pipe");
 
 const rowKeys = {
   pl: [
+    // "effectOfAccountingCharges": null,
+    // "minorityInterest": null,
+    // "nonOperatingIncomeNetOther": "2942000000.00",
+    // "interestExpense": "1647000000.00", !!
+    // "interestIncome": "555000000.00", !!
+    // "netInterestIncome": "-1092000000.00", !!
+    // "extraordinaryItems": null,
+    // "nonRecurring": null,
+    // "otherItems": null,
+    // "incomeTaxExpense": "2863000000.00",
+    // "discontinuedOperations": null,
+    // "preferredStockAndOtherAdjustments": null
+
     {
       title: "Total Revenue",
       oldTitle: "totalRevenue",
@@ -21,6 +34,20 @@ const rowKeys = {
     {
       title: "Operating Expenses",
       oldTitle: "totalOperatingExpenses",
+      subRows: [
+        {
+          title: "Selling General and Administrative",
+          oldTitle: "sellingGeneralAdministrative",
+        },
+        {
+          title: "Research & Development",
+          oldTitle: "researchDevelopment",
+        },
+        {
+          title: "Other Operating Expenses",
+          oldTitle: "otherOperatingExpenses",
+        },
+      ],
     },
     {
       title: "Operating Income",
@@ -29,10 +56,30 @@ const rowKeys = {
     {
       title: "Net Non Operating Interest",
       oldTitle: "netInterestIncome",
+      subRows: [
+        {
+          title: "Interest Income Non Operating",
+          oldTitle: "interestIncome",
+        },
+        {
+          title: "Interest Expense Non Operating",
+          oldTitle: "interestExpense",
+        },
+      ],
     },
     {
       title: "Other Income Expense",
       oldTitle: "totalOtherIncomeExpenseNet",
+      subRows: [
+        {
+          title: "Interest Income Non Operating",
+          oldTitle: "interestIncome",
+        },
+        {
+          title: "Interest Expense Non Operating",
+          oldTitle: "interestExpense",
+        },
+      ],
     },
     {
       title: "Pretax Income",
@@ -47,11 +94,76 @@ const rowKeys = {
       oldTitle: "netIncomeApplicableToCommonShares",
     },
     {
+        title: "Net Income",
+        oldTitle: "netIncome",
+    },
+    {
       title: "EBIT",
       oldTitle: "ebit",
     },
+    {
+      title: "Net Income from Continuing Operations",
+      oldTitle: "netIncomeFromContinuingOps",
+    },
+    // netIncomeFromContinuingOps
   ],
   bs: [
+
+    // "intangibleAssets": "4981000000.00",
+    // "earningAssets": null,
+    // "otherCurrentAssets": "233000000.00",
+    // "totalStockholderEquity": "93404000000.00",
+    // "deferredLongTermLiab": null,
+    // "otherCurrentLiab": "9708000000.00",
+    // "commonStock": "5000000.00",
+    // "retainedEarnings": "52551000000.00",
+    // "otherLiab": "17017000000.00",
+    // "goodWill": "15017000000.00",
+    // "otherAssets": "12097000000.00",
+    // "cash": "42122000000.00",
+    // "totalCurrentLiabilities": "126385000000.00",
+    // "shortTermDebt": null,
+    // "shortLongTermDebt": null,
+    // "shortLongTermDebtTotal": null,
+    // "otherStockholderEquity": "-180000000.00",
+    // "propertyPlantEquipment": "150667000000.00",
+    // "totalCurrentAssets": "132733000000.00",
+    // "longTermInvestments": null,
+    // "netTangibleAssets": "130960000000.00",
+    // "shortTermInvestments": "42274000000.00",
+    // "netReceivables": "24542000000.00",
+    // "longTermDebt": "31816000000.00",
+    // "inventory": "23795000000.00",
+    // "accountsPayable": "116677000000.00",
+    // "totalPermanentEquity": null,
+    // "noncontrollingInterestInConsolidatedEntity": null,
+    // "temporaryEquityRedeemableNoncontrollingInterests": null,
+    // "accumulatedOtherComprehensiveIncome": null,
+    // "additionalPaidInCapital": null,
+    // "commonStockTotalEquity": "5000000.00",
+    // "preferredStockTotalEquity": null,
+    // "retainedEarningsTotalEquity": "52551000000.00",
+    // "treasuryStock": "-1837000000.00",
+    // "accumulatedAmortization": null,
+    // "nonCurrrentAssetsOther": "173445000000.00",
+    // "deferredLongTermAssetCharges": null,
+    // "nonCurrentAssetsTotal": "188462000000.00",
+    // "capitalLeaseObligations": "52573000000.00",
+    // "longTermDebtTotal": "31816000000.00",
+    // "nonCurrentLiabilitiesOther": "17017000000.00",
+    // "nonCurrentLiabilitiesTotal": "48833000000.00",
+    // "negativeGoodwill": null,
+    // "warrants": null,
+    // "preferredStockRedeemable": null,
+    // "capitalSurpluse": "42865000000.00",
+    // "liabilitiesAndStockholdersEquity": "321195000000.00",
+    // "cashAndShortTermInvestments": "84396000000.00",
+    // "propertyPlantAndEquipmentGross": null,
+    // "accumulatedDepreciation": null,
+    // "commonStockSharesOutstanding": "503000000.00"
+
+
+
     {
       title: "Assets",
       oldTitle: "totalAssets",
@@ -86,6 +198,33 @@ const rowKeys = {
     },
   ],
   cf: [
+
+    // "investments": "-22242000000.00",
+    // "changeToLiabilities": "23234000000.00",
+    // "totalCashflowsFromInvestingActivities": "-59611000000.00",
+    // "netBorrowings": "8972000000.00",
+    // "totalCashFromFinancingActivities": "-1104000000.00",
+    // "changeToOperatingActivities": "5754000000.00",
+    // "netIncome": "21331000000.00",
+    // "changeInCash": "5349000000.00",
+    // "beginPeriodCashFlow": "36410000000.00",
+    // "endPeriodCashFlow": "42377000000.00",
+    // "totalCashFromOperatingActivities": "66064000000.00",
+    // "depreciation": "25251000000.00",
+    // "otherCashflowsFromInvestingActivities": "2771000000.00",
+    // "dividendsPaid": null,
+    // "changeToInventory": "-2849000000.00",
+    // "changeToAccountReceivables": "-8169000000.00",
+    // "salePurchaseOfStock": null,
+    // "otherCashflowsFromFinancingActivities": "-10076000000.00",
+    // "changeToNetincome": "6001000000.00",
+    // "capitalExpenditures": "40140000000",
+    // "changeReceivables": "-8169000000.00",
+    // "cashFlowsOtherOperating": "1265000000.00",
+    // "exchangeRateChanges": "618000000.00",
+    // "cashAndCashEquivalentsChanges": "5967000000.00"
+
+
     {
       title: "Operating Cash Flow",
       oldTitle: "totalCashFromOperatingActivities",
@@ -275,7 +414,7 @@ const convertEODFundamentalsToEarlyFinancials = (
       );
 
       return {
-        title: "outstandingShares",
+        title: "Diluted Shares",
         ...yearRange.reduce(
           (acc, y) => ({
             ...acc,

@@ -32,22 +32,24 @@ export const RatioCollections: FunctionComponent<{
                     justifyContent="space-between"
                 >
                     <Typography variant="h5">
-                        Ratios
+                        Ratio Collections
                     </Typography>
 
                     <RatioCollectionPicker ratioCollections={ratioCollections} />
                 </Box>
 
-                <Grid container spacing={3}>
-                    {pickedCollectionsWithCalculations?.map((c, i) => (
-                        <RatioCollection
-                            key={c.name+i}
-                            ticker={ticker}
-                            stock={stock}
-                            collection={c}
-                        />
-                    ))}
-                </Grid>
+                <Box mx={-1} mb={-2}>
+                    <Grid container spacing={3}>
+                        {pickedCollectionsWithCalculations?.map((c, i) => (
+                            <RatioCollection
+                                key={c.name+i}
+                                ticker={ticker}
+                                stock={stock}
+                                collection={c}
+                            />
+                        ))}
+                    </Grid>
+                </Box>
             </Box>
         </Paper>
     );
