@@ -201,12 +201,6 @@ export default function Table(
                                                         td
                                                         ${row?.subRows?.length ? 'relevant' : ''}
                                                     `}
-                                                // title={
-                                                //     cell.column.id !== 'expander' && changePercentage ? (
-                                                //         showPercentage && changePercentage ?
-                                                //             cell.value : `${changePercentage[cell?.column?.id]}%`
-                                                //     ) : ''
-                                                // }
                                                 >
                                                     <div className={`
                                                         ${cell.column.id === 'expander' && `pl-${row.depth}`}
@@ -270,15 +264,6 @@ export default function Table(
                                                                         </span >)
                                                             }
                                                         </div>
-                                                        {/* {row.original.aggregate && (
-                                                            <div>
-                                                                <small>{
-                                                                    cell.column.id === 'expander' ?
-                                                                        'industry > Internet Content & Information'
-                                                                        : `${row.original.aggregate ? numeral(row.original.aggregate[i].avg.$numberDecimal).format('(0.00a)') : '-'}`
-                                                                }</small>
-                                                            </div>
-                                                        )} */}
                                                         {pickedComparisons?.map(c => row.original[c] && (
                                                             <div key={c}>
                                                                 <small className="comparisson">{
@@ -287,44 +272,16 @@ export default function Table(
                                                                         (row.original[c][cell.column.id] ?
                                                                             <span
                                                                                 key={`${c}-${cell.column.id}-${row.cells[0].value}`}
-                                                                                // data-clicker="true"
-                                                                                // onClick={e => handleClick(e, {
-                                                                                //     title: `${getComparisonOption(c)} | ${row.cells[0].value} | ${cell.column.id}`,
-                                                                                //     companies: row.original[c][cell.column.id].companies
-                                                                                // })}
-                                                                                title="μ (average) | Σ (sum) | #/n (rank / number of companies)"
+                                                                                title="average ・ sum ・ rank / number of companies"
                                                                             >
-                                                                                μ<span className="number">{numeral(row.original[c][cell.column.id].avg?.$numberDecimal).format('(0a)')}</span>{' '}
-                                                                                Σ<span className="number">{numeral(row.original[c][cell.column.id].sum?.$numberDecimal).format('(0a)')}</span>{' '}
-                                                                                #<span className="number">{row.original[c][cell.column.id].rank}/{row.original[c][cell.column.id].count}</span>
+                                                                                <span className="number">{numeral(row.original[c][cell.column.id].avg?.$numberDecimal).format('(0a)')}</span>{'・'}
+                                                                                <span className="number">{numeral(row.original[c][cell.column.id].sum?.$numberDecimal).format('(0a)')}</span>{'・'}
+                                                                                <span className="number">{row.original[c][cell.column.id].rank}/{row.original[c][cell.column.id].count}</span>
                                                                             </span> : '-'
                                                                         )
                                                                 }</small>
                                                             </div>
                                                         ))}
-                                                        {/* {row.original.aggregate && (
-                                                            <div>
-                                                                <small className="comparisson">{
-                                                                    cell.column.id === 'expander' ?
-                                                                        ('[industry] Internet Content & Information') :
-                                                                        (row.original.aggregate[cell.column.id] ?
-                                                                            <span
-                                                                                data-clicker="true"
-                                                                                onClick={e => handleClick(e, {
-                                                                                    title: `industry > Internet Content & Information | ${row.cells[0].value} | ${cell.column.id}`,
-                                                                                    companies: row.original.aggregate[cell.column.id].companies
-                                                                                })}
-                                                                                title="μ (average) | Σ (sum) | #/n (rank / number of companies)"
-                                                                            >
-                                                                                μ<span className="number">{numeral(row.original.aggregate[cell.column.id].avg?.$numberDecimal).format('(0a)')}</span>{' '}
-                                                                                Σ<span className="number">{numeral(row.original.aggregate[cell.column.id].sum?.$numberDecimal).format('(0a)')}</span>{' '}
-                                                                                #<span className="number">{row.original.aggregate[cell.column.id].rank}/{row.original.aggregate[cell.column.id].count}</span>
-                                                                            </span> :
-                                                                            '-'
-                                                                        )
-                                                                }</small>
-                                                            </div>
-                                                        )} */}
                                                     </div>
                                                 </div>
                                             ))}

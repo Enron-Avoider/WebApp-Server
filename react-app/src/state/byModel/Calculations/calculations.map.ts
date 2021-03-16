@@ -28,7 +28,12 @@ export const scopeToRows = (scope: { [key: string]: string }, stock: any,) => Ob
     .filter(([k, v]: any) => !!v && k !== '__typename')
     .reduce((acc: any, [k, v]: any, i: number) => ({
         ...acc,
-        [k]: deepFind(stock, 'yearlyFinancialsWithKeys.'+v),
+        [k]: Object.entries(
+            deepFind(stock, 'yearlyFinancialsWithKeys.' + v)
+        ).reduce((p_, [k_, v_]) => ({
+            ...p_,
+            ...k_ !== 'subRows' ? { [k_]: v_ } : {}
+        }), {}),
     }), {});
 
 export const doCalculations = (

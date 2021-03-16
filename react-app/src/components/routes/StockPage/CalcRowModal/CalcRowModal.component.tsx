@@ -23,7 +23,7 @@ import {
     GET_RATIO_COLLECTIONS,
     SAVE_RATIO_COLLECTION
 } from '@state/byModel/Calculations/calculations.queries';
-import { doCalculations, scopeToRows, CalculationType } from '../calculations.map';
+import { doCalculations, scopeToRows, CalculationType } from '@state/byModel/Calculations/calculations.map';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 
 import Table from '../Table';
@@ -317,8 +317,8 @@ export default function NewCalcRowModal() {
 
                     {stock && (
                         <Box m={-2} mt={2}>
+                            {/* <pre>{JSON.stringify(scopeRows, null, 2)}</pre> */}
                             <Table
-                                // title={'Income Statement'}
                                 years={stock?.yearlyFinancials?.years}
                                 data={[
                                     ...Object.values(scopeRows),
