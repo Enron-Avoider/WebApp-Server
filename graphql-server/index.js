@@ -1,13 +1,13 @@
 const { ApolloServer } = require("apollo-server");
 const MongoClient = require("mongodb").MongoClient;
-const AWS = require('aws-sdk');
+const AWS = require("aws-sdk");
 // const s3 = require('s3');
 
 const { typeDefs } = require("./state/types");
 const { EODDataAPI, Ours } = require("./state/data-sources");
 const { query, mutation } = require("./state/resolvers");
-const atlasCredentials = require('./credentials/atlas-credentials.json');
-const awsCredentials = require('./credentials/aws-credentials.json');
+const atlasCredentials = require("./credentials/atlas-credentials.json");
+const awsCredentials = require("./credentials/aws-credentials.json");
 
 const mongoClient = new MongoClient(
   `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
@@ -16,16 +16,23 @@ const mongoClient = new MongoClient(
     useUnifiedTopology: true,
   }
 );
- 
+
 const s3 = new AWS.S3({
-    accessKeyId: awsCredentials.accessKeyId,
-    secretAccessKey: awsCredentials.secretAccessKey,
+  accessKeyId: awsCredentials.accessKeyId,
+  secretAccessKey: awsCredentials.secretAccessKey,
 });
 
 mongoClient.connect(async (err) => {
   const mongoDB = mongoClient.db("Enron");
 
   const server = new ApolloServer({
+    introspection: true,
+    playground: true,
+    cors: {
+      origin: "*",
+      allowedHeaders: ['Origin','X-Requested-With','contentType','Content-Type','Accept','Authorization'],
+      credentials: true,
+    },
     typeDefs,
     resolvers: {
       ...query,
@@ -33,17 +40,18 @@ mongoClient.connect(async (err) => {
     },
     dataSources: () => ({
       EODDataAPI: new EODDataAPI(mongoDB, s3),
-      Ours: new Ours(mongoDB, s3)
+      Ours: new Ours(mongoDB, s3),
     }),
     context: async ({ req }) => ({
       mongoDB,
-      s3
+      s3,
     }),
-    playground: true,
   });
 
   server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
-    console.log(`🚀  Server ready at ${url}`);
+    console.log(
+      `🚀  Server ready at ${url} on env:${process.env.NODE_ENV} and port:${process.env.PORT}`
+    );
   });
 });
 

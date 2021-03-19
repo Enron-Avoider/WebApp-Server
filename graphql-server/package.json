@@ -1,25 +1,17 @@
 {
-  "name": "graphql-server",
-  "version": "1.0.0",
-  "description": "",
   "scripts": {
-    "start": "nodemon index.js",
-    "dev": "now dev --listen 3000",
-    "stage": "now",
-    "update": "npx now --prod"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "zip": "zip dist.zip ./ -r"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "apollo-datasource-rest": "^0.8.1",
-    "apollo-server": "^2.18.2",
-    "apollo-server-cache-redis": "^1.1.6",
-    "apollo-server-plugin-response-cache": "^0.4.1",
+    "apollo-datasource-rest": "^0.10.0",
+    "apollo-server": "^2.21.1",
     "aws-sdk": "^2.767.0",
     "csv-parse": "^4.12.0",
     "dataloader": "^2.0.0",
-    "graphql": "^15.0.0",
-    "graphql-type-json": "^0.3.1",
+    "graphql": "^15.5.0",
+    "graphql-type-json": "^0.3.2",
     "jsep": "^0.3.5",
     "mathjs": "^7.0.0",
     "mongodb": "^3.6.4",

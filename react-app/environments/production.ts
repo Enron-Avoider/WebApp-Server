@@ -1,4 +1,4 @@
 export default {
     environment: 'production',
-    graphql: 'https://enron-monster.herokuapp.com/',
+    graphql: '//graphql.enronavoider.com',
 }

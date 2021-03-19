@@ -1,28 +1,29 @@
 # Enron.monster
 
-## Dev
+## Local Dev
 
-### terminal 1
+### terminal 1 - App
 ```
 cd react-app
 npm start
 ```
 
-### terminal 2
+### terminal 2 - Server
 ```
 cd graphql-server
-npm start
+npm run dev
 ```
 
 ## Deploy
-### app
+### App
 ```
 cd react-app
 npm run build
 npm run update
 ```
-### server
+### Server
 ```
 cd graphql-server
-npm run update
+npm run zip
+// upload dist.zip to elastic beanstalk manually (TODO: automate this step)
 ```

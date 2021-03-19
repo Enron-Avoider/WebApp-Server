@@ -1,4 +1,4 @@
 export default {
     environment: 'development',
-    graphql: 'http://localhost:4000/',
+    graphql: '//localhost:4000/',
 }
