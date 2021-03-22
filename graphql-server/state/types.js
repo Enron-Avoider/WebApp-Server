@@ -47,8 +47,8 @@ const typeDefs = gql`
   type RatioCollection {
     id: String
     name: String
-    isOwnedByPlatform: Boolean
     isOwnedByUser: Boolean
+    isOwnedByPlatform: Boolean
     about: String
     calcs: [Calc]
   }
@@ -61,7 +61,6 @@ const typeDefs = gql`
   }
 
   type User {
-    id: String
     name: String
     avatarUrl: String,
     isPlatformAdmin: Boolean
@@ -94,7 +93,7 @@ const typeDefs = gql`
     getCurrencyToCurrencyTimeseries(currency: String, toCurrency: String): JSON
     getIndustryStocks(name: String): JSON
     getExchangeStocks(code: String): JSON
-    getRatioCollections: [RatioCollection]
+    getRatioCollections(userId: String!): [RatioCollection]
 
     getUserById(id: String): User
   }

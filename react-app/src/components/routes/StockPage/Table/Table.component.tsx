@@ -31,6 +31,7 @@ import GraphCard from './GraphCard';
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
 
 import "./style.sass";
+import { boolean } from "mathjs";
 
 const getRowPercentages = (row: any, years: any) =>
     [...years]
@@ -68,14 +69,16 @@ export default function Table(
         years,
         data,
         title = '',
-        newCalcCollection,
+        collectionName,
+        isCollectionOwner,
         onTitleEdit,
     }: {
         ticker?: string,
         years: number[],
         data: {}[],
         title?: string,
-        newCalcCollection?: string,
+        collectionName?: string,
+        isCollectionOwner?: boolean,
         onTitleEdit?: Function
     }
 ) {
@@ -235,7 +238,13 @@ export default function Table(
                                                                                     color="inherit"
                                                                                     to={{
                                                                                         pathname: location.pathname,
-                                                                                        search: getNewSearchParamsString({ paramsToAdd: { ratio: cell.value, ticker, ratioCollection: newCalcCollection } })
+                                                                                        search: getNewSearchParamsString({
+                                                                                            paramsToAdd: {
+                                                                                                ratio: cell.value,
+                                                                                                ticker,
+                                                                                                ratioCollection: collectionName
+                                                                                            }
+                                                                                        })
                                                                                     }}
                                                                                 >
                                                                                     {cell.value || ''}
@@ -294,7 +303,12 @@ export default function Table(
                 </Box>
             </Paper>
 
-            {newCalcCollection && <NewCalcRowButton title={title} ticker={ticker || ''} newCalcCollection={newCalcCollection} />}
+            {collectionName && isCollectionOwner &&
+                <NewCalcRowButton
+                    title={title}
+                    ticker={ticker || ''}
+                    collectionName={collectionName}
+                />}
         </Box>
 
     );

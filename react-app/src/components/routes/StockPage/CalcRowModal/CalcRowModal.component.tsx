@@ -25,6 +25,7 @@ import {
 } from '@state/byModel/Calculations/calculations.queries';
 import { doCalculations, scopeToRows, CalculationType } from '@state/byModel/Calculations/calculations.map';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
+import getCalculations from '@state/byModel/Calculations/getCalculations.effect';
 
 import Table from '../Table';
 
@@ -33,37 +34,34 @@ import "./style.sass";
 export default function NewCalcRowModal() {
 
     const location = useLocation();
-
     const { allSearchParams, getNewSearchParamsString } = useSearchParams();
     const searchParams = allSearchParams;
-
-    const { loading: ratioCollections_loading, error: ratioCollections_error, data: ratioCollectionsQ } = useQuery(GET_RATIO_COLLECTIONS, {
-        variables: { ticker: searchParams.ticker },
-        skip: !searchParams.ticker
-    });
-
-    const [chosenCollectionName, chosenCollectionId] = searchParams.ratioCollection?.split('.') || [];
-    const chosenCollection = ratioCollectionsQ?.getRatioCollections.find((c: any) => c.id === chosenCollectionId);
-    const existingCalc = chosenCollection?.calcs?.find((c: any) => c.title === searchParams.ratio);
-
-    // console.log({
-    //     chosenCollectionName,
-    //     chosenCollectionId,
-    //     ratioCollectionsQ,
-    //     chosenCollection,
-    //     existingCalc
-    // });
 
     const { loading, error, data } = useQuery(GET_STOCK, {
         variables: { ticker: searchParams.ticker },
         skip: !searchParams.ticker
     });
+    const stock = data && data.getStockByCode;
+
+    const { ratioCollections } = getCalculations({ stock });
+
+    const [chosenCollectionName, chosenCollectionId] = searchParams.ratioCollection?.split('.') || [];
+    const chosenCollection = ratioCollections?.find((c: any) => c.id === chosenCollectionId);
+    const existingCalc = chosenCollection?.calcs?.find((c: any) => c.title === searchParams.ratio);
+
+    console.log({
+        ratioCollections,
+        ratioCollection: searchParams.ratioCollection,
+        ratio: searchParams.ratio,
+        chosenCollectionName,
+        chosenCollectionId,
+        chosenCollection,
+        existingCalc
+    });
 
     const [saveRatioCollection] = useMutation(SAVE_RATIO_COLLECTION);
 
     const isOpen = !!searchParams.ticker;
-
-    const stock = data && data.getStockByCode;
 
     const calcRowOptions = stock ? [
         { path: 'yearlyFinancials.price', tableName: 'Price' },
@@ -252,6 +250,9 @@ export default function NewCalcRowModal() {
                                 onChange={(event: any) => {
                                     setTitleValue(event.target.value);
                                 }}
+                                InputProps={{
+                                    readOnly: !chosenCollection?.isOwnedByUser,
+                                }}
                             />
                         </Box>
 
@@ -265,6 +266,9 @@ export default function NewCalcRowModal() {
                                 value={aboutValue}
                                 onChange={(event: any) => {
                                     setAboutValue(event.target.value);
+                                }}
+                                InputProps={{
+                                    readOnly: !chosenCollection?.isOwnedByUser,
                                 }}
                             />
                         </Box>
@@ -292,6 +296,9 @@ export default function NewCalcRowModal() {
                                 variant="outlined"
                                 label="Calculation"
                                 placeholder=""
+                                InputProps={{
+                                    readOnly: !chosenCollection?.isOwnedByUser,
+                                }}
                             />
                         )}
                         renderTags={(value: any[], getTagProps) =>
@@ -345,24 +352,27 @@ export default function NewCalcRowModal() {
                     <Box p={2}></Box> */}
 
                 </DialogContent>
-                <DialogActions>
-                    {existingCalc && (
-                        <>
-                            <Button onClick={handleRemove} color="primary">
-                                Remove
-                            </Button>
 
-                            <Button onClick={handleSave} color="secondary">
-                                Save
+                {chosenCollection?.isOwnedByUser && (
+                    <DialogActions>
+                        {existingCalc && (
+                            <>
+                                <Button onClick={handleRemove} color="primary">
+                                    Remove
+                                </Button>
+
+                                <Button onClick={handleSave} color="secondary">
+                                    Save
+                                </Button>
+                            </>
+                        )}
+                        {!existingCalc && (
+                            <Button onClick={handleAdd} color="secondary">
+                                Add
                             </Button>
-                        </>
-                    )}
-                    {!existingCalc && (
-                        <Button onClick={handleAdd} color="secondary">
-                            Add
-                        </Button>
-                    )}
-                </DialogActions>
+                        )}
+                    </DialogActions>
+                )}
             </Box>
         </Dialog>
     );

@@ -26,11 +26,14 @@ export const RatioCollection: FunctionComponent<{
     stock,
     collection
 }) => {
+
+        console.log({ collection });
+
         const { pickedComparisons } = getComparisonOptions();
 
         const [title, setTitle] = useState('');
         useEffect(() => {
-            setTitle(collection.name);
+            setTitle(collection.name || '');
         }, []);
 
         const [saveRatioCollection] = useMutation(SAVE_RATIO_COLLECTION);
@@ -102,7 +105,8 @@ export const RatioCollection: FunctionComponent<{
                                 collection.calculationResults
                             }
                             onTitleEdit={onTitleEdit}
-                            newCalcCollection={`${collection.name}.${collection.id}`}
+                            collectionName={`${collection.name}.${collection.id}`}
+                            isCollectionOwner={collection.isOwnedByUser}
                         />
                     </Box>
                 </Paper>

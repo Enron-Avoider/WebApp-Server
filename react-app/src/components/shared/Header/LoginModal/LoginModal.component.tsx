@@ -96,16 +96,19 @@ export const LoginModal: FunctionComponent<{}> = ({ }) => {
                     <Box display="flex" justifyContent="space-around">
 
                         <Box flex={1}>
-                            <TextField
-                                label="User Key"
-                                fullWidth
-                                // size="small"
-                                // variant="outlined"
-                                value={userKeyValue}
-                                onChange={(event: any) => {
-                                    setUserKeyValue(event.target.value);
-                                }}
-                            />
+                            <form>
+                                <TextField
+                                    label="User Key"
+                                    fullWidth
+                                    // size="small"
+                                    // variant="outlined"
+                                    value={userKeyValue}
+                                    onChange={(event: any) => {
+                                        setUserKeyValue(event.target.value);
+                                    }}
+                                    name="one-time-code"
+                                />
+                            </form>
                         </Box>
 
                     </Box>

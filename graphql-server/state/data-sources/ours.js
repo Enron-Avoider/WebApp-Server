@@ -681,8 +681,11 @@ module.exports = {
       };
     };
 
-    getRatioCollections = async () => {
-      return await this.mongoDBRatioCollectionTable.find().toArray();
+    getRatioCollections = async ({ userId }) => {
+      return (await this.mongoDBRatioCollectionTable.find().toArray()).map(c => ({
+          ...c,
+          isOwnedByUser: userId === c.ownerUserId
+      }));
     };
 
     getUniqueNanoid = async (table, length = 2) => {

@@ -6,8 +6,8 @@ import { Grid, Box, Link, Badge, Avatar, Button } from '@material-ui/core';
 
 import logoImg from '@assets/e-transparent.png';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
+import { GET_USER_KEYS } from "@state/byModel/User/UserKey.localQueries";
 import { GET_USER_BY_ID } from '@state/byModel/User/User.queries';
-import { GET_USER_KEYS, ADD_USER_KEY } from "@state/byModel/User/UserKey.localQueries";
 import StockSearcher from '@components/shared/StockSearcher';
 import LoginModal from './LoginModal';
 

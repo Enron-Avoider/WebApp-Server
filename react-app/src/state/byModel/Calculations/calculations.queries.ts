@@ -1,22 +1,40 @@
 import { gql } from "apollo-boost";
 
 export const GET_RATIO_COLLECTIONS = gql`
-{
-  getRatioCollections {
-    id
-    name
-    about
-    isOwnedByUser
-    isOwnedByPlatform
-    calcs {
-      title
-      calc
-      about
-      scope
+    query($userId: String! ) {
+        getRatioCollections(userId: $userId) {
+            id
+            name
+            about
+            isOwnedByUser
+            isOwnedByPlatform
+            calcs {
+            title
+            calc
+            about
+            scope
+            }
+        }
     }
-  }
-}
 `;
+
+// export const GET_RATIO_COLLECTIONS = gql`
+// {
+//   getRatioCollections {
+//     id
+//     name
+//     about
+//     isOwnedByUser
+//     isOwnedByPlatform
+//     calcs {
+//       title
+//       calc
+//       about
+//       scope
+//     }
+//   }
+// }
+// `;
 
 export const SAVE_RATIO_COLLECTION = gql`
   mutation saveRatioCollection($ratioCollection: JSON!) {

@@ -11,17 +11,15 @@ import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import "./style.sass";
 
 export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }> = ({ ratioCollections }) => {
-    const { allSearchParams, getNewSearchParamsString, updateParams } = useSearchParams();
-
-    // console.log({
-    //     allSearchParams
-    // });
+    const {
+        allSearchParams, getNewSearchParamsString, updateParams
+    } = useSearchParams();
 
     const options: { value: string, title: string, type: string }[] = ratioCollections ?
         ratioCollections?.map((c: any) => ({
             value: c.id,
             title: c.name,
-            type: c.isOwnedByPlatform ? 'system' : c.isOwnedByUser ? 'user' : 'other\'s'
+            type: c.isOwnedByPlatform ? 'system' : c.isOwnedByUser ? 'yours' : 'other user\'s'
         })) : [];
 
     const pickedChosenCollections = allSearchParams.ratioCollections?.length ? (
