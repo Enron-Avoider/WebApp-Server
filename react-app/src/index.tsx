@@ -13,6 +13,10 @@ import localforage from "localforage";
 
 import App from './App';
 import './index.scss';
+import { GET_TODOS } from '@state/byModel/Todos/todos.queries';
+import { GET_USER_KEYS } from '@state/byModel/User/UserKey.localQueries';
+import { todoResolvers } from '@state/byModel/Todos/todo.resolvers';
+import { userKeysResolvers } from '@state/byModel/User/UserKey.localResolvers';
 
 console.log({ env });
 
@@ -26,7 +30,30 @@ console.log({ env });
     const client = new ApolloClient({
         uri: env.graphql,
         cache,
+        resolvers: {
+            Mutation: {
+                ...todoResolvers.Mutation,
+                ...userKeysResolvers.Mutation
+            }
+        }
     });
+
+    // TODO: incapsulate in promises and handle Indiviualy.
+    // This lazy ass way won't scale as any unsolveable query resets
+    // everything in `data`
+
+    try {
+        client.readQuery({ query: GET_TODOS });
+        client.readQuery({ query: GET_USER_KEYS });
+    } catch (error) {
+        console.log({ error });
+        client.writeData({
+            data: {
+                todos: [],
+                userKeys: []
+            }
+        });
+    }
 
     const darkTheme = responsiveFontSizes(createMuiTheme({
         palette: {

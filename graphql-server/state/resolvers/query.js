@@ -21,6 +21,8 @@ module.exports = {
 
     getRatioCollections: async (_source, params, { dataSources }) =>
       dataSources.Ours.getRatioCollections(params),
+    getUserById: async (_source, params, { dataSources }) =>
+      dataSources.Ours.getUserById(params),
     // getSystemRatioCollections
     // getUserRatioCollections
     // saveRatioCollection

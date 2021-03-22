@@ -6,5 +6,7 @@ module.exports = {
   Mutation: {
     saveRatioCollection: async (_source, params, { dataSources }) =>
       await dataSources.Ours.saveRatioCollection(params),
+    saveUser: async (_source, params, { dataSources }) =>
+      await dataSources.Ours.saveUser(params),
   },
 };

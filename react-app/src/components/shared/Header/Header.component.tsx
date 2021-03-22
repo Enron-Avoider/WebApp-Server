@@ -1,44 +1,66 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, IconButton } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import { Grid, Box, Link, Badge } from '@material-ui/core';
-import { useTheme, makeStyles } from '@material-ui/core/styles';
 import { useQuery } from "react-apollo";
+import { AppBar, Toolbar, Typography, IconButton } from '@material-ui/core';
 import { Link as Link_ } from "react-router-dom";
+import { Grid, Box, Link, Badge, Avatar, Button } from '@material-ui/core';
 
-import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import logoImg from '@assets/e-transparent.png';
-import StockSearcher from '@components/shared/StockSearcher';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
+import { GET_USER_BY_ID } from '@state/byModel/User/User.queries';
+import { GET_USER_KEYS, ADD_USER_KEY } from "@state/byModel/User/UserKey.localQueries";
+import StockSearcher from '@components/shared/StockSearcher';
+import LoginModal from './LoginModal';
 
 import './style.sass';
 
 export default function Header() {
 
-    const { allSearchParams ,getNewSearchParamsString } = useSearchParams();
+    const { loading: UserKeysLoading, error: UserKeysError, data: UserKeysData } = useQuery(GET_USER_KEYS);
+    const { loading: UserByIdLoading, error: UserByIdError, data: UserByIdData } = useQuery(GET_USER_BY_ID, {
+        variables: { id: UserKeysData?.userKeys?.length && UserKeysData?.userKeys[0].id },
+        skip: !UserKeysData?.userKeys?.length
+    });
+
+    const user = UserByIdData?.getUserById;
+
+    console.log({
+        UserKeysData,
+        key: UserKeysData?.userKeys?.length && UserKeysData?.userKeys[0].id,
+        UserByIdData
+    });
+
+    const { allSearchParams, getNewSearchParamsString, updateParams } = useSearchParams();
 
     return (
         <>
+            <LoginModal />
             <AppBar position="fixed">
                 <Toolbar>
                     <Box display="flex" width={'100%'} justifyContent="space-between">
-                        <Badge
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'right',
-                            }}
-                            color="secondary"
-                            badgeContent="⚠️ alpha"
+
+                        <Box
+                            display="flex"
+                            flexDirection="row"
+                            justifyContent="center"
+                            alignItems="center"
                         >
-                            <>
-                                <Box mr={2}>
-                                    <Link_ color="inherit" to={{
-                                        pathname: `/home`,
-                                        search: (getNewSearchParamsString({ paramsToAdd: { ticker: allSearchParams.ticker || 'BRK-A' } }) as string)
-                                    }}>
-                                        <img className="logo" src={logoImg} />
-                                    </Link_>
-                                </Box>
+                            <Box mr={2}>
+                                <Link_ color="inherit" to={{
+                                    pathname: `/home`,
+                                    search: (getNewSearchParamsString({ paramsToAdd: { ticker: allSearchParams.ticker || 'BRK-A' } }) as string)
+                                }}>
+                                    <img className="logo" src={logoImg} />
+                                </Link_>
+                            </Box>
+                            <Badge
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'right',
+                                }}
+                                color="secondary"
+                                badgeContent="⚠️ alpha"
+                            >
+
                                 <Grid container direction="column" justify="center">
                                     <Grid item >
                                         <Link component={Link_} color="inherit" to={{
@@ -60,15 +82,26 @@ export default function Header() {
                                         </Box>
                                     </Grid>
                                 </Grid>
-                            </>
-                        </Badge>
+                            </Badge>
+                            <Box
+                                ml={5}
+                                display="flex"
+                                // flexDirection="row"
+                                // justifyContent="center"
+                                // alignItems="center"
+                                width={210}
+                            >
+                                <StockSearcher />
+                            </Box>
+                        </Box>
 
                         <Box
+                            className="hide-on-mobile"
                             display="flex"
                             flexDirection="row"
                             justifyContent="center"
                             alignItems="center"
-                            ml={3}
+                            ml={-22}
                         >
                             <Link
                                 style={{
@@ -126,7 +159,24 @@ export default function Header() {
                         </Box>
 
                         <Box display="flex" overflow="visible" alignItems="center">
-                            <StockSearcher />
+                            {/* <StockSearcher /> */}
+                            <Box ml={1}>
+                                {/* <Avatar alt="You" src="http://www.gstatic.com/tv/thumb/persons/73202/73202_v9_bb.jpg" /> */}
+                                { user ? (
+                                    <Avatar
+                                        alt="You"
+                                        title={user?.name}
+                                        src={user?.avatarUrl || 'http://www.gstatic.com/tv/thumb/persons/73202/73202_v9_bb.jpg'}
+                                    />
+                                ) : (
+                                    <Button
+                                        onClick={() => updateParams({ search: getNewSearchParamsString({ paramsToAdd: { isRegistering: true } }) })}
+                                    // color="primary"
+                                    >
+                                        Login
+                                    </Button>
+                                )}
+                            </Box>
                         </Box>
                     </Box>
                 </Toolbar>

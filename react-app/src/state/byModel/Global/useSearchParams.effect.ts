@@ -16,6 +16,7 @@ export default function useSearchParams() {
         ticker?: string,
         ratio?: string,
         ratioCollection?: string,
+        isRegistering?: boolean
     };
 
     const getNewSearchParamsString = ({

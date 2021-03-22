@@ -60,6 +60,13 @@ const typeDefs = gql`
     exchange: String
   }
 
+  type User {
+    id: String
+    name: String
+    avatarUrl: String,
+    isPlatformAdmin: Boolean
+  }
+
   type Query {
     searchStocks(name: String): [Stock]
     getStockByCode(code: String): Stock
@@ -88,10 +95,13 @@ const typeDefs = gql`
     getIndustryStocks(name: String): JSON
     getExchangeStocks(code: String): JSON
     getRatioCollections: [RatioCollection]
+
+    getUserById(id: String): User
   }
 
   type Mutation {
     saveRatioCollection(ratioCollection: JSON): RatioCollection
+    saveUser(user: JSON): User
     resetCache(key: String!): JSON
   }
 `;

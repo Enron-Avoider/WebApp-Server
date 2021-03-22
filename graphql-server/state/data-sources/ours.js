@@ -15,6 +15,7 @@ module.exports = {
 
       this.mongoDBStocksTable = mongoDB.collection("Stocks");
       this.mongoDBRatioCollectionTable = mongoDB.collection("RatioCollection");
+      this.mongoDBUsersCollectionTable = mongoDB.collection("Users");
       this.mongoDBAggregationsCacheTable = mongoDB.collection(
         "AggregationsCache"
       );
@@ -262,7 +263,7 @@ module.exports = {
                   query,
                   rowKeysPathsBatch: batch,
                   stockToRank,
-                  companiesForRow
+                  companiesForRow,
                 },
                 getUncachedAggregationFn: getSomeFinancialRows,
                 getUncachedAggregationParameters: {
@@ -275,7 +276,7 @@ module.exports = {
 
             return {
               ...accResolved,
-              ...batchResults
+              ...batchResults,
             };
           },
           {}
@@ -684,8 +685,8 @@ module.exports = {
       return await this.mongoDBRatioCollectionTable.find().toArray();
     };
 
-    getUniqueNanoid = async (table) => {
-      const nanoid = customAlphabet(urlAlphabet, 2)();
+    getUniqueNanoid = async (table, length = 2) => {
+      const nanoid = customAlphabet(urlAlphabet, length)();
 
       const nanoidInDB = (
         await table
@@ -739,6 +740,54 @@ module.exports = {
         id: !!ratioCollectionInDB ? ratioCollectionInDB.id : newNanoid,
         // isOwnedByPlatform: 'TODO',
         // isOwnedByUser: 'TODO'
+      };
+    };
+
+    getUserById = async ({ id }) =>
+      !!id &&
+      (
+        await this.mongoDBUsersCollectionTable
+          .find({
+            id: id,
+          })
+          .toArray()
+      )[0];
+
+    saveUser = async ({ user }) => {
+      // TODO: check permission
+
+      const userInDB =
+        user.id &&
+        (
+          await this.mongoDBUsersCollectionTable
+            .find({
+              id: user.id,
+            })
+            .toArray()
+        )[0];
+
+      const newNanoid = await this.getUniqueNanoid(
+        this.mongoDBUsersCollectionTable,
+        10
+      );
+
+      if (!!userInDB) {
+        const updated = await this.mongoDBUsersCollectionTable.updateOne(
+          { _id: userInDB._id },
+          { $set: { ...user } }
+        );
+        console.log(`updated ${user.name} ${user.id}`);
+      } else {
+        const created = await this.mongoDBUsersCollectionTable.insertOne({
+          ...user,
+          id: newNanoid,
+        });
+        console.log(`created ${user.name} ${newNanoid}`);
+      }
+
+      return {
+        ...user,
+        id: !!userInDB ? userInDB.id : newNanoid,
       };
     };
   },

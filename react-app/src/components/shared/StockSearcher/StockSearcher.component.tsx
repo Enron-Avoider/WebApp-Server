@@ -4,6 +4,7 @@ import { useLazyQuery } from "react-apollo";
 import SearchIcon from '@material-ui/icons/Search';
 import { MenuItem, MenuList, Paper, InputBase, Typography, ClickAwayListener } from '@material-ui/core';
 import numeral from 'numeral';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { SEARCH_QUERY } from '@state/byModel/Stocks/stocks.queries';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
@@ -56,7 +57,7 @@ export default function StockSearcher() {
                         <MenuList>
                             {loading && (
                                 <MenuItem disabled={true}>
-                                    loading
+                                    <CircularProgress />
                                 </MenuItem>
                             )}
                             {data && data.searchStocks.map((d: any, i: number) => (
