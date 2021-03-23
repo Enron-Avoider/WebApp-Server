@@ -49,16 +49,6 @@ export default function NewCalcRowModal() {
     const chosenCollection = ratioCollections?.find((c: any) => c.id === chosenCollectionId);
     const existingCalc = chosenCollection?.calcs?.find((c: any) => c.title === searchParams.ratio);
 
-    console.log({
-        ratioCollections,
-        ratioCollection: searchParams.ratioCollection,
-        ratio: searchParams.ratio,
-        chosenCollectionName,
-        chosenCollectionId,
-        chosenCollection,
-        existingCalc
-    });
-
     const [saveRatioCollection] = useMutation(SAVE_RATIO_COLLECTION);
 
     const isOpen = !!searchParams.ticker;
@@ -120,6 +110,18 @@ export default function NewCalcRowModal() {
     const [titleValue, setTitleValue] = React.useState('');
     const [aboutValue, setAboutValue] = React.useState('');
     const [autocompleteValue, setAutocompleteValue] = React.useState([]);
+
+    console.log({
+        // ratioCollections,
+        // ratioCollection: searchParams.ratioCollection,
+        // ratio: searchParams.ratio,
+        // chosenCollectionName,
+        // chosenCollectionId,
+        // chosenCollection,
+        existingCalc,
+        autocompleteValue
+    });
+
 
     const handleOnChange = (e: any, v: any) => {
         setAutocompleteValue(v);
@@ -296,9 +298,9 @@ export default function NewCalcRowModal() {
                                 variant="outlined"
                                 label="Calculation"
                                 placeholder=""
-                                InputProps={{
-                                    readOnly: !chosenCollection?.isOwnedByUser,
-                                }}
+                                // InputProps={{
+                                //     readOnly: !chosenCollection?.isOwnedByUser,
+                                // }}
                             />
                         )}
                         renderTags={(value: any[], getTagProps) =>

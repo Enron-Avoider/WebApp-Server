@@ -29,7 +29,7 @@ mongoClient.connect(async (err) => {
     introspection: true,
     playground: true,
     cors: {
-      origin: "*",
+      origin: true, //"*",
       allowedHeaders: ['Origin','X-Requested-With','contentType','Content-Type','Accept','Authorization'],
       credentials: true,
     },

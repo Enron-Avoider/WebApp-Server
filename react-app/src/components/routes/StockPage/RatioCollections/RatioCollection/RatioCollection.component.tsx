@@ -27,7 +27,7 @@ export const RatioCollection: FunctionComponent<{
     collection
 }) => {
 
-        console.log({ collection });
+        // console.log({ collection });
 
         const { pickedComparisons } = getComparisonOptions();
 
