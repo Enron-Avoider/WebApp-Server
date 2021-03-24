@@ -2,7 +2,7 @@ const { RESTDataSource } = require("apollo-datasource-rest");
 const { ObjectId } = require("mongodb");
 const { customAlphabet, urlAlphabet } = require("nanoid");
 
-const { EODDataMaps } = require("../data-maps");
+const { EODDataMaps, OursDataMaps } = require("../data-maps");
 const mathToMongo = require("../utils/mathToMongo");
 const chunkUp = require("../utils/chunkUp");
 
@@ -308,7 +308,7 @@ module.exports = {
 
     getAggregateForCalcRows = async ({
       query,
-      calcs,
+      //   calcs,
       stockToRank,
       collectionId,
       companiesForRow,
@@ -320,6 +320,14 @@ module.exports = {
           })
           .toArray()
       )[0];
+
+      //   console.log({
+      //     query,
+      //     //   calcs,
+      //     stockToRank,
+      //     collectionId,
+      //     companiesForRow,
+      //   });
 
       const getCalcRows = async ({
         query,
@@ -334,12 +342,19 @@ module.exports = {
               (v) => `yearlyFinancialsByYear.${v}.v`
             );
 
+            const calc = mathToMongo(
+              c.calc,
+              paths.map((p) => `$${p}`)
+            );
+
+            // console.log({
+            //   title: c.title,
+            //   calc: JSON.stringify(calc, null, 2),
+            // });
+
             return {
               fieldName: c.title.replace(/\./g, "_"),
-              calc: mathToMongo(
-                c.calc,
-                paths.map((p) => `$${p}`)
-              ),
+              calc,
               paths,
             };
           });
@@ -454,11 +469,11 @@ module.exports = {
         ? await this.getAggregationThroughCacheIfPossible({
             cacheQuery: {
               type: "calcRows",
-              query,
-              stockToRank,
-              companiesForRow,
+          query,
+          stockToRank,
+          companiesForRow,
               collectionId,
-              calcs: collection.calcs,
+          calcs: collection.calcs,
             },
             getUncachedAggregationFn: getCalcRows,
             getUncachedAggregationParameters: {
@@ -682,10 +697,12 @@ module.exports = {
     };
 
     getRatioCollections = async ({ userId }) => {
-      return (await this.mongoDBRatioCollectionTable.find().toArray()).map(c => ({
+      return (await this.mongoDBRatioCollectionTable.find().toArray()).map(
+        (c) => ({
           ...c,
-          isOwnedByUser: userId === c.ownerUserId
-      }));
+          isOwnedByUser: userId === c.ownerUserId,
+        })
+      );
     };
 
     getUniqueNanoid = async (table, length = 2) => {
@@ -707,9 +724,7 @@ module.exports = {
       }
     };
 
-    saveRatioCollection = async ({ ratioCollection }) => {
-      // TODO: check permission
-
+    saveRatioCollection = async ({ ratioCollection, userId }) => {
       const ratioCollectionInDB =
         ratioCollection.id &&
         (
@@ -725,11 +740,17 @@ module.exports = {
       );
 
       if (!!ratioCollectionInDB) {
-        const updated = await this.mongoDBRatioCollectionTable.updateOne(
-          { _id: ratioCollectionInDB._id },
-          { $set: { ...ratioCollection } }
-        );
-        console.log(`updated ${ratioCollection.name} ${ratioCollection.id}`);
+        if (userId === ratioCollectionInDB.ownerUserId) {
+          const updated = await this.mongoDBRatioCollectionTable.updateOne(
+            { _id: ratioCollectionInDB._id },
+            { $set: { ...ratioCollection } }
+          );
+          console.log(`updated ${ratioCollection.name} ${ratioCollection.id}`);
+        } else {
+          console.log(
+            `${userId} not authorised for ${ratioCollection.name} ${ratioCollection.id}`
+          );
+        }
       } else {
         const created = await this.mongoDBRatioCollectionTable.insertOne({
           ...ratioCollection,
@@ -793,5 +814,7 @@ module.exports = {
         id: !!userInDB ? userInDB.id : newNanoid,
       };
     };
+
+    getRows = async ({}) => OursDataMaps.rowKeysPaths;
   },
 };

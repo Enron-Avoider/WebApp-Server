@@ -18,7 +18,7 @@ export default function getCalculations({ stock }: { stock?: any }) {
         variables: {
             userId: UserKeysData?.userKeys?.length > 0 ? UserKeysData?.userKeys[0].id : ""
         },
-        skip: !stock
+        // skip: !stock
     });
 
     const ratioCollections = ratioCollectionsQ?.getRatioCollections;
@@ -30,7 +30,7 @@ export default function getCalculations({ stock }: { stock?: any }) {
             .filter((o: any) => typeof o !== 'undefined')
     )(allSearchParams.ratioCollections?.split('-').map(c => c.split('.')[1])) : [];
 
-    const pickedCollectionsWithCalculations = pickedCollections?.map(c => ({
+    const pickedCollectionsWithCalculations = stock && pickedCollections?.map(c => ({
         ...c,
         calculationResults: doCalculations(c.calcs, stock.yearlyFinancials.years, stock)
     }));

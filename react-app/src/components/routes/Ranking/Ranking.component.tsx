@@ -14,6 +14,7 @@ import { useQuery } from "react-apollo";
 
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
 import ComparisonsPicker from '@components/shared/ComparisonsPicker';
+import RowPicker from '@components/shared/RowPicker';
 import RankingItem from './RankingItem';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
@@ -22,7 +23,7 @@ import './style.sass';
 
 export const Ranking: FunctionComponent<{}> = ({ }) => {
 
-    const { row, collectionId } = useParams<{ row: string }>();
+    const { row, collectionId } = useParams<{ row: string, collectionId?: string }>();
     const { pickedComparisonsOptions } = getComparisonOptions();
     const { allSearchParams } = useSearchParams();
 
@@ -33,11 +34,11 @@ export const Ranking: FunctionComponent<{}> = ({ }) => {
 
     const stock = data && data.getStockByCode;
 
-    console.log({
-        stock,
-        collectionId,
-        ticker: allSearchParams?.ticker
-    });
+    // console.log({
+    //     stock,
+    //     collectionId,
+    //     ticker: allSearchParams?.ticker
+    // });
 
     return (
         <ScrollSync>
@@ -52,7 +53,7 @@ export const Ranking: FunctionComponent<{}> = ({ }) => {
                                             <Box display="flex" flexDirection="row" justifyContent="space-between">
                                                 <Box display="flex" alignItems="center" mr={2}>
                                                     <Typography variant="h5">
-                                                        {row}
+                                                        <RowPicker />
                                                     </Typography>
                                                 </Box>
                                                 <ComparisonsPicker />
@@ -70,7 +71,7 @@ export const Ranking: FunctionComponent<{}> = ({ }) => {
                     <RankingItem
                         key={c?.title}
                         comparison={c}
-                        row={row}
+                        row={decodeURIComponent(row)}
                         collectionId={collectionId}
                         stock={stock}
                         ticker={allSearchParams?.ticker}

@@ -14,20 +14,14 @@ module.exports = {
       dataSources.Ours.getAggregateForFinancialRows(params),
     getAggregateForCalcRows: async (_source, params, { dataSources }) =>
       dataSources.Ours.getAggregateForCalcRows(params),
-    removeEmptyAndDuplicates: async (_source, params, { dataSources }) =>
-      dataSources.Ours.removeEmptyAndDuplicates(params),
-    getDistinctStockNames: async (_source, params, { dataSources }) =>
-      dataSources.Ours.getDistinctStockNames(params),
-
     getRatioCollections: async (_source, params, { dataSources }) =>
       dataSources.Ours.getRatioCollections(params),
     getUserById: async (_source, params, { dataSources }) =>
       dataSources.Ours.getUserById(params),
-    // getSystemRatioCollections
-    // getUserRatioCollections
-    // saveRatioCollection
+    getRows: async (_source, params, { dataSources }) =>
+        dataSources.Ours.getRows(params),
 
-    // TODO: encapsulate somewhere else
+    // Internal
     getCurrencyToCurrencyTimeseries: async (_source, params, { dataSources }) =>
       dataSources.EODDataAPI.getCurrencyToCurrencyTimeseries(params),
     getExchangeStocks: async (_source, params, { dataSources }) =>
@@ -36,5 +30,7 @@ module.exports = {
       dataSources.EODDataAPI.getAllExchanges(params),
     updateStocksCompletely: async (_source, params, { dataSources }) =>
       dataSources.EODDataAPI.updateStocksCompletely(params),
+    removeEmptyAndDuplicates: async (_source, params, { dataSources }) =>
+      dataSources.Ours.removeEmptyAndDuplicates(params),
   },
 };

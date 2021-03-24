@@ -23,11 +23,11 @@ export default function Header() {
 
     const user = UserByIdData?.getUserById;
 
-    console.log({
-        UserKeysData,
-        key: UserKeysData?.userKeys?.length && UserKeysData?.userKeys[0].id,
-        UserByIdData
-    });
+    // console.log({
+    //     UserKeysData,
+    //     key: UserKeysData?.userKeys?.length && UserKeysData?.userKeys[0].id,
+    //     UserByIdData
+    // });
 
     const { allSearchParams, getNewSearchParamsString, updateParams } = useSearchParams();
 
@@ -83,16 +83,6 @@ export default function Header() {
                                     </Grid>
                                 </Grid>
                             </Badge>
-                            <Box
-                                ml={5}
-                                display="flex"
-                                // flexDirection="row"
-                                // justifyContent="center"
-                                // alignItems="center"
-                                width={210}
-                            >
-                                <StockSearcher />
-                            </Box>
                         </Box>
 
                         <Box
@@ -101,7 +91,7 @@ export default function Header() {
                             flexDirection="row"
                             justifyContent="center"
                             alignItems="center"
-                            ml={-22}
+                            // ml={-22}
                         >
                             <Link
                                 style={{
@@ -156,13 +146,20 @@ export default function Header() {
                             >
                                 Explore
                             </Link>
+                            <Box
+                                ml={5}
+                                display="flex"
+                                width={210}
+                            >
+                                <StockSearcher />
+                            </Box>
                         </Box>
 
                         <Box display="flex" overflow="visible" alignItems="center">
                             {/* <StockSearcher /> */}
                             <Box ml={1}>
                                 {/* <Avatar alt="You" src="http://www.gstatic.com/tv/thumb/persons/73202/73202_v9_bb.jpg" /> */}
-                                { user ? (
+                                {user ? (
                                     <Avatar
                                         alt="You"
                                         title={user?.name}

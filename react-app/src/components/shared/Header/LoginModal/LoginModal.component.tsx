@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState, useEffect } from "react";
-import { useParams, useRouteMatch, useHistory, useLocation } from "react-router-dom";
+import { useParams, useRouteMatch, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useLazyQuery } from "react-apollo";
 import deepFind from 'deep-find';
 import {
@@ -38,12 +38,12 @@ export const LoginModal: FunctionComponent<{}> = ({ }) => {
     const [getUser, { loading, error, data }] = useLazyQuery(GET_USER_BY_ID);
     // const [saveRatioCollection] = useMutation(SAVE_RATIO_COLLECTION);
 
-    console.log({ UserKeyData });
+    // console.log({ UserKeyData });
 
     useEffect(() => {
-        console.log({
-            user: data?.getUserById
-        });
+        // console.log({
+        //     user: data?.getUserById
+        // });
 
         if (data?.getUserById) {
             addUserKey({
@@ -57,16 +57,11 @@ export const LoginModal: FunctionComponent<{}> = ({ }) => {
         }
     }, [data?.getUserById]);
 
-    const history = useHistory();
     const handleClose = () => {
-        //
-        console.log('close');
         updateParams({ search: getNewSearchParamsString({ keysToRemove: ['isRegistering'] }) })
     };
 
     const handleLogin = () => {
-        console.log('login');
-
         getUser({ variables: { id: userKeyValue } });
     }
 

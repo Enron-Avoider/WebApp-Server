@@ -16,6 +16,7 @@ import { SAVE_RATIO_COLLECTION } from '@state/byModel/Calculations/calculations.
 import { GET_AGGREGATES_FOR_CALC_ROWS } from '@state/byModel/Aggregate/aggregate.queries';
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
 import { mergeCalculationsAndAggregates } from '@state/byModel/Stocks/stock.map';
+import { GET_USER_KEYS } from '@state/byModel/User/UserKey.localQueries';
 
 export const RatioCollection: FunctionComponent<{
     ticker: string,
@@ -28,7 +29,8 @@ export const RatioCollection: FunctionComponent<{
 }) => {
 
         // console.log({ collection });
-
+        const { loading: UserKeysLoading, error: UserKeysError, data: UserKeysData } = useQuery(GET_USER_KEYS);
+        const userKey = UserKeysData?.userKeys?.length && UserKeysData?.userKeys[0].id;
         const { pickedComparisons } = getComparisonOptions();
 
         const [title, setTitle] = useState('');
@@ -44,7 +46,8 @@ export const RatioCollection: FunctionComponent<{
                     ratioCollection: {
                         ...collection,
                         name: title
-                    }
+                    },
+                    userId: userKey
                 }
             }),
             2000

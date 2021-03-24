@@ -24,11 +24,11 @@ export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
             .filter((o: any) => typeof o !== 'undefined')
     )(allSearchParams.comparisons?.split('-')) : [];
 
-    console.log({
-        pickedComparisons,
-        // c: allSearchParams.comparisons,
-        // c1: allSearchParams.comparisons?.split('-'),
-    });
+    // console.log({
+    //     pickedComparisons,
+    //     // c: allSearchParams.comparisons,
+    //     // c1: allSearchParams.comparisons?.split('-'),
+    // });
 
     const handleComparisonToggle = (e: any, { v }: any) => {
         updateParams({

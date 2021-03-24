@@ -37,8 +37,8 @@ export const GET_RATIO_COLLECTIONS = gql`
 // `;
 
 export const SAVE_RATIO_COLLECTION = gql`
-  mutation saveRatioCollection($ratioCollection: JSON!) {
-    saveRatioCollection(ratioCollection: $ratioCollection) {
+  mutation saveRatioCollection($ratioCollection: JSON!, $userId: String) {
+    saveRatioCollection(ratioCollection: $ratioCollection, userId: $userId) {
         id
         name
         isOwnedByPlatform

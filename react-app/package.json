@@ -7,7 +7,8 @@
     "serve:dev": "cross-env NODE_ENV=development webpack-dev-server",
     "serve:staging": "cross-env NODE_ENV=staging webpack-dev-server --color --progress",
     "serve:production": "cross-env NODE_ENV=production webpack-dev-server --color --progress",
-    "update": "aws s3 sync ./dist s3://enronavoider.com --profile pedro"
+    "predeploy": "npm run build",
+    "deploy": "aws s3 sync ./dist s3://enronavoider.com --profile pedro"
   },
   "dependencies": {
     "@loadable/component": "^5.12.0",

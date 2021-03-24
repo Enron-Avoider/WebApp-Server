@@ -14,7 +14,7 @@ export const userKeysResolvers = {
                     userKeys: [/*...userKeys,*/ new_userKey] // replaces last key with new
                 }
             });
-            console.log("UserKeys: ", cache.readQuery({ query: GET_USER_KEYS }));
+            // console.log("UserKeys: ", cache.readQuery({ query: GET_USER_KEYS }));
             return new_userKey;
         }
     }

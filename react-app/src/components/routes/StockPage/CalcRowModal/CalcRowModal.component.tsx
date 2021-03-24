@@ -26,12 +26,16 @@ import {
 import { doCalculations, scopeToRows, CalculationType } from '@state/byModel/Calculations/calculations.map';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import getCalculations from '@state/byModel/Calculations/getCalculations.effect';
+import { GET_USER_KEYS } from '@state/byModel/User/UserKey.localQueries';
 
 import Table from '../Table';
 
 import "./style.sass";
 
 export default function NewCalcRowModal() {
+
+    const { loading: UserKeysLoading, error: UserKeysError, data: UserKeysData } = useQuery(GET_USER_KEYS);
+    const userKey = UserKeysData?.userKeys?.length && UserKeysData?.userKeys[0].id;
 
     const location = useLocation();
     const { allSearchParams, getNewSearchParamsString } = useSearchParams();
@@ -162,7 +166,8 @@ export default function NewCalcRowModal() {
                             scope: calc[0].scope
                         }
                     ]
-                }
+                },
+                userId: userKey
             }
         });
         handleClose();
@@ -175,7 +180,8 @@ export default function NewCalcRowModal() {
                     ...chosenCollection,
                     calcs: chosenCollection.calcs
                         .filter((c: any) => c.title !== existingCalc.title)
-                }
+                },
+                userId: userKey
             }
         });
         handleClose();
@@ -199,7 +205,8 @@ export default function NewCalcRowModal() {
                             return c;
                         }
                     })
-                }
+                },
+                userId: userKey
             }
         });
         handleClose();
@@ -298,9 +305,9 @@ export default function NewCalcRowModal() {
                                 variant="outlined"
                                 label="Calculation"
                                 placeholder=""
-                                // InputProps={{
-                                //     readOnly: !chosenCollection?.isOwnedByUser,
-                                // }}
+                            // InputProps={{
+                            //     readOnly: !chosenCollection?.isOwnedByUser,
+                            // }}
                             />
                         )}
                         renderTags={(value: any[], getTagProps) =>

@@ -142,6 +142,9 @@ export const RankingItem: FunctionComponent<{
             skip: (!comparison || !!ticker && !stock)
         });
 
+
+        console.log({ aggregateRes });
+
         const aggregationsPerYear = aggregateRes && (
             collectionId ?
                 aggregateRes?.getAggregateForCalcRows?.calcRows[`calc_${row}`] : 
@@ -175,18 +178,18 @@ export const RankingItem: FunctionComponent<{
             }), {}) : {}
         }));
 
-        console.log({
-            ticker,
-            stock,
-            aggregateRes,
-            aggregationsPerYear
-            // row,
-            // comparison,
-            // aggregationsPerYear,
-            // agg: aggregateRes?.getAggregateForFinancialRows?.financialRows[row.replace('.', '_')],
-            // maxCompanyYearlyLength,
-            // rankTable
-        });
+        // console.log({
+        //     ticker,
+        //     stock,
+        //     aggregateRes,
+        //     aggregationsPerYear
+        //     // row,
+        //     // comparison,
+        //     // aggregationsPerYear,
+        //     // agg: aggregateRes?.getAggregateForFinancialRows?.financialRows[row.replace('.', '_')],
+        //     // maxCompanyYearlyLength,
+        //     // rankTable
+        // });
 
         const columns = React.useMemo(
             () => [

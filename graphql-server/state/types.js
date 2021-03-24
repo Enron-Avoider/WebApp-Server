@@ -84,24 +84,21 @@ const typeDefs = gql`
     ): JSON
 
     getAllExchanges: JSON
-    saveIndustriesToDB: JSON
-    saveExchangesToDB: JSON
-    updateStocksInDB: JSON
     updateStocksCompletely: JSON
     removeEmptyAndDuplicates: JSON
-    getDistinctStockNames: JSON
     getCurrencyToCurrencyTimeseries(currency: String, toCurrency: String): JSON
     getIndustryStocks(name: String): JSON
     getExchangeStocks(code: String): JSON
     getRatioCollections(userId: String!): [RatioCollection]
+    getRows: JSON
 
     getUserById(id: String): User
   }
 
   type Mutation {
-    saveRatioCollection(ratioCollection: JSON): RatioCollection
-    saveUser(user: JSON): User
-    resetCache(key: String!): JSON
+    saveRatioCollection(ratioCollection: JSON, userId: String): RatioCollection
+    saveUser(user: JSON, userId: String): User
+    # resetCache(key: String!): JSON
   }
 `;
 module.exports = {
