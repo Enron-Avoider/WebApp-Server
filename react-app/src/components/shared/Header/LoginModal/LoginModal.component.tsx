@@ -68,7 +68,7 @@ export const LoginModal: FunctionComponent<{}> = ({ }) => {
     return (
         <Dialog open={!!allSearchParams.isRegistering} onClose={handleClose}>
             <Box
-                minWidth={450}
+                minWidth={455}
             >
                 <DialogTitle>
                     Enter User Key

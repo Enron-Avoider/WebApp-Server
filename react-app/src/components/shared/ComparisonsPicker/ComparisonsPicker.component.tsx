@@ -47,7 +47,7 @@ export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
 
     return (
         <>
-            <Box width={450}>
+            <Box width={465}>
                 <Autocomplete
                     multiple
                     autoComplete

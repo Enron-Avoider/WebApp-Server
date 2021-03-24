@@ -237,7 +237,7 @@ export default function NewCalcRowModal() {
     return (
         <Dialog open={isOpen} onClose={handleClose}>
             <Box
-                minWidth={450}
+                minWidth={455}
             >
                 <DialogTitle>
                     {!existingCalc ?

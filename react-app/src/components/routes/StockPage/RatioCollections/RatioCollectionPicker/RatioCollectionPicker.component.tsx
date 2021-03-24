@@ -50,7 +50,7 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
 
     return (
         <>
-            <Box width={450}>
+            <Box width={465}>
                 <Autocomplete
                     multiple
                     autoComplete

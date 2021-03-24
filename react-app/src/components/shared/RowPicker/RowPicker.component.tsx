@@ -55,7 +55,6 @@ export const RowPicker: FunctionComponent<{}> = ({ }) => {
             value: `${curr.id}/${encodeURIComponent(c.title)}`,
             title: `${curr.name}: ${c.title}`,
             type: 'Ratios'
-
         }))
     ], []);
 
@@ -86,7 +85,7 @@ export const RowPicker: FunctionComponent<{}> = ({ }) => {
 
     return (
         allOpts?.length && (<>
-            <Box width={450}>
+            <Box width={465}>
                 <Autocomplete
                     multiple
                     autoComplete
@@ -119,6 +118,7 @@ export const RowPicker: FunctionComponent<{}> = ({ }) => {
                             variant="outlined"
                             label={`Selected Row`}
                             placeholder=""
+                            style={{ minWidth: '0 !important' }}
                         />
                     )}
                     renderTags={(value: any[], getTagProps) =>
