@@ -101,7 +101,7 @@ export const RatioCollection: FunctionComponent<{
                         <Table
                             ticker={ticker}
                             title={title}
-                            years={stock.yearlyFinancials.years}
+                            years={stock.yearlyFinancials?.years}
                             // data={collection.calculationResults}
                             data={
                                 mergedCalculationsAndAggregates ||

@@ -43,7 +43,7 @@ export const doCalculations = (
         .map(([key, value]: any) => value)
         .map(forTable => {
             const scopeRows = scopeToRows(forTable.scope, stock);
-            const calc = years.reduce((acc: any, year: any, i: number) => ({
+            const calc = years?.reduce((acc: any, year: any, i: number) => ({
                 ...acc,
                 [`${year}`]:
                     (() => {

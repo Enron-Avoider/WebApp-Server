@@ -7,7 +7,7 @@ export const mergeStockAndAggregatesForYearlyFinancials = ({
     stock, aggregates
 }: {
     stock: any, aggregates: any
-}) => stock && aggregates && (Object.entries(stock.yearlyFinancials) as any)
+}) => aggregates && stock?.yearlyFinancials && (Object.entries(stock.yearlyFinancials) as any)
     .filter(([key, value]: any) => !!value && key !== '__typename')
     .reduce(
         (p: any, [k, v]: any) => ({

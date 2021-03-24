@@ -91,7 +91,7 @@ export default function Header() {
                             flexDirection="row"
                             justifyContent="center"
                             alignItems="center"
-                            // ml={-22}
+                        // ml={-22}
                         >
                             <Link
                                 style={{
@@ -157,6 +157,9 @@ export default function Header() {
 
                         <Box display="flex" overflow="visible" alignItems="center">
                             {/* <StockSearcher /> */}
+                            <Typography variant="caption">
+                                Currency in USD
+                            </Typography>
                             <Box ml={1}>
                                 {/* <Avatar alt="You" src="http://www.gstatic.com/tv/thumb/persons/73202/73202_v9_bb.jpg" /> */}
                                 {user ? (

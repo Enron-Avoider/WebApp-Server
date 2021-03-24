@@ -32,7 +32,7 @@ export default function getCalculations({ stock }: { stock?: any }) {
 
     const pickedCollectionsWithCalculations = stock && pickedCollections?.map(c => ({
         ...c,
-        calculationResults: doCalculations(c.calcs, stock.yearlyFinancials.years, stock)
+        calculationResults: doCalculations(c.calcs, stock.yearlyFinancials?.years, stock)
     }));
 
     return {

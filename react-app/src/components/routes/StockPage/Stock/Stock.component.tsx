@@ -176,13 +176,16 @@ export const Stock: FunctionComponent<{
                                                     </Box>
                                                 </Box>
                                             </Box>
-                                            <Box mt={-4}>
-                                                <Table
-                                                    years={stock.yearlyFinancials.years}
-                                                    data={[]}
-                                                    ticker={ticker}
-                                                />
-                                            </Box>
+
+                                            {stock.yearlyFinancials ? (
+                                                <Box mt={-4}>
+                                                    <Table
+                                                        years={stock.yearlyFinancials?.years}
+                                                        data={[]}
+                                                        ticker={ticker}
+                                                    />
+                                                </Box>
+                                            ) : null}
                                         </Container>
                                     </Paper>
                                 </Grid>
@@ -190,101 +193,104 @@ export const Stock: FunctionComponent<{
                         </Box>
                         <Box height={140} width="100%"></Box>
 
-                        <RatioCollections
-                            stock={stock}
-                            ticker={ticker}
-                        />
-
-                        <Paper>
-                            <Box display="flex" flexDirection="row" p={2} mt={2}>
-                                <div>
-                                    <Typography variant="h5">
-                                        Analysis Ratings & Checks
+                        {stock.yearlyFinancials ? (
+                            <>
+                                <RatioCollections
+                                    stock={stock}
+                                    ticker={ticker}
+                                />
+                                <Paper>
+                                    <Box display="flex" flexDirection="row" p={2} mt={2}>
+                                        <div>
+                                            <Typography variant="h5">
+                                                Analysis Ratings & Checks
                                     </Typography>
-                                    <Typography
-                                        display="block"
-                                        variant="body1"
-                                    >[ In Development ]</Typography>
-                                </div>
-                            </Box>
-                        </Paper>
+                                            <Typography
+                                                display="block"
+                                                variant="body1"
+                                            >[ In Development ]</Typography>
+                                        </div>
+                                    </Box>
+                                </Paper>
 
-                        <Paper>
-                            <Table
-                                title={'Shares'}
-                                years={stock.yearlyFinancials.years}
-                                data={
-                                    [
-                                        ...(mergedStockAndAggregatesYearlyFinancials?.marketCap || stock.yearlyFinancials.marketCap),
-                                        ...(mergedStockAndAggregatesYearlyFinancials?.aggregatedShares || stock.yearlyFinancials.aggregatedShares),
-                                        ...(mergedStockAndAggregatesYearlyFinancials?.price || stock.yearlyFinancials.price),
-                                    ]
-                                }
-                                ticker={ticker}
-                            />
-                        </Paper>
+                                <Paper>
+                                    <Table
+                                        title={'Shares'}
+                                        years={stock.yearlyFinancials?.years}
+                                        data={
+                                            [
+                                                ...(mergedStockAndAggregatesYearlyFinancials?.marketCap || stock.yearlyFinancials?.marketCap) || [],
+                                                ...(mergedStockAndAggregatesYearlyFinancials?.aggregatedShares || stock.yearlyFinancials?.aggregatedShares) || [],
+                                                ...(mergedStockAndAggregatesYearlyFinancials?.price || stock.yearlyFinancials?.price) || [],
+                                            ]
+                                        }
+                                        ticker={ticker}
+                                    />
+                                </Paper>
 
-                        <Paper>
-                            <Box p={2} mt={2}>
+                                <Paper>
+                                    <Box p={2} mt={2}>
 
-                                <Box
-                                    display="flex"
-                                    alignItems="center"
-                                    justifyContent="space-between"
-                                >
-                                    <Typography variant="h5">
-                                        Financial Statements
+                                        <Box
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="space-between"
+                                        >
+                                            <Typography variant="h5">
+                                                Financial Statements
                                     </Typography>
 
-                                    <ToggleButtonGroup size="small" exclusive value={visibleFinancials || 'pl'} onChange={handleVisibleFinancials} color="primary">
-                                        <ToggleButton value="pl" defaultChecked>Income Statement</ToggleButton>
-                                        <ToggleButton value="bs">Balance Sheet</ToggleButton>
-                                        <ToggleButton value="cf">Cash Flow</ToggleButton>
-                                    </ToggleButtonGroup>
-                                </Box>
+                                            <ToggleButtonGroup size="small" exclusive value={visibleFinancials || 'pl'} onChange={handleVisibleFinancials} color="primary">
+                                                <ToggleButton value="pl" defaultChecked>Income Statement</ToggleButton>
+                                                <ToggleButton value="bs">Balance Sheet</ToggleButton>
+                                                <ToggleButton value="cf">Cash Flow</ToggleButton>
+                                            </ToggleButtonGroup>
+                                        </Box>
 
-                                <Box mx={-1} mb={-2}>
-                                    <Grid container spacing={3}>
-                                        {(!visibleFinancials || visibleFinancials === 'pl') && (
-                                            <Grid item xs={(12) as any}>
-                                                <Paper elevation={5}>
-                                                    <Table
-                                                        title={'Income Statement'}
-                                                        years={stock.yearlyFinancials.years}
-                                                        data={mergedStockAndAggregatesYearlyFinancials?.pl || stock.yearlyFinancials.pl}
-                                                        ticker={ticker}
-                                                    />
-                                                </Paper>
+                                        <Box mx={-1} mb={-2}>
+                                            <Grid container spacing={3}>
+                                                {(!visibleFinancials || visibleFinancials === 'pl') && (
+                                                    <Grid item xs={(12) as any}>
+                                                        <Paper elevation={5}>
+                                                            <Table
+                                                                title={'Income Statement'}
+                                                                years={stock.yearlyFinancials?.years}
+                                                                data={mergedStockAndAggregatesYearlyFinancials?.pl || stock.yearlyFinancials?.pl}
+                                                                ticker={ticker}
+                                                            />
+                                                        </Paper>
+                                                    </Grid>
+                                                )}
+                                                {visibleFinancials === 'bs' && (
+                                                    <Grid item xs={(12) as any}>
+                                                        <Paper elevation={5}>
+                                                            <Table
+                                                                title={'Balance Sheet'}
+                                                                years={stock.yearlyFinancials?.years}
+                                                                data={mergedStockAndAggregatesYearlyFinancials?.bs || stock.yearlyFinancials?.bs}
+                                                                ticker={ticker}
+                                                            />
+                                                        </Paper>
+                                                    </Grid>
+                                                )}
+                                                {visibleFinancials === 'cf' && (
+                                                    <Grid item xs={(12) as any}>
+                                                        <Paper elevation={5}>
+                                                            <Table
+                                                                title={'Cash Flow'}
+                                                                years={stock.yearlyFinancials?.years}
+                                                                data={mergedStockAndAggregatesYearlyFinancials?.cf || stock.yearlyFinancials?.cf}
+                                                                ticker={ticker}
+                                                            />
+                                                        </Paper>
+                                                    </Grid>
+                                                )}
                                             </Grid>
-                                        )}
-                                        {visibleFinancials === 'bs' && (
-                                            <Grid item xs={(12) as any}>
-                                                <Paper elevation={5}>
-                                                    <Table
-                                                        title={'Balance Sheet'}
-                                                        years={stock.yearlyFinancials.years}
-                                                        data={mergedStockAndAggregatesYearlyFinancials?.bs || stock.yearlyFinancials.bs}
-                                                        ticker={ticker}
-                                                    />
-                                                </Paper>
-                                            </Grid>
-                                        )}
-                                        {visibleFinancials === 'cf' && (
-                                            <Grid item xs={(12) as any}>
-                                                <Paper elevation={5}>
-                                                    <Table
-                                                        title={'Cash Flow'}
-                                                        years={stock.yearlyFinancials.years}
-                                                        data={mergedStockAndAggregatesYearlyFinancials?.cf || stock.yearlyFinancials.cf}
-                                                        ticker={ticker}
-                                                    />
-                                                </Paper>
-                                            </Grid>
-                                        )}
-                                    </Grid>
-                                </Box>
-                            </Box>
-                        </Paper>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            </>
+                        ) : null}
 
                         <Paper>
                             <Box display="flex" flexDirection="row" p={2} mt={2}>

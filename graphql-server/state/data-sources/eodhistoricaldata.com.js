@@ -41,18 +41,14 @@ module.exports = {
       //   });
 
       const is_in_exchange_country =
-        fundamentalData.General && fundamentalData.General.AddressData
-          ? regionNamesInEnglish
-              .of(fundamentalData.General.CountryISO)
-              .toLowerCase()
-              .includes(
-                fundamentalData.General.AddressData.Country.toLowerCase()
-              )
-          : fundamentalData.General.Address.toLowerCase().includes(
-              regionNamesInEnglish
-                .of(fundamentalData.General.CountryISO)
-                .toLowerCase()
-            );
+        fundamentalData.General &&
+        fundamentalData.General.Address &&
+        fundamentalData.General.CountryISO &&
+        fundamentalData.General.Address.toLowerCase().includes(
+          regionNamesInEnglish
+            .of(fundamentalData.General.CountryISO)
+            .toLowerCase()
+        );
 
       const priceData = await this.get(
         `
