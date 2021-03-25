@@ -45,12 +45,12 @@ export const Stock: FunctionComponent<{
             }),
         });
 
-        const { loading, error, data } = useQuery(GET_STOCK, {
+        const { loading: stock_loading, error: stock_error, data: stock_data } = useQuery(GET_STOCK, {
             variables: { ticker },
             skip: !ticker
         });
 
-        const stock = data && data.getStockByCode;
+        const stock = stock_data && stock_data.getStockByCode;
 
         const {
             loading: loading_aggregatesForFinancialRows,
@@ -73,7 +73,7 @@ export const Stock: FunctionComponent<{
 
         return <>
             {
-                stock ? (
+                !stock_loading && stock ? (
                     <>
 
                         <Box position="fixed" top={63} width="100%" left={0} zIndex={2}>

@@ -755,6 +755,7 @@ module.exports = {
         const created = await this.mongoDBRatioCollectionTable.insertOne({
           ...ratioCollection,
           id: newNanoid,
+          ownerUserId: userId
         });
         console.log(`created ${ratioCollection.name} ${newNanoid}`);
       }

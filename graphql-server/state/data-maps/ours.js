@@ -140,62 +140,8 @@ const rowKeys = {
         },
       ],
     },
-    // netIncomeFromContinuingOps
   ],
   bs: [
-    // "intangibleAssets": "4981000000.00",
-    // "earningAssets": null,
-    // "otherCurrentAssets": "233000000.00",
-    // "totalStockholderEquity": "93404000000.00",
-    // "deferredLongTermLiab": null,
-    // "otherCurrentLiab": "9708000000.00",
-    // "commonStock": "5000000.00",
-    // "retainedEarnings": "52551000000.00",
-    // "otherLiab": "17017000000.00",
-    // "goodWill": "15017000000.00",
-    // "otherAssets": "12097000000.00",
-    // "cash": "42122000000.00",
-    // "totalCurrentLiabilities": "126385000000.00",
-    // "shortTermDebt": null,
-    // "shortLongTermDebt": null,
-    // "shortLongTermDebtTotal": null,
-    // "otherStockholderEquity": "-180000000.00",
-    // "propertyPlantEquipment": "150667000000.00",
-    // "totalCurrentAssets": "132733000000.00",
-    // "longTermInvestments": null,
-    // "netTangibleAssets": "130960000000.00",
-    // "shortTermInvestments": "42274000000.00",
-    // "netReceivables": "24542000000.00",
-    // "longTermDebt": "31816000000.00",
-    // "inventory": "23795000000.00",
-    // "accountsPayable": "116677000000.00",
-    // "totalPermanentEquity": null,
-    // "noncontrollingInterestInConsolidatedEntity": null,
-    // "temporaryEquityRedeemableNoncontrollingInterests": null,
-    // "accumulatedOtherComprehensiveIncome": null,
-    // "additionalPaidInCapital": null,
-    // "commonStockTotalEquity": "5000000.00",
-    // "preferredStockTotalEquity": null,
-    // "retainedEarningsTotalEquity": "52551000000.00",
-    // "treasuryStock": "-1837000000.00",
-    // "accumulatedAmortization": null,
-    // "nonCurrrentAssetsOther": "173445000000.00",
-    // "deferredLongTermAssetCharges": null,
-    // "nonCurrentAssetsTotal": "188462000000.00",
-    // "capitalLeaseObligations": "52573000000.00",
-    // "longTermDebtTotal": "31816000000.00",
-    // "nonCurrentLiabilitiesOther": "17017000000.00",
-    // "nonCurrentLiabilitiesTotal": "48833000000.00",
-    // "negativeGoodwill": null,
-    // "warrants": null,
-    // "preferredStockRedeemable": null,
-    // "capitalSurpluse": "42865000000.00",
-    // "liabilitiesAndStockholdersEquity": "321195000000.00",
-    // "cashAndShortTermInvestments": "84396000000.00",
-    // "propertyPlantAndEquipmentGross": null,
-    // "accumulatedDepreciation": null,
-    // "commonStockSharesOutstanding": "503000000.00"
-
     {
       title: "Assets",
       oldTitle: "totalAssets",
@@ -203,10 +149,70 @@ const rowKeys = {
         {
           title: "Current Assets",
           oldTitle: "totalCurrentAssets",
+          subRows: [
+            {
+              title: "Cash, Cash Equivalents & Short Term Investments",
+              oldTitle: "cashAndShortTermInvestments",
+            },
+            {
+              title: "Short Term Investments",
+              oldTitle: "shortTermInvestments",
+            },
+            {
+              title: "Cash",
+              oldTitle: "cash",
+            },
+            {
+              title: "Receivables",
+              oldTitle: "netReceivables",
+            },
+            {
+              title: "Inventory",
+              oldTitle: "inventory",
+            },
+            {
+              title: "Other Current Assets",
+              oldTitle: "otherCurrentAssets",
+            },
+          ],
         },
         {
           title: "Non-current assets",
           oldTitle: "nonCurrentAssetsTotal",
+          subRows: [
+            {
+              title: "Property Plant Equipment",
+              oldTitle: "propertyPlantEquipment",
+            },
+            {
+              title: "Property Plant Equipment Gross",
+              oldTitle: "propertyPlantAndEquipmentGross",
+            },
+            {
+              title: "GoodWill",
+              oldTitle: "goodWill",
+            },
+            {
+              title: "Intangible Assets",
+              oldTitle: "intangibleAssets",
+            },
+            {
+              title: "Accumulated Depreciation",
+              oldTitle: "accumulatedDepreciation",
+            },
+            {
+              title: "Long Term Investments",
+              oldTitle: "longTermInvestments",
+            },
+            {
+              title: "Other Non Current Assets",
+              oldTitle: "nonCurrrentAssetsOther",
+            },
+          ],
+        },
+        {
+          title: "Other Assets",
+          oldTitle: "otherAssets",
         },
       ],
     },
@@ -215,18 +221,165 @@ const rowKeys = {
       oldTitle: "totalLiab",
       subRows: [
         {
-          title: "Current Assets",
+          title: "Current Liabilities",
           oldTitle: "totalCurrentLiabilities",
+          subRows: [
+            {
+              title: "Accounts Payable",
+              oldTitle: "accountsPayable",
+            },
+            {
+              title: "Short Term Debpt",
+              oldTitle: "shortTermDebt",
+            },
+            {
+              title: "Other Current Liabilities",
+              oldTitle: "otherCurrentLiab",
+            },
+          ],
         },
         {
           title: "Non-current Liabilities",
           oldTitle: "nonCurrentLiabilitiesTotal",
+          subRows: [
+            {
+              title: "Deferred Long Term Liab",
+              oldTitle: "deferredLongTermLiab",
+            },
+            {
+              title: "Deferred Long Term Asset Charges",
+              oldTitle: "deferredLongTermAssetCharges",
+            },
+            {
+              title: "Long Term Debt",
+              oldTitle: "longTermDebt",
+            },
+            {
+              title: "Long Term Debt",
+              oldTitle: "longTermDebtTotal",
+            },
+            {
+              title: "Other Non Current Liabilities",
+              oldTitle: "nonCurrentLiabilitiesOther",
+            },
+          ],
+        },
+        {
+          title: "Other Liabilities",
+          oldTitle: "otherLiab",
         },
       ],
     },
     {
       title: "Equity",
       oldTitle: "totalStockholderEquity",
+      subRows: [
+        {
+          title: "Common Stock",
+          oldTitle: "commonStock",
+        },
+        {
+          title: "Retained Earnings",
+          oldTitle: "retainedEarnings",
+        },
+        {
+          title: "Retained Earnings Total Equity",
+          oldTitle: "retainedEarningsTotalEquity",
+        },
+        {
+          title: "Common Stock Total Equity",
+          oldTitle: "commonStockTotalEquity",
+        },
+        {
+          title: "Preferred Stock Total Equity",
+          oldTitle: "preferredStockTotalEquity",
+        },
+        {
+          title: "Treasury Stock",
+          oldTitle: "treasuryStock",
+        },
+        {
+          title: "Total Permanent Equity",
+          oldTitle: "totalPermanentEquity",
+        },
+        {
+          title: "Other Stockholder Equity",
+          oldTitle: "otherStockholderEquity",
+        },
+      ],
+    },
+    {
+      title: "Net Tangible Assets",
+      oldTitle: "netTangibleAssets",
+    },
+    {
+      title: "TODO: Not Organized Yet",
+      subRows: [
+        {
+          title: "earningAssets",
+          oldTitle: "earningAssets",
+        },
+        {
+          title: "shortTermDebt",
+          oldTitle: "shortTermDebt",
+        },
+        {
+          title: "shortLongTermDebt",
+          oldTitle: "shortLongTermDebt",
+        },
+        {
+          title: "shortLongTermDebtTotal",
+          oldTitle: "shortLongTermDebtTotal",
+        },
+        {
+          title: "noncontrollingInterestInConsolidatedEntity",
+          oldTitle: "noncontrollingInterestInConsolidatedEntity",
+        },
+        {
+          title: "temporaryEquityRedeemableNoncontrollingInterests",
+          oldTitle: "temporaryEquityRedeemableNoncontrollingInterests",
+        },
+        {
+          title: "accumulatedOtherComprehensiveIncome",
+          oldTitle: "accumulatedOtherComprehensiveIncome",
+        },
+        {
+          title: "additionalPaidInCapital",
+          oldTitle: "additionalPaidInCapital",
+        },
+        {
+          title: "accumulatedAmortization",
+          oldTitle: "accumulatedAmortization",
+        },
+        {
+          title: "capitalLeaseObligations",
+          oldTitle: "capitalLeaseObligations",
+        },
+        {
+          title: "negativeGoodwill",
+          oldTitle: "negativeGoodwill",
+        },
+        {
+          title: "warrants",
+          oldTitle: "warrants",
+        },
+        {
+          title: "preferredStockRedeemable",
+          oldTitle: "preferredStockRedeemable",
+        },
+        {
+          title: "capitalSurpluse",
+          oldTitle: "capitalSurpluse",
+        },
+        {
+          title: "liabilitiesAndStockholdersEquity",
+          oldTitle: "liabilitiesAndStockholdersEquity",
+        },
+        {
+          title: "commonStockSharesOutstanding",
+          oldTitle: "commonStockSharesOutstanding",
+        },
+      ],
     },
   ],
   cf: [

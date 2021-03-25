@@ -1,6 +1,3 @@
-const numeral = require("numeral");
-const math = require("mathjs");
-
 const pipe = require("../utils/pipe");
 
 const { rowKeys, rowKeysPaths } = require("./ours");
@@ -71,15 +68,37 @@ const convertEODFundamentalsToEarlyFinancials = (
   const organizeTable = (statement, statementKey) => {
     return [
       ...rowKeys[statementKey].map((row) => ({
-        ...statement.find((row2) => row2.title === row.oldTitle),
+        ...statement.find(
+          (statementRow) => statementRow.title === row.oldTitle
+        ),
         title: row.title,
         EODTitle: row.oldTitle,
-        ...(row.type && { type: row.type }),
+        // ...(row.type && { type: row.type }),
         ...(row.subRows && {
-          subRows: row.subRows.map((row3) => ({
-            ...statement.find((row2) => row2.title === row3.oldTitle),
-            title: row3.title,
-            EODTitle: row3.oldTitle,
+          subRows: row.subRows.map((row_) => ({
+            ...statement.find(
+              (statementRow) => statementRow.title === row_.oldTitle
+            ),
+            title: row_.title,
+            EODTitle: row_.oldTitle,
+            ...(row_.subRows && {
+              subRows: row_.subRows.map((row__) => ({
+                ...statement.find(
+                  (statementRow) => statementRow.title === row__.oldTitle
+                ),
+                title: row__.title,
+                EODTitle: row__.oldTitle,
+                ...(row__.subRows && {
+                  subRows: row__.subRows.map((row___) => ({
+                    ...statement.find(
+                      (statementRow) => statementRow.title === row___.oldTitle
+                    ),
+                    title: row___.title,
+                    EODTitle: row___.oldTitle,
+                  })),
+                }),
+              })),
+            }),
           })),
         }),
       })),
@@ -194,7 +213,29 @@ const yearlyFinancialsWithKeys = (yearlyFinancials) =>
                     subRows: c.subRows.reduce(
                       (p_, c_) => ({
                         ...p_,
-                        [c_.title]: c_,
+                        [c_.title]: {
+                          ...c_,
+                          ...(c_.subRows && {
+                            subRows: c_.subRows.reduce(
+                              (p__, c__) => ({
+                                ...p__,
+                                [c__.title]: {
+                                  ...c__,
+                                  ...(c__.subRows && {
+                                    subRows: c__.subRows.reduce(
+                                      (p___, c___) => ({
+                                        ...p___,
+                                        [c___.title]: c___,
+                                      }),
+                                      {}
+                                    ),
+                                  }),
+                                },
+                              }),
+                              {}
+                            ),
+                          }),
+                        },
                       }),
                       {}
                     ),
@@ -208,69 +249,7 @@ const yearlyFinancialsWithKeys = (yearlyFinancials) =>
   );
 
 const yearlyFinancialsFlatByYear = (yearlyFinancialsWithKeys) => {
-  //   const keys = Object.entries(yearlyFinancials).reduce(
-  //     (p, [k, v]) => [
-  //       ...p,
-  //       ...(k === "years"
-  //         ? []
-  //         : v.reduce(
-  //             (p, c) => [
-  //               ...p,
-  //               [k, c.title],
-  //               ...(c.subRows
-  //                 ? c.subRows.reduce(
-  //                     (p_, c_) => [...p_, [k, c.title, c_.title]],
-  //                     []
-  //                   )
-  //                 : []),
-  //             ],
-  //             []
-  //           )),
-  //     ],
-  //     //   [k]:
-  //     //     k === "years"
-  //     //       ? v
-  //     //       : v.reduce(
-  //     //           (p, c) => [
-  //     //             ...p,
-  //     //             {
-  //     //               ...c,
-  //     //               ...(c.subRows && {
-  //     //                 subRows: c.subRows.reduce(
-  //     //                   (p_, c_) => [
-  //     //                     ...p_,
-  //     //                     { ...c_ },
-  //     //                   ],
-  //     //                   []
-  //     //                 ),
-  //     //               }),
-  //     //             },
-  //     //           ],
-  //     //           []
-  //     //         ),
-  //     // }),
-  //     []
-  //   );
-
-  //   const res = yearlyFinancials.years.map((year) => ({
-  //     year,
-  //     ...keys.reduce(
-  //       (p, k) => ({
-  //         ...p,
-  //         [k.reduce(
-  //           (p, c, i) => `${p}${i > 0 ? "." : ""}${i === 2 ? "subRows." : ""}${c}`
-  //         )]:
-  //           k.length === 2
-  //             ? yearlyFinancialsWithKeys[k[0]][k[1]][year] || 0
-  //             : k.length === 3
-  //             ? yearlyFinancialsWithKeys[k[0]][k[1]].subRows[k[2]][year] || 0
-  //             : null,
-  //       }),
-  //       {}
-  //     ),
-  //   }));
-
-  const res2 = yearlyFinancialsWithKeys.years.map((year) => ({
+  const res = yearlyFinancialsWithKeys.years.map((year) => ({
     year,
     ...Object.entries(yearlyFinancialsWithKeys).reduce(
       (p, [k, v]) => ({
@@ -289,6 +268,34 @@ const yearlyFinancialsFlatByYear = (yearlyFinancialsWithKeys) => {
                         v:
                           yearlyFinancialsWithKeys[k][k_].subRows[k__][year] ||
                           0,
+                        ...(v__.subRows && {
+                          subRows: Object.entries(v__.subRows).reduce(
+                            (p___, [k___, v___]) => ({
+                              ...p___,
+                              [k___]: {
+                                v:
+                                  yearlyFinancialsWithKeys[k][k_].subRows[k__]
+                                    .subRows[k___][year] || 0,
+                                ...(v___.subRows && {
+                                  subRows: Object.entries(v___.subRows).reduce(
+                                    (p____, [k____, v____]) => ({
+                                      ...p____,
+                                      [k____]: {
+                                        v:
+                                          yearlyFinancialsWithKeys[k][k_]
+                                            .subRows[k__].subRows[k___].subRows[
+                                            k____
+                                          ][year] || 0,
+                                      },
+                                    }),
+                                    {}
+                                  ),
+                                }),
+                              },
+                            }),
+                            {}
+                          ),
+                        }),
                       },
                     }),
                     {}
@@ -299,30 +306,12 @@ const yearlyFinancialsFlatByYear = (yearlyFinancialsWithKeys) => {
             {}
           ),
         }),
-
-        // k === "years"
-        //   ? {}
-        //   : v.reduce(
-        //       (p, c) => [
-        //         ...p,
-        //         {
-        //           ...c,
-        //           ...(c.subRows && {
-        //             subRows: c.subRows.reduce(
-        //               (p_, c_) => [...p_, { ...c_ }],
-        //               []
-        //             ),
-        //           }),
-        //         },
-        //       ],
-        //       {}
-        //     ),
       }),
       {}
     ),
   }));
 
-  return res2;
+  return res;
 };
 
 module.exports = {

@@ -50,14 +50,16 @@ module.exports = {
             .toLowerCase()
         );
 
-      const priceData = await this.get(
-        `
+      const priceData =
+        is_in_exchange_country &&
+        (await this.get(
+          `
             https://eodhistoricaldata.com/api/eod/${code}?
                 period=m&
                 fmt=json&
                 api_token=${this.keys.eodhistoricaldata}
         `
-      );
+        ));
 
       const fundamentalsCurrency =
         fundamentalData.Financials &&
@@ -71,6 +73,7 @@ module.exports = {
       //     }).catch((e) => null));
 
       const yearlyCurrencyPairs =
+        is_in_exchange_country &&
         fundamentalsCurrency &&
         (await getAggregationThroughCacheIfPossible({
           cacheQuery: {
@@ -87,6 +90,7 @@ module.exports = {
 
       // EODFundamentals > yearlyFinancials
       const yearlyFinancials =
+        is_in_exchange_country &&
         Object.keys(fundamentalData).length &&
         fundamentalData.Highlights &&
         yearlyCurrencyPairs &&
