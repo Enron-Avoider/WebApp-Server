@@ -1,5 +1,4 @@
 import deepFind from 'deep-find';
-import numeral from 'numeral';
 import * as math from 'mathjs';
 // https://github.com/yashprit/deep-find#readme
 

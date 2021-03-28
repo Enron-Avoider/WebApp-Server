@@ -3,7 +3,6 @@ const rowKeys = {
     {
       title: "Total Revenue",
       oldTitle: "totalRevenue",
-      // subRows: []
     },
     {
       title: "Cost of Revenue",
@@ -153,14 +152,16 @@ const rowKeys = {
             {
               title: "Cash, Cash Equivalents & Short Term Investments",
               oldTitle: "cashAndShortTermInvestments",
-            },
-            {
-              title: "Short Term Investments",
-              oldTitle: "shortTermInvestments",
-            },
-            {
-              title: "Cash",
-              oldTitle: "cash",
+              subRows: [
+                {
+                  title: "Short Term Investments",
+                  oldTitle: "shortTermInvestments",
+                },
+                {
+                  title: "Cash",
+                  oldTitle: "cash",
+                },
+              ],
             },
             {
               title: "Receivables",
@@ -183,10 +184,6 @@ const rowKeys = {
             {
               title: "Property Plant Equipment",
               oldTitle: "propertyPlantEquipment",
-            },
-            {
-              title: "Property Plant Equipment Gross",
-              oldTitle: "propertyPlantAndEquipmentGross",
             },
             {
               title: "GoodWill",
@@ -316,6 +313,10 @@ const rowKeys = {
       title: "TODO: Not Organized Yet",
       subRows: [
         {
+          title: "Property Plant Equipment Gross",
+          oldTitle: "propertyPlantAndEquipmentGross",
+        },
+        {
           title: "earningAssets",
           oldTitle: "earningAssets",
         },
@@ -390,19 +391,14 @@ const rowKeys = {
     // "totalCashFromFinancingActivities": "-1104000000.00",
     // "changeToOperatingActivities": "5754000000.00",
     // "netIncome": "21331000000.00",
-    // "changeInCash": "5349000000.00",
-    // "beginPeriodCashFlow": "36410000000.00",
-    // "endPeriodCashFlow": "42377000000.00",
     // "totalCashFromOperatingActivities": "66064000000.00",
     // "depreciation": "25251000000.00",
     // "otherCashflowsFromInvestingActivities": "2771000000.00",
     // "dividendsPaid": null,
     // "changeToInventory": "-2849000000.00",
     // "changeToAccountReceivables": "-8169000000.00",
-    // "salePurchaseOfStock": null,
     // "otherCashflowsFromFinancingActivities": "-10076000000.00",
     // "changeToNetincome": "6001000000.00",
-    // "capitalExpenditures": "40140000000",
     // "changeReceivables": "-8169000000.00",
     // "cashFlowsOtherOperating": "1265000000.00",
     // "exchangeRateChanges": "618000000.00",
@@ -419,6 +415,30 @@ const rowKeys = {
     {
       title: "Financing Cash Flow",
       oldTitle: "totalCashFromFinancingActivities",
+    },
+
+    {
+      title: "End Cash Position",
+      oldTitle: "endPeriodCashFlow",
+      subRows: [
+        {
+          title: "Change In Cash",
+          oldTitle: "changeInCash",
+        },
+        {
+          title: "Beginning Cash Position",
+          oldTitle: "beginPeriodCashFlow",
+        },
+      ],
+    },
+
+    {
+      title: "Capital Expenditures",
+      oldTitle: "capitalExpenditures",
+    },
+    {
+      title: "Sale/Purchase Of Stock",
+      oldTitle: "salePurchaseOfStock",
     },
   ],
   aggregatedShares: [

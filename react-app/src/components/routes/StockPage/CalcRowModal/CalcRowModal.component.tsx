@@ -59,11 +59,11 @@ export default function NewCalcRowModal() {
 
     const calcRowOptions = stock ? [
         { path: 'yearlyFinancials.price', tableName: 'Price' },
+        { path: 'yearlyFinancials.marketCap', tableName: 'Market Cap' },
         { path: 'yearlyFinancials.aggregatedShares', tableName: 'Aggregated Shares' },
+        { path: 'yearlyFinancials.pl', tableName: 'Income Statement' },
         { path: 'yearlyFinancials.bs', tableName: 'Balance Sheet' },
         { path: 'yearlyFinancials.cf', tableName: 'Cash Flow' },
-        { path: 'yearlyFinancials.pl', tableName: 'Income Statement' },
-        { path: 'yearlyFinancials.marketCap', tableName: 'Market Cap' }
     ].reduce((acc: any, table: any) => {
         return [
             ...acc,
@@ -79,9 +79,29 @@ export default function NewCalcRowModal() {
                         ...p_,
                         {
                             value: `${table.path}.${row.title}.subRows.${row_.title}`.replace('yearlyFinancials.', ''),
-                            title: row.title + ' - ' + row_.title,
+                            title: row.title + ' > ' + row_.title,
                             type: table.tableName
-                        }
+                        },
+                        ...row_?.subRows ?
+                            row_.subRows.reduce((p__: any, row__: any) => [
+                                ...p__,
+                                {
+                                    value: `${table.path}.${row.title}.subRows.${row_.title}.subRows.${row__.title}`.replace('yearlyFinancials.', ''),
+                                    title: row.title + ' > ' + row_.title + ' > ' + row__.title,
+                                    type: table.tableName
+                                },
+                                ...row__?.subRows ?
+                                    row__.subRows.reduce((p___: any, row___: any) => [
+                                        ...p___,
+                                        {
+                                            value: `${table.path}.${row.title}.subRows.${row_.title}.subRows.${row__.title}.subRows.${row___.title}`.replace('yearlyFinancials.', ''),
+                                            title: row.title + ' > ' + row_.title + ' > ' + row__.title + ' > ' + row___.title,
+                                            type: table.tableName
+                                        }
+                                    ], []) :
+                                    []
+                            ], []) :
+                            []
                     ], []) :
                     []
             ], [])
@@ -114,18 +134,6 @@ export default function NewCalcRowModal() {
     const [titleValue, setTitleValue] = React.useState('');
     const [aboutValue, setAboutValue] = React.useState('');
     const [autocompleteValue, setAutocompleteValue] = React.useState([]);
-
-    console.log({
-        // ratioCollections,
-        // ratioCollection: searchParams.ratioCollection,
-        // ratio: searchParams.ratio,
-        // chosenCollectionName,
-        // chosenCollectionId,
-        // chosenCollection,
-        existingCalc,
-        autocompleteValue
-    });
-
 
     const handleOnChange = (e: any, v: any) => {
         setAutocompleteValue(v);
@@ -234,6 +242,17 @@ export default function NewCalcRowModal() {
         }
     }, [searchParams.ratio]);
 
+    // console.log({
+    //     // ratioCollections,
+    //     // ratioCollection: searchParams.ratioCollection,
+    //     // ratio: searchParams.ratio,
+    //     // chosenCollectionName,
+    //     // chosenCollectionId,
+    //     // chosenCollection,
+    //     calc,
+    //     scopeRows
+    // });
+
     return (
         <Dialog open={isOpen} onClose={handleClose}>
             <Box
@@ -316,9 +335,9 @@ export default function NewCalcRowModal() {
                                     <Chip
                                         variant={option?.type === 'Math' ? 'default' : 'outlined'}
                                         label={`
-                                                    ${(option?.type !== 'Math' && option?.type !== 'Price') ? option?.type + ' >' : ''}
-                                                    ${option?.title}
-                                                `}
+                                            ${(option?.type !== 'Math' && option?.type !== 'Price') ? option?.type + ' >' : ''}
+                                            ${option?.title}
+                                        `}
                                         {...getTagProps({ index })}
                                         className={`${option?.type}`}
                                         color={option?.type === 'Math' ? 'primary' : 'default'}

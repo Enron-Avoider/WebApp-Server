@@ -1,7 +1,5 @@
 import { gql } from "apollo-boost";
 
-import { stringifyWithoutQuotesOnKeys } from "@utils/stringifyWithoutQuotesOnKeys";
-
 export const GET_LAST_YEAR_COUNTS = gql`
     query($query: AggregationInputQuery ) { 
         getLastYearCounts(
@@ -67,7 +65,7 @@ export const GET_AGGREGATES_FOR_CALC_ROWS = ({
         (p, v) => ({
             ...p,
             [v]:
-                (v => `getAggregateForCalcRows(stockToRank:"${stock.name}", collectionId:"${collectionId}", calcs:${stringifyWithoutQuotesOnKeys(calcs) }, query: { ${v[0] === 'Stock_Related' ? v[1].replaceAll("_", " ") : v[0]
+                (v => `getAggregateForCalcRows(stockToRank:"${stock.name}", collectionId:"${collectionId}", query: { ${v[0] === 'Stock_Related' ? v[1].replaceAll("_", " ") : v[0]
                     }: "${v[0] === 'Stock_Related' ? stock[v[1]] : v[1]?.replaceAll("_", " ")
                     }"})`)
                     (v.split('__'))
