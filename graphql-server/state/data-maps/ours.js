@@ -35,30 +35,24 @@ const rowKeys = {
       oldTitle: "operatingIncome",
     },
     {
-      title: "Net Non Operating Interest",
+      title: "Other Income (Expense)",
+      oldTitle: "totalOtherIncomeExpenseNet",
+    },
+    {
+      title: "EBIT",
+      oldTitle: "ebit",
+    },
+    {
+      title: "Net Interest Income",
       oldTitle: "netInterestIncome",
       subRows: [
         {
-          title: "Interest Income Non Operating",
-          oldTitle: "interestIncome",
-        },
-        {
-          title: "Interest Expense Non Operating",
+          title: "Interest Expense",
           oldTitle: "interestExpense",
         },
-      ],
-    },
-    {
-      title: "Other Income Expense",
-      oldTitle: "totalOtherIncomeExpenseNet",
-      subRows: [
         {
-          title: "Interest Income Non Operating",
+          title: "Interest Income",
           oldTitle: "interestIncome",
-        },
-        {
-          title: "Interest Expense Non Operating",
-          oldTitle: "interestExpense",
         },
       ],
     },
@@ -67,51 +61,43 @@ const rowKeys = {
       oldTitle: "incomeBeforeTax",
     },
     {
-      title: "Tax Provision",
-      oldTitle: "taxProvision",
-    },
-    {
-      title: "Net Income Common Stockholders",
-      oldTitle: "netIncomeApplicableToCommonShares",
+      title: "Income Tax Expense",
+      oldTitle: "incomeTaxExpense",
+      subRows: [
+        {
+          title: "Tax Provision",
+          oldTitle: "taxProvision",
+        },
+      ],
     },
     {
       title: "Net Income",
       oldTitle: "netIncome",
+      subRows: [
+        {
+          title: "Net Income from Continuing Operations",
+          oldTitle: "netIncomeFromContinuingOps",
+        },
+        {
+          title: "Net Income Avail. to Common Stockholders",
+          oldTitle: "netIncomeApplicableToCommonShares",
+        },
+        {
+          title: "minorityInterest",
+          oldTitle: "minorityInterest",
+        },
+      ],
     },
     {
-      title: "EBIT",
-      oldTitle: "ebit",
-    },
-    {
-      title: "Net Income from Continuing Operations",
-      oldTitle: "netIncomeFromContinuingOps",
-    },
-    {
-      title: "TODO: Not Organized Yet",
+      title: "Not Used",
       subRows: [
         {
           title: "effectOfAccountingCharges",
           oldTitle: "effectOfAccountingCharges",
         },
         {
-          title: "minorityInterest",
-          oldTitle: "minorityInterest",
-        },
-        {
           title: "nonOperatingIncomeNetOther",
           oldTitle: "nonOperatingIncomeNetOther",
-        },
-        {
-          title: "interestExpense",
-          oldTitle: "interestExpense",
-        },
-        {
-          title: "interestIncome",
-          oldTitle: "interestIncome",
-        },
-        {
-          title: "netInterestIncome",
-          oldTitle: "netInterestIncome",
         },
         {
           title: "extraordinaryItems",
@@ -124,10 +110,6 @@ const rowKeys = {
         {
           title: "otherItems",
           oldTitle: "otherItems",
-        },
-        {
-          title: "incomeTaxExpense",
-          oldTitle: "incomeTaxExpense",
         },
         {
           title: "discontinuedOperations",
@@ -158,7 +140,7 @@ const rowKeys = {
                   oldTitle: "shortTermInvestments",
                 },
                 {
-                  title: "Cash",
+                  title: "Cash and Equivalents",
                   oldTitle: "cash",
                 },
               ],
@@ -178,31 +160,51 @@ const rowKeys = {
           ],
         },
         {
-          title: "Non-current assets",
+          title: "Long Term assets",
           oldTitle: "nonCurrentAssetsTotal",
           subRows: [
             {
-              title: "Property Plant Equipment",
+              title: "Property Plant Equipment Net",
               oldTitle: "propertyPlantEquipment",
+              subRows: [
+                {
+                  title: "Property Plant Equipment Gross",
+                  oldTitle: "propertyPlantAndEquipmentGross",
+                },
+                {
+                  title: "Accumulated Depreciation",
+                  oldTitle: "accumulatedDepreciation",
+                },
+                {
+                  title: "Accumulated Amortization",
+                  oldTitle: "accumulatedAmortization",
+                },
+              ],
             },
             {
               title: "GoodWill",
               oldTitle: "goodWill",
+              subRows: [
+                {
+                  title: "Negative Goodwill",
+                  oldTitle: "negativeGoodwill",
+                },
+              ],
             },
             {
               title: "Intangible Assets",
               oldTitle: "intangibleAssets",
             },
             {
-              title: "Accumulated Depreciation",
-              oldTitle: "accumulatedDepreciation",
-            },
-            {
               title: "Long Term Investments",
               oldTitle: "longTermInvestments",
             },
             {
-              title: "Other Non Current Assets",
+              title: "Earning Assets",
+              oldTitle: "earningAssets",
+            },
+            {
+              title: "Other Long Term Assets",
               oldTitle: "nonCurrrentAssetsOther",
             },
           ],
@@ -222,7 +224,7 @@ const rowKeys = {
           oldTitle: "totalCurrentLiabilities",
           subRows: [
             {
-              title: "Accounts Payable",
+              title: "Accounts Payable and Accrued Expenses",
               oldTitle: "accountsPayable",
             },
             {
@@ -236,9 +238,21 @@ const rowKeys = {
           ],
         },
         {
-          title: "Non-current Liabilities",
+          title: "Long Term Liabilities",
           oldTitle: "nonCurrentLiabilitiesTotal",
           subRows: [
+            {
+              title: "Long Term Debt",
+              oldTitle: "longTermDebtTotal",
+            },
+            {
+              title: "Capital Lease Obligations",
+              oldTitle: "capitalLeaseObligations",
+            },
+            {
+              title: "Other Long Term Liabilities",
+              oldTitle: "nonCurrentLiabilitiesOther",
+            },
             {
               title: "Deferred Long Term Liab",
               oldTitle: "deferredLongTermLiab",
@@ -246,18 +260,6 @@ const rowKeys = {
             {
               title: "Deferred Long Term Asset Charges",
               oldTitle: "deferredLongTermAssetCharges",
-            },
-            {
-              title: "Long Term Debt",
-              oldTitle: "longTermDebt",
-            },
-            {
-              title: "Long Term Debt",
-              oldTitle: "longTermDebtTotal",
-            },
-            {
-              title: "Other Non Current Liabilities",
-              oldTitle: "nonCurrentLiabilitiesOther",
             },
           ],
         },
@@ -274,22 +276,38 @@ const rowKeys = {
         {
           title: "Common Stock",
           oldTitle: "commonStock",
+          subRows: [
+            {
+              title: "Common Stock Shares Outstanding",
+              oldTitle: "commonStockSharesOutstanding",
+            },
+          ],
         },
         {
           title: "Retained Earnings",
           oldTitle: "retainedEarnings",
         },
         {
-          title: "Retained Earnings Total Equity",
-          oldTitle: "retainedEarningsTotalEquity",
+          title: "Capital Surplus",
+          oldTitle: "capitalSurpluse",
         },
         {
-          title: "Common Stock Total Equity",
-          oldTitle: "commonStockTotalEquity",
+          title: "Additional Paid In Capital",
+          oldTitle: "additionalPaidInCapital",
+        },
+        {
+          title: "Accumulated Other Comprehensive Income",
+          oldTitle: "accumulatedOtherComprehensiveIncome",
         },
         {
           title: "Preferred Stock Total Equity",
           oldTitle: "preferredStockTotalEquity",
+          subRows: [
+            {
+              title: "Preferred Stock Redeemable",
+              oldTitle: "preferredStockRedeemable",
+            },
+          ],
         },
         {
           title: "Treasury Stock",
@@ -298,6 +316,20 @@ const rowKeys = {
         {
           title: "Total Permanent Equity",
           oldTitle: "totalPermanentEquity",
+        },
+        {
+          title: "Warrants",
+          oldTitle: "warrants",
+        },
+        {
+          title: "Non Controlling Interest In Consolidated Entity",
+          oldTitle: "noncontrollingInterestInConsolidatedEntity",
+          subRows: [
+            {
+              title: "Temporary Equity Redeemable Non Controlling Interests",
+              oldTitle: "temporaryEquityRedeemableNoncontrollingInterests",
+            },
+          ],
         },
         {
           title: "Other Stockholder Equity",
@@ -310,15 +342,19 @@ const rowKeys = {
       oldTitle: "netTangibleAssets",
     },
     {
-      title: "TODO: Not Organized Yet",
+      title: "Not Used",
       subRows: [
         {
-          title: "Property Plant Equipment Gross",
-          oldTitle: "propertyPlantAndEquipmentGross",
+          title: "Common Stock Total Equity",
+          oldTitle: "commonStockTotalEquity",
         },
         {
-          title: "earningAssets",
-          oldTitle: "earningAssets",
+          title: "Retained Earnings Total Equity",
+          oldTitle: "retainedEarningsTotalEquity",
+        },
+        {
+          title: "longTermDebt",
+          oldTitle: "longTermDebt",
         },
         {
           title: "shortTermDebt",
@@ -333,88 +369,86 @@ const rowKeys = {
           oldTitle: "shortLongTermDebtTotal",
         },
         {
-          title: "noncontrollingInterestInConsolidatedEntity",
-          oldTitle: "noncontrollingInterestInConsolidatedEntity",
-        },
-        {
-          title: "temporaryEquityRedeemableNoncontrollingInterests",
-          oldTitle: "temporaryEquityRedeemableNoncontrollingInterests",
-        },
-        {
-          title: "accumulatedOtherComprehensiveIncome",
-          oldTitle: "accumulatedOtherComprehensiveIncome",
-        },
-        {
-          title: "additionalPaidInCapital",
-          oldTitle: "additionalPaidInCapital",
-        },
-        {
-          title: "accumulatedAmortization",
-          oldTitle: "accumulatedAmortization",
-        },
-        {
-          title: "capitalLeaseObligations",
-          oldTitle: "capitalLeaseObligations",
-        },
-        {
-          title: "negativeGoodwill",
-          oldTitle: "negativeGoodwill",
-        },
-        {
-          title: "warrants",
-          oldTitle: "warrants",
-        },
-        {
-          title: "preferredStockRedeemable",
-          oldTitle: "preferredStockRedeemable",
-        },
-        {
-          title: "capitalSurpluse",
-          oldTitle: "capitalSurpluse",
-        },
-        {
           title: "liabilitiesAndStockholdersEquity",
           oldTitle: "liabilitiesAndStockholdersEquity",
-        },
-        {
-          title: "commonStockSharesOutstanding",
-          oldTitle: "commonStockSharesOutstanding",
         },
       ],
     },
   ],
   cf: [
-    // "investments": "-22242000000.00",
-    // "changeToLiabilities": "23234000000.00",
-    // "totalCashflowsFromInvestingActivities": "-59611000000.00",
-    // "netBorrowings": "8972000000.00",
-    // "totalCashFromFinancingActivities": "-1104000000.00",
-    // "changeToOperatingActivities": "5754000000.00",
-    // "netIncome": "21331000000.00",
-    // "totalCashFromOperatingActivities": "66064000000.00",
-    // "depreciation": "25251000000.00",
-    // "otherCashflowsFromInvestingActivities": "2771000000.00",
-    // "dividendsPaid": null,
-    // "changeToInventory": "-2849000000.00",
-    // "changeToAccountReceivables": "-8169000000.00",
-    // "otherCashflowsFromFinancingActivities": "-10076000000.00",
-    // "changeToNetincome": "6001000000.00",
-    // "changeReceivables": "-8169000000.00",
-    // "cashFlowsOtherOperating": "1265000000.00",
-    // "exchangeRateChanges": "618000000.00",
-    // "cashAndCashEquivalentsChanges": "5967000000.00"
-
     {
       title: "Operating Cash Flow",
       oldTitle: "totalCashFromOperatingActivities",
+      subRows: [
+        {
+          title: "Net Income",
+          oldTitle: "netIncome",
+        },
+        {
+          title: "Depreciation",
+          oldTitle: "depreciation",
+        },
+        {
+          title: "Change To Inventory",
+          oldTitle: "changeToInventory",
+        },
+        {
+          title: "Change To Account Receivables",
+          oldTitle: "changeToAccountReceivables",
+        },
+        {
+          title: "Change To Operating Activities",
+          oldTitle: "changeToOperatingActivities",
+        },
+        {
+          title: "Other Operating Cash Flows",
+          oldTitle: "cashFlowsOtherOperating",
+        },
+      ],
     },
     {
       title: "Investing Cash Flow",
       oldTitle: "totalCashflowsFromInvestingActivities",
+      subRows: [
+        {
+          title: "Capital Expenditures",
+          oldTitle: "capitalExpenditures",
+        },
+        {
+          title: "Investments",
+          oldTitle: "investments",
+        },
+        {
+          title: "Other Cash Flows From Investing Activities",
+          oldTitle: "otherCashflowsFromInvestingActivities",
+        },
+      ],
     },
     {
       title: "Financing Cash Flow",
       oldTitle: "totalCashFromFinancingActivities",
+      subRows: [
+        {
+          title: "Dividends Paid",
+          oldTitle: "dividendsPaid",
+        },
+        {
+          title: "Sale (Purchase) Of Stock",
+          oldTitle: "salePurchaseOfStock",
+        },
+        {
+          title: "Cash And Cash Equivalents Changes",
+          oldTitle: "cashAndCashEquivalentsChanges",
+        },
+        {
+          title: "Other Cash Flows From Financing Activities",
+          oldTitle: "otherCashflowsFromFinancingActivities",
+        },
+        {
+          title: "Exchange Rate Changes",
+          oldTitle: "exchangeRateChanges",
+        },
+      ],
     },
 
     {
@@ -431,14 +465,26 @@ const rowKeys = {
         },
       ],
     },
-
     {
-      title: "Capital Expenditures",
-      oldTitle: "capitalExpenditures",
-    },
-    {
-      title: "Sale/Purchase Of Stock",
-      oldTitle: "salePurchaseOfStock",
+      title: "Not Used",
+      subRows: [
+        {
+          title: "changeToNetincome",
+          oldTitle: "changeToNetincome",
+        },
+        {
+          title: "changeReceivables",
+          oldTitle: "changeReceivables",
+        },
+        {
+          title: "netBorrowings",
+          oldTitle: "netBorrowings",
+        },
+        {
+          title: "changeToLiabilities",
+          oldTitle: "changeToLiabilities",
+        },
+      ],
     },
   ],
   aggregatedShares: [

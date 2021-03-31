@@ -56,9 +56,10 @@ const convertEODFundamentalsToEarlyFinancials = (
       ...Object.entries(r).reduce(
         (acc, [key, value]) => ({
           ...acc,
-          [key]: isNaN(value)
-            ? value
-            : Number(value) * Number(yearlyCurrencyPairs.perYear[key]),
+          [key]:
+            isNaN(value) || value === null
+              ? value
+              : Number(value) * Number(yearlyCurrencyPairs.perYear[key]),
         }),
         {}
       ),

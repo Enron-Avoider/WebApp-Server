@@ -242,17 +242,6 @@ export default function NewCalcRowModal() {
         }
     }, [searchParams.ratio]);
 
-    // console.log({
-    //     // ratioCollections,
-    //     // ratioCollection: searchParams.ratioCollection,
-    //     // ratio: searchParams.ratio,
-    //     // chosenCollectionName,
-    //     // chosenCollectionId,
-    //     // chosenCollection,
-    //     calc,
-    //     scopeRows
-    // });
-
     return (
         <Dialog open={isOpen} onClose={handleClose}>
             <Box

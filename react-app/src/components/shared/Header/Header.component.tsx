@@ -53,6 +53,7 @@ export default function Header() {
                                 </Link_>
                             </Box>
                             <Badge
+                                className="hide-on-mobile"
                                 anchorOrigin={{
                                     vertical: 'bottom',
                                     horizontal: 'right',
@@ -86,7 +87,6 @@ export default function Header() {
                         </Box>
 
                         <Box
-                            className="hide-on-mobile"
                             display="flex"
                             flexDirection="row"
                             justifyContent="center"
@@ -94,6 +94,7 @@ export default function Header() {
                         // ml={-22}
                         >
                             <Link
+                                className="hide-on-mobile"
                                 style={{
                                     ...window.location.pathname.includes('/stock/') && { fontWeight: 'bold' },
                                     // marginLeft: '5px'
@@ -112,6 +113,7 @@ export default function Header() {
                                 Stock
                             </Link>
                             <Link
+                                className="hide-on-mobile"
                                 style={{
                                     ...window.location.pathname.includes('/ranking/') && { fontWeight: 'bold' },
                                     marginLeft: '15px'
@@ -130,6 +132,7 @@ export default function Header() {
                                 Rank
                             </Link>
                             <Link
+                                className="hide-on-mobile"
                                 style={{
                                     marginLeft: '15px',
                                 }}

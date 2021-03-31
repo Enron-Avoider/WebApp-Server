@@ -224,7 +224,7 @@ export default function Table(
                                                                 {showPercentage && changePercentage && cell.column.id !== 'expander' ?
                                                                     `${changePercentage[cell.column.id]}%` :
                                                                     cell.column.id !== 'expander' ?
-                                                                        <span title={numeral(cell.value).format('0,0[.]00')}>{numeral(cell.value).format('(0.00a)')}</span> :
+                                                                        <span title={numeral(cell.value).format('0,0[.]00')}>{cell.value === null ? '-' : numeral(cell.value).format('(0.00a)')}</span> :
                                                                         (
                                                                             <span
                                                                                 {...row.getToggleRowExpandedProps()}
