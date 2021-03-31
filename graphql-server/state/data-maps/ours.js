@@ -83,7 +83,7 @@ const rowKeys = {
           oldTitle: "netIncomeApplicableToCommonShares",
         },
         {
-          title: "minorityInterest",
+          title: "Minority Interest",
           oldTitle: "minorityInterest",
         },
       ],
@@ -355,10 +355,6 @@ const rowKeys = {
         {
           title: "longTermDebt",
           oldTitle: "longTermDebt",
-        },
-        {
-          title: "shortTermDebt",
-          oldTitle: "shortTermDebt",
         },
         {
           title: "shortLongTermDebt",

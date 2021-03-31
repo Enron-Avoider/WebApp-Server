@@ -10,6 +10,7 @@ import { GET_USER_KEYS } from "@state/byModel/User/UserKey.localQueries";
 import { GET_USER_BY_ID } from '@state/byModel/User/User.queries';
 import StockSearcher from '@components/shared/StockSearcher';
 import LoginModal from './LoginModal';
+import AlphaWarningModal from './AlphaWarningModal';
 
 import './style.sass';
 
@@ -34,6 +35,7 @@ export default function Header() {
     return (
         <>
             <LoginModal />
+            <AlphaWarningModal />
             <AppBar position="fixed">
                 <Toolbar>
                     <Box display="flex" width={'100%'} justifyContent="space-between">
