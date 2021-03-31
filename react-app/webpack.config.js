@@ -47,6 +47,9 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       template: "src/index.html",
+      templateParameters: {
+        env: process.env.NODE_ENV,
+      },
       favicon: "src/assets/favicon.ico",
     }),
     new webpack.DefinePlugin({

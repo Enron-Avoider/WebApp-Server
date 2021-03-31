@@ -46,10 +46,10 @@ export default function Header() {
                             justifyContent="center"
                             alignItems="center"
                         >
-                            <Box mr={2}>
+                            <Box mr={1}>
                                 <Link_ color="inherit" to={{
                                     pathname: `/home`,
-                                    search: (getNewSearchParamsString({ paramsToAdd: { ticker: allSearchParams.ticker || 'BRK-A' } }) as string)
+                                    search: (getNewSearchParamsString({ paramsToAdd: { ticker: allSearchParams.ticker || 'AMZN' } }) as string)
                                 }}>
                                     <img className="logo" src={logoImg} />
                                 </Link_>
@@ -106,7 +106,7 @@ export default function Header() {
                                 variant="subtitle1"
                                 to={
                                     {
-                                        pathname: `/stock/BRK-A`,
+                                        pathname: `/stock/AMZN`,
                                         search: (getNewSearchParamsString({ keysToRemove: ['ticker'] }) as string)
                                     }
                                 }
@@ -126,7 +126,7 @@ export default function Header() {
                                 to={
                                     {
                                         pathname: `/ranking/pl.Total Revenue`,
-                                        search: (getNewSearchParamsString({ paramsToAdd: { ticker: allSearchParams.ticker || 'BRK-A' } }) as string)
+                                        search: (getNewSearchParamsString({ paramsToAdd: { ticker: allSearchParams.ticker || 'AMZN' } }) as string)
                                     }
                                 }
                                 target="_blank"

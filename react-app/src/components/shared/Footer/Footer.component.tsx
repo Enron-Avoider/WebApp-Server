@@ -32,7 +32,7 @@ export default function Footer() {
                     </Box>
                 </Box>
                 <Box display="flex">
-                    <b>Community</b>:
+                    <b>Feedback</b>:
                     <Box ml={1}>
                         <Link href="https://discord.gg/NBgpx5guRe" color="primary" target="_blank">
                             <Box display="flex" alignItems="center">

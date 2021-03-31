@@ -41,7 +41,7 @@ function App() {
                             component={loadable(() => import('./components/routes/Home'))}
                         />
 
-                        <Redirect from="/" to="/stock/BRK-A?comparisons=Stock_Related__industry&ratioCollections=Valuation.9PJQ" />
+                        <Redirect from="/" to="/stock/AMZN?comparisons=Stock_Related__industry&ratioCollections=Valuation.9PJQ" />
                     </Switch>
                     <Footer />
                 </Container>

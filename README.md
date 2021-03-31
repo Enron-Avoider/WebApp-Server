@@ -18,8 +18,7 @@ npm run dev
 ### App
 ```
 cd react-app
-npm run build
-npm run update
+npm run deploy
 ```
 ### Server
 ```

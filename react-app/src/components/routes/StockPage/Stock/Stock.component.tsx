@@ -199,7 +199,7 @@ export const Stock: FunctionComponent<{
                                     stock={stock}
                                     ticker={ticker}
                                 />
-                                <Paper>
+                                {/* <Paper>
                                     <Box display="flex" flexDirection="row" p={2} mt={2}>
                                         <div>
                                             <Typography variant="h5">
@@ -211,7 +211,7 @@ export const Stock: FunctionComponent<{
                                             >[ In Development ]</Typography>
                                         </div>
                                     </Box>
-                                </Paper>
+                                </Paper> */}
 
                                 <Paper>
                                     <Table
