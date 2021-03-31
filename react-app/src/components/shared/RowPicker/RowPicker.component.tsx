@@ -125,7 +125,7 @@ export const RowPicker: FunctionComponent<{}> = ({ }) => {
                         value && value.map((option: any, index: number) => {
                             return (
                                 <Chip
-                                    label={`[${option?.type}] ${option?.title}`}
+                                    label={`${option?.type}: ${option?.title}`}
                                     {...getTagProps({ index })}
                                     className={`${option?.type}`}
                                     onDelete={undefined}

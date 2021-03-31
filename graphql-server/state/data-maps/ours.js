@@ -35,7 +35,7 @@ const rowKeys = {
       oldTitle: "operatingIncome",
     },
     {
-      title: "Other Income (Expense)",
+      title: "Other Income",
       oldTitle: "totalOtherIncomeExpenseNet",
     },
     {
@@ -43,7 +43,7 @@ const rowKeys = {
       oldTitle: "ebit",
     },
     {
-      title: "Net Interest Income",
+      title: "Net Interest",
       oldTitle: "netInterestIncome",
       subRows: [
         {
@@ -61,7 +61,7 @@ const rowKeys = {
       oldTitle: "incomeBeforeTax",
     },
     {
-      title: "Income Tax Expense",
+      title: "Tax Expense",
       oldTitle: "incomeTaxExpense",
       subRows: [
         {

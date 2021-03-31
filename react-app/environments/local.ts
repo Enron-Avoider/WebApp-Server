@@ -1,4 +1,5 @@
 export default {
     environment: 'local',
-    graphql: '//localhost:4000/',
+    website: 'http://localhost:8080',
+    graphql: '//localhost:4000',
 }

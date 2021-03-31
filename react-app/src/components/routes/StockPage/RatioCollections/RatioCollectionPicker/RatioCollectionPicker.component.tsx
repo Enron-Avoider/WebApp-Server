@@ -85,7 +85,7 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
                         value.map((option: any, index: number) => {
                             return (
                                 <Chip
-                                    label={`[${option.type}] ${option.title}`}
+                                    label={`${option.type}: ${option.title}`}
                                     {...getTagProps({ index })}
                                     className={`${option.type}`}
                                     // color={'default'}

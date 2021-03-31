@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { useQuery } from "react-apollo";
 import { useLocation, useHistory, Link as Link_ } from "react-router-dom";
-
+import { DiscussionEmbed } from 'disqus-react';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -15,6 +15,7 @@ import {
     Link,
 } from '@material-ui/core';
 
+import env from '@env';
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import { GET_AGGREGATES_FOR_FINANCIAL_ROWS } from '@state/byModel/Aggregate/aggregate.queries';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
@@ -100,7 +101,7 @@ export const Stock: FunctionComponent<{
                                                                     </Typography>
                                                                     <Box ml={1}>
                                                                         <Typography variant="body2">
-                                                                            ({ticker})
+                                                                            ({stock.code})
                                                                         </Typography>
                                                                     </Box>
                                                                 </Box>
@@ -238,7 +239,7 @@ export const Stock: FunctionComponent<{
                                         >
                                             <Typography variant="h5">
                                                 Financial Statements
-                                    </Typography>
+                                            </Typography>
 
                                             <ToggleButtonGroup size="small" exclusive value={visibleFinancials || 'pl'} onChange={handleVisibleFinancials} color="primary">
                                                 <ToggleButton value="pl" defaultChecked>Income Statement</ToggleButton>
@@ -295,14 +296,35 @@ export const Stock: FunctionComponent<{
                         <Paper>
                             <Box display="flex" flexDirection="row" p={2} mt={2}>
                                 <div>
-                                    <Typography variant="h5">
-                                        About
-                                </Typography>
+                                    <Typography
+                                        variant="h5"
+                                    >About</Typography>
                                     <Typography
                                         display="block"
                                         variant="body1"
                                     >{stock.description}</Typography>
                                 </div>
+                            </Box>
+                        </Paper>
+
+                        <Paper>
+                            <Box display="flex" flexDirection="column" p={2} mt={2}>
+                                <Typography
+                                    variant="h5"
+                                >Comments</Typography>
+
+                                <br />
+
+                                <DiscussionEmbed
+                                    shortname='enronavoider'
+                                    config={
+                                        {
+                                            url: `${env.website}/stock/${stock.code}`,
+                                            identifier: `enronavoiderstock${stock.code}`,
+                                            title: stock.name,
+                                        }
+                                    }
+                                />
                             </Box>
                         </Paper>
                     </>

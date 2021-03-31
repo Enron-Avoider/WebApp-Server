@@ -65,7 +65,7 @@ export default function getComparisonOptions() {
     const getComparisonOption = (value: string) => {
         const option = comparisonOptions.find((c: any) => c.value === value);
 
-        return `[${option?.type}] ${option?.title}`;
+        return `${option?.type}: ${option?.title}`;
     };
 
     const pickedComparisons = allSearchParams.comparisons?.split('-')

@@ -17,7 +17,9 @@ import {
     Chip
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import { DiscussionEmbed } from 'disqus-react';
 
+import env from '@env';
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
 import {
     GET_RATIO_COLLECTIONS,
@@ -353,20 +355,26 @@ export default function NewCalcRowModal() {
 
                     )}
 
-                    {/* <pre>{JSON.stringify(Object.values(scopeRows), null, 2)}</pre>
-                    <pre>{JSON.stringify(calcRow, null, 2)}</pre> */}
+                    {/* {existingCalc && (
+                        <Box display="flex" flexDirection="column" p={2} mt={2}>
+                            <Typography
+                                variant="h5"
+                            >Comments</Typography>
 
-                    {/*
+                            <br />
 
-                    <Box p={2}></Box>
-
-                    <pre>{JSON.stringify(autocompleteValue, null, 2)}</pre>
-
-                    <Box p={2}></Box>
-
-                    <pre>{JSON.stringify(calc, null, 2)}</pre>
-
-                    <Box p={2}></Box> */}
+                            <DiscussionEmbed
+                                shortname='enronavoider'
+                                config={
+                                    {
+                                        url: `${env.website}`,
+                                        identifier: `enronavoidercalc1`,
+                                        title: `${existingCalc.title} on ${chosenCollectionName}`,
+                                    }
+                                }
+                            />
+                        </Box>
+                    )} */}
 
                 </DialogContent>
 

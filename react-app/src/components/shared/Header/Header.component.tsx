@@ -133,7 +133,7 @@ export default function Header() {
                             >
                                 Rank
                             </Link>
-                            <Link
+                            {/* <Link
                                 className="hide-on-mobile"
                                 style={{
                                     marginLeft: '15px',
@@ -150,9 +150,12 @@ export default function Header() {
                                 target="_blank"
                             >
                                 Explore
-                            </Link>
+                            </Link> */}
                             <Box
                                 ml={5}
+                                className="hide-on-mobile"
+                            ></Box>
+                            <Box
                                 display="flex"
                                 width={210}
                             >
@@ -162,10 +165,12 @@ export default function Header() {
 
                         <Box display="flex" overflow="visible" alignItems="center">
                             {/* <StockSearcher /> */}
-                            <Typography variant="caption">
-                                Currency in USD
-                            </Typography>
-                            <Box ml={1}>
+                            <Box mr={1} className="hide-on-mobile">
+                                <Typography variant="caption">
+                                    Currency in USD
+                                </Typography>
+                            </Box>
+                            <Box>
                                 {/* <Avatar alt="You" src="http://www.gstatic.com/tv/thumb/persons/73202/73202_v9_bb.jpg" /> */}
                                 {user ? (
                                     <Avatar
