@@ -778,13 +778,13 @@ module.exports = {
           .toArray()
       )[0];
 
-    isAdmin = async ({ id }) => (await this.getUserById({ id })).isPlatformAdmin;
+    isAdmin = async ({ id }) =>
+      (await this.getUserById({ id })).isPlatformAdmin;
 
     saveUser = async ({ user, userId }) => {
+      const isAdmin = await this.isAdmin({ id: userId });
 
-      const isAdmin = await this.isAdmin({id: userId});
-
-      const userInDB = await this.getUserById({id: user.id});
+      const userInDB = await this.getUserById({ id: user.id });
 
       const newNanoid = await this.getUniqueNanoid(
         this.mongoDBUsersCollectionTable,

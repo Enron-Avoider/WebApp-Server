@@ -3,7 +3,7 @@ module.exports = {
     searchStocks: async (_source, params, { dataSources }) =>
       await dataSources.Ours.searchStocks(params),
     getStockByCode: async (_source, params, { dataSources }) =>
-      await dataSources.Ours.getStockByCode(params),
+        dataSources.Ours.getStockByCode(params),
     //   dataSources.EODDataAPI.getStockByCode(
     //     params,
     //     dataSources
