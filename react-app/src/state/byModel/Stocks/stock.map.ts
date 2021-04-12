@@ -41,5 +41,5 @@ export const mergeCalculationsAndAggregates = ({
     ...Object.entries(aggregates).reduce((p_, [aggKey, aggValue]: any) => ({
         ...p_,
         [aggKey]: convertAggregateArrayToObjectWithYearlyKeys(aggValue.calcRows[`calc_${calculation.title}`]),
-    }), { key: `${collectionId}/${calculation.title}` }),
+    }), { key: `${collectionId}/${encodeURIComponent(calculation.title)}` }),
 }));

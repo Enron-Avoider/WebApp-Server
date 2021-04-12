@@ -31,7 +31,7 @@ module.exports = {
             ],
             is_in_exchange_country: true,
           },
-          { name: 1, code: 1, market_capitalization: 1 }
+          { name: 1, code: 1, market_capitalization: 1, EODExchange: 1 }
         )
         .sort({ market_capitalization: -1 })
         .limit(10)
@@ -43,13 +43,25 @@ module.exports = {
     getStockByCode = async ({ code }) => {
       const [Ticker, EODExchange] = code.split(".");
 
+      //   console.log({
+      //     code,
+      //     Ticker,
+      //     EODExchange,
+      //   });
+
       const stockInDB = await this.mongoDBStocksTable.findOne({
         code: Ticker,
         ...(EODExchange && { EODExchange }),
         is_in_exchange_country: true,
       });
 
-      return stockInDB;
+      return stockInDB
+        ? {
+            ...stockInDB,
+            // weird fix for when the logo string is an object for some unknown reason
+            logo: typeof stockInDB.logo === "object" ? null : stockInDB.logo,
+          }
+        : null;
     };
 
     getLastYearCounts = async ({ query }) => {
@@ -101,6 +113,7 @@ module.exports = {
       cacheQuery,
       getUncachedAggregationFn,
       getUncachedAggregationParameters,
+      updateAlways = false,
     }) => {
       const aggregationInDB = (
         await this.mongoDBAggregationsCacheTable
@@ -110,8 +123,29 @@ module.exports = {
           .toArray()
       )[0];
 
-      if (!!aggregationInDB) {
-        // console.log("in db", { cacheQuery });
+      if (
+        !!aggregationInDB &&
+        (updateAlways ||
+          (new Date() - new Date(aggregationInDB.retrieved_at)) /
+            (1000 * 60 * 60 * 24) >
+            14)
+      ) {
+        const object = await getUncachedAggregationFn(
+          getUncachedAggregationParameters
+        );
+        const updated = await this.mongoDBAggregationsCacheTable.updateOne(
+          { _id: aggregationInDB._id },
+          {
+            $set: {
+              cacheQuery,
+              object,
+              retrieved_at: Date.now(),
+            },
+          }
+        );
+        return object;
+      } else if (!!aggregationInDB) {
+        console.log("in db", { cacheQuery });
         return aggregationInDB.object;
       } else {
         // console.log("not in db", { cacheQuery });
@@ -123,7 +157,6 @@ module.exports = {
           object,
           retrieved_at: Date.now(),
         });
-        await new Promise((t) => setTimeout(t, 1000));
         return object;
       }
     };
@@ -168,6 +201,7 @@ module.exports = {
                               $project: {
                                 name: 1,
                                 code: 1,
+                                EODExchange: 1,
                                 "yearlyFinancialsByYear.year": 1,
                                 [path]: { $toDecimal: `$${path}` },
                               },
@@ -195,6 +229,7 @@ module.exports = {
                                   $push: {
                                     company: "$name",
                                     code: "$code",
+                                    EODExchange: "$EODExchange",
                                     v: `$${path}`,
                                   },
                                 },
@@ -391,6 +426,7 @@ module.exports = {
                           $project: {
                             name: 1,
                             code: 1,
+                            EODExchange: 1,
                             "yearlyFinancialsByYear.year": 1,
                             [`calc_${fieldName}`]: {
                               $toDecimal: `$calc_${fieldName}`,
@@ -421,6 +457,7 @@ module.exports = {
                               $push: {
                                 company: "$name",
                                 code: "$code",
+                                EODExchange: "$EODExchange",
                                 v: `$${`calc_${fieldName}`}`,
                               },
                             },

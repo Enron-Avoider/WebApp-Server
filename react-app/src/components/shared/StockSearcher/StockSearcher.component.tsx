@@ -67,7 +67,7 @@ export default function StockSearcher() {
                                     component={Link}
                                     to={
                                         {
-                                            pathname: `/stock/${d.code}`,
+                                            pathname: `/stock/${d.code}.${d.EODExchange}`,
                                             search: (getNewSearchParamsString({ keysToRemove: ['ticker'] }) as string)
                                         }
                                     }

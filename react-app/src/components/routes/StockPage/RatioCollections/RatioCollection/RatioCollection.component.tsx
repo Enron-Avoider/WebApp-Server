@@ -28,7 +28,6 @@ export const RatioCollection: FunctionComponent<{
     collection
 }) => {
 
-        // console.log({ collection });
         const { loading: UserKeysLoading, error: UserKeysError, data: UserKeysData } = useQuery(GET_USER_KEYS);
         const userKey = UserKeysData?.userKeys?.length && UserKeysData?.userKeys[0].id;
         const { pickedComparisons } = getComparisonOptions();
@@ -76,23 +75,6 @@ export const RatioCollection: FunctionComponent<{
             aggregates: aggregatesForCalcRows,
             collectionId: collection.id
         })
-
-        // console.log({
-        //     // aggregatesList: stock && pickedComparisons || [],
-        //     // stock,
-        //     // collectionId: collection.id,
-        //     // calcs: collection.calcs,
-        //     // q: useQuery(GET_AGGREGATES_FOR_CALC_ROWS({
-        //     //     aggregatesList: stock && pickedComparisons || [],
-        //     //     stock,
-        //     //     collectionId: collection.id,
-        //     //     calcs: collection.calcs
-        //     // })),
-        //     // stock,
-        //     // collection,
-        //     // aggregatesForCalcRows,
-        //     // mergedCalculationsAndAggregates
-        // });
 
         return (
             <Grid item xs={(12) as any}>

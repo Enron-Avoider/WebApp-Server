@@ -166,7 +166,7 @@ export const RankingItem: FunctionComponent<{
                             color="inherit"
                             to={
                                 {
-                                    pathname: `/stock/${y.companies[i]?.code}`,
+                                    pathname: `/stock/${y.companies[i]?.code}.${y.companies[i]?.EODExchange}`,
                                     search: (getNewSearchParamsString({ keysToRemove: ['ticker'] }) as string)
                                 }
                             }
