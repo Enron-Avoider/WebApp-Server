@@ -59,11 +59,6 @@ module.exports = {
       const priceCurrency =
         fundamentalData.General && fundamentalData.General.CurrencyCode;
 
-      console.log({
-        fundamentalsCurrency,
-        priceCurrency,
-      });
-
       const yearlyCurrencyPairsForFundamental =
         is_in_exchange_country &&
         fundamentalsCurrency &&
@@ -241,8 +236,6 @@ module.exports = {
 
       const isGBX = currency === "GBX";
 
-      console.log({ currency, toCurrency, isGBX });
-
       const getCurrencyToCurrencyTimeseries =
         !areCurrenciesSame &&
         (await this.get(
@@ -398,11 +391,9 @@ module.exports = {
 
                 console.log({
                   onlySkippedStocks,
+                  onlyFailedStocks,
+                  totalProgress: `${j} of ${ExchangesFromEODAPI.length} exchanges`,
                   exchange: `${exchange.Name} - ${exchange.Code}`,
-                  totalProgress: `${(
-                    (j / ExchangesFromEODAPI.length) *
-                    100
-                  ).toFixed(2)}%`,
                   exchangeProgress: `${(
                     (i / exchangeStockBatches.length) *
                     100

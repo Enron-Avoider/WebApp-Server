@@ -3,11 +3,11 @@ module.exports = {
     searchStocks: async (_source, params, { dataSources }) =>
       await dataSources.Ours.searchStocks(params),
     getStockByCode: async (_source, params, { dataSources }) =>
-      //   dataSources.Ours.getStockByCode(params),
-      dataSources.EODDataAPI.getStockByCode(
-        params,
-        dataSources
-      ),
+      await dataSources.Ours.getStockByCode(params),
+    //   dataSources.EODDataAPI.getStockByCode(
+    //     params,
+    //     dataSources
+    //   ),
     getLastYearCounts: async (_source, params, { dataSources }) =>
       dataSources.Ours.getLastYearCounts(params),
     getAggregateForFinancialRows: async (_source, params, { dataSources }) =>
@@ -19,7 +19,7 @@ module.exports = {
     getUserById: async (_source, params, { dataSources }) =>
       dataSources.Ours.getUserById(params),
     getRows: async (_source, params, { dataSources }) =>
-        dataSources.Ours.getRows(params),
+      dataSources.Ours.getRows(params),
 
     // Internal
     getCurrencyToCurrencyTimeseries: async (_source, params, { dataSources }) =>
