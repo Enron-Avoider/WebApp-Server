@@ -14,7 +14,8 @@ const typeDefs = gql`
     currency_code: String
     fundamentalsCurrency: String
     finalCurrency: String
-    yearlyCurrencyPairs: JSON
+    yearlyCurrencyPairsForFundamental: JSON
+    yearlyCurrencyPairsForPrice: JSON
     market_capitalization: String
     sector: String
     industry: String
@@ -84,8 +85,6 @@ const typeDefs = gql`
     ): JSON
 
     getAllExchanges: JSON
-    updateStocksCompletely: JSON
-    removeEmptyAndDuplicates: JSON
     getCurrencyToCurrencyTimeseries(currency: String, toCurrency: String): JSON
     getIndustryStocks(name: String): JSON
     getExchangeStocks(code: String): JSON
@@ -98,6 +97,8 @@ const typeDefs = gql`
   type Mutation {
     saveRatioCollection(ratioCollection: JSON, userId: String): RatioCollection
     saveUser(user: JSON, userId: String): User
+    updateStocksCompletely(userId: String): JSON
+    removeEmptyAndDuplicates(userId: String): JSON
     # resetCache(key: String!): JSON
   }
 `;

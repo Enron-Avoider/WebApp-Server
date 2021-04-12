@@ -79,7 +79,7 @@ const rowKeys = {
           oldTitle: "netIncomeFromContinuingOps",
         },
         {
-          title: "Net Income Avail. to Common Stockholders",
+          title: "Net Income Available to Common Stockholders",
           oldTitle: "netIncomeApplicableToCommonShares",
         },
         {
@@ -228,7 +228,7 @@ const rowKeys = {
               oldTitle: "accountsPayable",
             },
             {
-              title: "Short Term Debpt",
+              title: "Short Term Debt",
               oldTitle: "shortTermDebt",
             },
             {
@@ -273,16 +273,17 @@ const rowKeys = {
       title: "Equity",
       oldTitle: "totalStockholderEquity",
       subRows: [
-        {
-          title: "Common Stock",
-          oldTitle: "commonStock",
-          subRows: [
-            {
-              title: "Common Stock Shares Outstanding",
-              oldTitle: "commonStockSharesOutstanding",
-            },
-          ],
-        },
+        // Common Stock is messed up because of currency conversion
+        // {
+        //   title: "Common Stock",
+        //   oldTitle: "commonStock",
+        //   subRows: [
+        //     {
+        //       title: "Common Stock Shares Outstanding",
+        //       oldTitle: "commonStockSharesOutstanding",
+        //     },
+        //   ],
+        // },
         {
           title: "Retained Earnings",
           oldTitle: "retainedEarnings",

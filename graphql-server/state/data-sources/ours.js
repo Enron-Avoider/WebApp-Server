@@ -469,11 +469,11 @@ module.exports = {
         ? await this.getAggregationThroughCacheIfPossible({
             cacheQuery: {
               type: "calcRows",
-          query,
-          stockToRank,
-          companiesForRow,
+              query,
+              stockToRank,
+              companiesForRow,
               collectionId,
-          calcs: collection.calcs,
+              calcs: collection.calcs,
             },
             getUncachedAggregationFn: getCalcRows,
             getUncachedAggregationParameters: {
@@ -755,7 +755,7 @@ module.exports = {
         const created = await this.mongoDBRatioCollectionTable.insertOne({
           ...ratioCollection,
           id: newNanoid,
-          ownerUserId: userId
+          ownerUserId: userId,
         });
         console.log(`created ${ratioCollection.name} ${newNanoid}`);
       }
@@ -773,36 +773,31 @@ module.exports = {
       (
         await this.mongoDBUsersCollectionTable
           .find({
-            id: id,
+            id,
           })
           .toArray()
       )[0];
 
-    saveUser = async ({ user }) => {
-      // TODO: check permission
+    isAdmin = async ({ id }) => (await this.getUserById({ id })).isPlatformAdmin;
 
-      const userInDB =
-        user.id &&
-        (
-          await this.mongoDBUsersCollectionTable
-            .find({
-              id: user.id,
-            })
-            .toArray()
-        )[0];
+    saveUser = async ({ user, userId }) => {
+
+      const isAdmin = await this.isAdmin({id: userId});
+
+      const userInDB = await this.getUserById({id: user.id});
 
       const newNanoid = await this.getUniqueNanoid(
         this.mongoDBUsersCollectionTable,
         10
       );
 
-      if (!!userInDB) {
+      if (!!userInDB && isAdmin) {
         const updated = await this.mongoDBUsersCollectionTable.updateOne(
           { _id: userInDB._id },
           { $set: { ...user } }
         );
         console.log(`updated ${user.name} ${user.id}`);
-      } else {
+      } else if (isAdmin) {
         const created = await this.mongoDBUsersCollectionTable.insertOne({
           ...user,
           id: newNanoid,
@@ -811,8 +806,10 @@ module.exports = {
       }
 
       return {
-        ...user,
-        id: !!userInDB ? userInDB.id : newNanoid,
+        ...(isAdmin && {
+          ...user,
+          id: !!userInDB ? userInDB.id : newNanoid,
+        }),
       };
     };
 

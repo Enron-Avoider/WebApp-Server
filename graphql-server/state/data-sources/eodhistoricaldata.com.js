@@ -23,22 +23,13 @@ module.exports = {
       this.s3 = s3;
     }
 
-    getStockByCode = async ({ code }, getAggregationThroughCacheIfPossible) => {
+    getStockByCode = async ({ code }, dataSources) => {
       const fundamentalData = await this.get(
         `
           https://eodhistoricaldata.com/api/fundamentals/${code}?
             api_token=${this.keys.eodhistoricaldata}
         `.replace(/\s/g, "")
       );
-
-      //   console.log({
-      //     c: fundamentalData.General.AddressData.Country.toLowerCase(),
-      //     cc: fundamentalData.General.CountryISO.toLowerCase(),
-      //     ccc: regionNamesInEnglish
-      //       .of(fundamentalData.General.CountryISO)
-      //       .toLowerCase(),
-      //     a: fundamentalData.General.Address.toLowerCase(),
-      //   });
 
       const is_in_exchange_country =
         fundamentalData.General &&
@@ -65,17 +56,18 @@ module.exports = {
         fundamentalData.Financials &&
         fundamentalData.Financials.Balance_Sheet.currency_symbol;
 
-      //   const yearlyCurrencyPairs =
-      //     fundamentalsCurrency &&
-      //     (await this.getCurrencyToCurrencyTimeseries({
-      //       currency: fundamentalsCurrency,
-      //       toCurrency: "USD",
-      //     }).catch((e) => null));
+      const priceCurrency =
+        fundamentalData.General && fundamentalData.General.CurrencyCode;
 
-      const yearlyCurrencyPairs =
+      console.log({
+        fundamentalsCurrency,
+        priceCurrency,
+      });
+
+      const yearlyCurrencyPairsForFundamental =
         is_in_exchange_country &&
         fundamentalsCurrency &&
-        (await getAggregationThroughCacheIfPossible({
+        (await dataSources.Ours.getAggregationThroughCacheIfPossible({
           cacheQuery: {
             type: "yearlyCurrencyPair",
             currency: fundamentalsCurrency,
@@ -88,16 +80,33 @@ module.exports = {
           },
         }));
 
+      const yearlyCurrencyPairsForPrice =
+        is_in_exchange_country &&
+        priceCurrency &&
+        (await dataSources.Ours.getAggregationThroughCacheIfPossible({
+          cacheQuery: {
+            type: "yearlyCurrencyPair",
+            currency: priceCurrency,
+            toCurrency: "USD",
+          },
+          getUncachedAggregationFn: this.getCurrencyToCurrencyTimeseries,
+          getUncachedAggregationParameters: {
+            currency: priceCurrency,
+            toCurrency: "USD",
+          },
+        }));
+
       // EODFundamentals > yearlyFinancials
       const yearlyFinancials =
         is_in_exchange_country &&
         Object.keys(fundamentalData).length &&
         fundamentalData.Highlights &&
-        yearlyCurrencyPairs &&
+        yearlyCurrencyPairsForFundamental &&
         EODDataMaps.convertEODFundamentalsToEarlyFinancials(
           fundamentalData,
           priceData,
-          yearlyCurrencyPairs
+          yearlyCurrencyPairsForFundamental,
+          yearlyCurrencyPairsForPrice
         );
 
       // yearlyFinancials > yearlyFinancialsWithKeys
@@ -166,8 +175,12 @@ module.exports = {
             currency_code: fundamentalData.General.CurrencyCode,
             fundamentalsCurrency,
             finalCurrency: "USD",
-            yearlyCurrencyPairs:
-              yearlyCurrencyPairs && yearlyCurrencyPairs.perYear,
+            yearlyCurrencyPairsForFundamental:
+              yearlyCurrencyPairsForFundamental &&
+              yearlyCurrencyPairsForFundamental.perYear,
+            yearlyCurrencyPairsForPrice:
+              yearlyCurrencyPairsForPrice &&
+              yearlyCurrencyPairsForPrice.perYear,
             market_capitalization:
               fundamentalData.Highlights.MarketCapitalization,
             sector: fundamentalData.General.Sector,
@@ -188,21 +201,6 @@ module.exports = {
       return await this.get(`
         https://eodhistoricaldata.com/api/exchanges-list/?api_token=${this.keys.eodhistoricaldata}
       `);
-    };
-
-    // Deprecated
-    getAllIndustries = async () => {
-      //   const csv = await this.get(
-      //     `http://eodhistoricaldata.com/download/SectorIndustries.csv`
-      //   );
-      //   const json = (
-      //     await new Promise((r) =>
-      //       parse(csv, { columns: true, trim: true }, (err, output) => r(output))
-      //     )
-      //   )
-      //     .filter((item) => item.industry !== "\\N")
-      //     .filter((item) => item.industry.length);
-      //   return json;
     };
 
     getExchangeStocks = async ({ code }) => {
@@ -241,11 +239,17 @@ module.exports = {
     getCurrencyToCurrencyTimeseries = async ({ currency, toCurrency }) => {
       const areCurrenciesSame = currency === toCurrency;
 
+      const isGBX = currency === "GBX";
+
+      console.log({ currency, toCurrency, isGBX });
+
       const getCurrencyToCurrencyTimeseries =
         !areCurrenciesSame &&
         (await this.get(
           `
-            https://eodhistoricaldata.com/api/eod/${currency}${toCurrency}.FOREX?
+            https://eodhistoricaldata.com/api/eod/${
+              isGBX ? "GBP" : currency
+            }${toCurrency}.FOREX?
                 fmt=json&
                 api_token=${this.keys.eodhistoricaldata}
         `
@@ -253,7 +257,10 @@ module.exports = {
 
       const perYear = !areCurrenciesSame
         ? getCurrencyToCurrencyTimeseries.reduce(
-            (p, c) => ({ ...p, [c.date.substring(0, 4)]: c.close }),
+            (p, c) => ({
+              ...p,
+              [c.date.substring(0, 4)]: isGBX ? c.close / 100 : c.close,
+            }),
             {}
           )
         : Array(45)
@@ -270,7 +277,7 @@ module.exports = {
       };
     };
 
-    saveBatchOfStocksToDB = async ({ stockBatch }) => {
+    saveBatchOfStocksToDB = async ({ stockBatch }, dataSources) => {
       const workingBatch = await Promise.all(
         stockBatch.map(async ({ Code, Exchange, EODExchange }, i) => {
           const stockInDB = (
@@ -291,9 +298,12 @@ module.exports = {
             return "Skipped [Updated < 14 days ago]: " + Code + "." + Exchange;
           }
 
-          const stock = await this.getStockByCode({
-            code: Code + "." + EODExchange,
-          })
+          const stock = await this.getStockByCode(
+            {
+              code: Code + "." + EODExchange,
+            },
+            dataSources
+          )
             .then((s) => ({
               ...s,
               ...(!s.is_in_exchange_country && {
@@ -303,15 +313,13 @@ module.exports = {
               }),
             }))
             .catch((e) => {
-              console.log(
-                "Failed: " + Code + "." + Exchange + "." + EODExchange
-              );
+              console.log("Failed_: " + Code + "." + EODExchange, !!stockInDB);
               return {};
             });
 
           // console.log(`${Code}.${Exchange} ${!!stockInDB} ${stock.is_in_exchange_country}`);
 
-          if (!!stockInDB) {
+          if (!!stockInDB && stock.code) {
             const updated = await this.mongoDBStocksTable.updateOne(
               { _id: stockInDB._id },
               { $set: { ...stock } }
@@ -329,73 +337,101 @@ module.exports = {
       return workingBatch;
     };
 
-    updateStocksCompletely = async () => {
-      // get exchanges
-      const ExchangesFromEODAPI = await this.getAllExchanges();
-      // get exchange Stock codes
-      const loopThroughExchangesOneByOne = await ExchangesFromEODAPI.reduce(
-        async (accUnresolved, exchange, j) => {
-          const accResolved = await accUnresolved;
+    updateStocksCompletely = async ({ userId }, dataSources) => {
+      const isAdmin = await dataSources.Ours.isAdmin({ id: userId });
 
-          //   console.log(`working on exchange`, { exchange: exchange.Name });
+      if (isAdmin) {
+        // get exchanges
+        const ExchangesFromEODAPI = await this.getAllExchanges();
+        // get exchange Stock codes
+        const loopThroughExchangesOneByOne = await ExchangesFromEODAPI.reduce(
+          async (accUnresolved, exchange, j) => {
+            const accResolved = await accUnresolved;
 
-          await new Promise((t) => setTimeout(t, 1000));
+            //   console.log(`working on exchange`, { exchange: exchange.Name });
 
-          const exchangeStocks = (
-            await this.getExchangeStocks({
-              code: exchange.Code,
-            })
-          ).stocks;
+            await new Promise((t) => setTimeout(t, 1000));
 
-          // bundle stock codes
-          const exchangeStockBatches = chunkUp(exchangeStocks, 10);
+            const exchangeStocks = (
+              await this.getExchangeStocks({
+                code: exchange.Code,
+              })
+            ).stocks;
 
-          const savedExchangeStocks = await exchangeStockBatches.reduce(
-            async (accUnresolved, stockBatch, i) => {
-              const accResolved = await accUnresolved;
+            // bundle stock codes
+            const exchangeStockBatches = chunkUp(exchangeStocks, 10);
 
-              //   await new Promise((t) => setTimeout(t, 100));
-              const savedStocks = await this.saveBatchOfStocksToDB({
-                stockBatch,
-              });
+            const savedExchangeStocks = await exchangeStockBatches.reduce(
+              async (accUnresolved, stockBatch, i) => {
+                const accResolved = await accUnresolved;
 
-              const onlySkippedStocks =
-                savedStocks.reduce(
-                  (p, c) => (c.includes("Skipped") ? p + 1 : p),
-                  0
-                ) === 10;
+                //   await new Promise((t) => setTimeout(t, 100));
+                const savedStocks = await this.saveBatchOfStocksToDB(
+                  {
+                    stockBatch,
+                  },
+                  dataSources
+                );
 
-              await new Promise((t) =>
-                setTimeout(t, onlySkippedStocks ? 10 : 100)
-              );
+                const onlySkippedStocks =
+                  savedStocks.reduce(
+                    (p, c) => (c.includes("Skipped") ? p + 1 : p),
+                    0
+                  ) === 10;
 
-              console.log({
-                onlySkippedStocks,
-                exchange: exchange.Name,
-                exchangeProgress: `${(j / ExchangesFromEODAPI.length) * 100}%`,
-                progressStock: `${(i / exchangeStockBatches.length) * 100}%`,
-                savedStocks,
-              });
+                const onlyFailedStocks =
+                  savedStocks.reduce(
+                    (p, c) => (c.includes("Failed") ? p + 1 : p),
+                    0
+                  ) === 10;
 
-              return [...accResolved, ...savedStocks];
-            },
-            []
-          );
+                await new Promise((t) =>
+                  setTimeout(
+                    t,
+                    onlyFailedStocks
+                      ? 24.1 * 60 * 60 * 1000
+                      : onlySkippedStocks
+                      ? 10
+                      : 100
+                  )
+                );
 
-          return [
-            ...accResolved,
-            {
-              ...exchange,
-              stockCount: exchangeStocks.length,
-              exchangeStockBatchesCount: exchangeStockBatches.length,
-              savedExchangeStocks,
-            },
-          ];
-        },
-        []
-      );
+                console.log({
+                  onlySkippedStocks,
+                  exchange: `${exchange.Name} - ${exchange.Code}`,
+                  totalProgress: `${(
+                    (j / ExchangesFromEODAPI.length) *
+                    100
+                  ).toFixed(2)}%`,
+                  exchangeProgress: `${(
+                    (i / exchangeStockBatches.length) *
+                    100
+                  ).toFixed(2)}%`,
+                  savedStocks,
+                });
 
-      return loopThroughExchangesOneByOne;
+                return [...accResolved, ...savedStocks];
+              },
+              []
+            );
+
+            return [
+              ...accResolved,
+              {
+                ...exchange,
+                stockCount: exchangeStocks.length,
+                exchangeStockBatchesCount: exchangeStockBatches.length,
+                savedExchangeStocks,
+              },
+            ];
+          },
+          []
+        );
+
+        return loopThroughExchangesOneByOne;
+      } else {
+        return null;
+      }
     };
   },
 };

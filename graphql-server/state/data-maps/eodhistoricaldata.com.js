@@ -5,7 +5,8 @@ const { rowKeys, rowKeysPaths } = require("./ours");
 const convertEODFundamentalsToEarlyFinancials = (
   fundamentalData,
   priceData,
-  yearlyCurrencyPairs
+  yearlyCurrencyPairsForFundamental,
+  yearlyCurrencyPairsForPrice
 ) => {
   // TODO: Get longest range out of all financials
   const yearRange = Object.keys(fundamentalData.Financials.Balance_Sheet.yearly)
@@ -185,16 +186,16 @@ const convertEODFundamentalsToEarlyFinancials = (
                 y: yearRange,
               }),
               ({ f, y }) => convertStatementToTable(f, y),
-              (table) => convertCurrencyInTable(table, yearlyCurrencyPairs),
+              (table) => convertCurrencyInTable(table, yearlyCurrencyPairsForFundamental),
               (table) => organizeTable(table, statementShortName)
             )(),
           }),
           {}
         )
       : []),
-    price: convertCurrencyInTable([pricesByYear], yearlyCurrencyPairs),
+    price: convertCurrencyInTable([pricesByYear], yearlyCurrencyPairsForPrice),
     aggregatedShares: [aggregatedShares],
-    marketCap: convertCurrencyInTable([marketCap], yearlyCurrencyPairs),
+    marketCap: convertCurrencyInTable([marketCap], yearlyCurrencyPairsForPrice),
   };
 };
 

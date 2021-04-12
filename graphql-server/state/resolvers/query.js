@@ -6,7 +6,7 @@ module.exports = {
       //   dataSources.Ours.getStockByCode(params),
       dataSources.EODDataAPI.getStockByCode(
         params,
-        dataSources.Ours.getAggregationThroughCacheIfPossible
+        dataSources
       ),
     getLastYearCounts: async (_source, params, { dataSources }) =>
       dataSources.Ours.getLastYearCounts(params),
@@ -28,9 +28,5 @@ module.exports = {
       dataSources.EODDataAPI.getExchangeStocks(params),
     getAllExchanges: async (_source, params, { dataSources }) =>
       dataSources.EODDataAPI.getAllExchanges(params),
-    updateStocksCompletely: async (_source, params, { dataSources }) =>
-      dataSources.EODDataAPI.updateStocksCompletely(params),
-    removeEmptyAndDuplicates: async (_source, params, { dataSources }) =>
-      dataSources.Ours.removeEmptyAndDuplicates(params),
   },
 };

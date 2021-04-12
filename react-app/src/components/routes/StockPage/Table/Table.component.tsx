@@ -166,9 +166,6 @@ export default function Table(
                                 <path d={PercentagePath} />
                             </SvgIcon>
                         </IconButton>
-                        {/* <IconButton color={showGraph ? 'secondary' : 'primary'} onClick={toggleShowGraph}>
-                            <Equalizer />
-                        </IconButton> */}
                     </Box>
                 </Box>
             )}
