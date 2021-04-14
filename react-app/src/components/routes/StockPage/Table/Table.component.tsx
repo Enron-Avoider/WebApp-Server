@@ -29,7 +29,6 @@ const math = require("mathjs");
 import PercentagePath from "@assets/icon-paths/percentage";
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import NewCalcRowButton from '../NewCalcRowButton';
-import GraphCard from './GraphCard';
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
 
 import "./style.sass";
