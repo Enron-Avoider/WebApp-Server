@@ -23,7 +23,7 @@ module.exports = {
       this.s3 = s3;
     }
 
-    getStockByCode = async ({ code }, dataSources) => {
+    getProviderStockByCode = async ({ code }, dataSources) => {
       const fundamentalData = await this.get(
         `
           https://eodhistoricaldata.com/api/fundamentals/${code}?
@@ -286,9 +286,9 @@ module.exports = {
             !!stockInDB &&
             (new Date() - new Date(stockInDB.retrieved_at)) /
               (1000 * 60 * 60 * 24) <
-              14
+              30
           ) {
-            return "Skipped [Updated < 14 days ago]: " + Code + "." + Exchange;
+            return "Skipped [Updated < 30 days ago]: " + Code + "." + Exchange;
           }
 
           const stock = await this.getStockByCode(

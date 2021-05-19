@@ -445,6 +445,10 @@ const rowKeys = {
           title: "Exchange Rate Changes",
           oldTitle: "exchangeRateChanges",
         },
+        {
+          title: "Net Borrowings",
+          oldTitle: "netBorrowings",
+        },
       ],
     },
 
@@ -472,10 +476,6 @@ const rowKeys = {
         {
           title: "changeReceivables",
           oldTitle: "changeReceivables",
-        },
-        {
-          title: "netBorrowings",
-          oldTitle: "netBorrowings",
         },
         {
           title: "changeToLiabilities",

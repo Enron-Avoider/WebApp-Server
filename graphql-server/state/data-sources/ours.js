@@ -145,7 +145,7 @@ module.exports = {
         );
         return object;
       } else if (!!aggregationInDB) {
-        console.log("in db", { cacheQuery });
+        // console.log("in db", { cacheQuery });
         return aggregationInDB.object;
       } else {
         // console.log("not in db", { cacheQuery });
@@ -565,9 +565,9 @@ module.exports = {
             !!stockInDB &&
             (new Date() - new Date(stockInDB.retrieved_at)) /
               (1000 * 60 * 60 * 24) <
-              14
+              30
           ) {
-            return "Skipped [Updated < 14 days ago]: " + Code + "." + Exchange;
+            return "Skipped [Updated < 30 days ago]: " + Code + "." + Exchange;
           }
 
           const stock = await this.getStockByCode({

@@ -3,11 +3,9 @@ module.exports = {
     searchStocks: async (_source, params, { dataSources }) =>
       await dataSources.Ours.searchStocks(params),
     getStockByCode: async (_source, params, { dataSources }) =>
-        dataSources.Ours.getStockByCode(params),
-    //   dataSources.EODDataAPI.getStockByCode(
-    //     params,
-    //     dataSources
-    //   ),
+      dataSources.Ours.getStockByCode(params),
+    getProviderStockByCode: async (_source, params, { dataSources }) =>
+      dataSources.EODDataAPI.getProviderStockByCode(params, dataSources),
     getLastYearCounts: async (_source, params, { dataSources }) =>
       dataSources.Ours.getLastYearCounts(params),
     getAggregateForFinancialRows: async (_source, params, { dataSources }) =>

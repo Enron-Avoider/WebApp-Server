@@ -70,6 +70,7 @@ const typeDefs = gql`
   type Query {
     searchStocks(name: String): [Stock]
     getStockByCode(code: String): Stock
+    getProviderStockByCode(code: String): Stock
     getLastYearCounts(query: AggregationInputQuery): JSON
     getAggregateForFinancialRows(
         query: AggregationInputQuery,
