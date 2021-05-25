@@ -91,25 +91,25 @@ module.exports = {
           },
         }));
 
-      // EODFundamentals > yearlyFinancials
+      // EODFundamentals > yearlyFinancials  // FOR TABLE
       const yearlyFinancials =
         is_in_exchange_country &&
         Object.keys(fundamentalData).length &&
         fundamentalData.Highlights &&
         yearlyCurrencyPairsForFundamental &&
-        EODDataMaps.convertEODFundamentalsToEarlyFinancials(
+        EODDataMaps.convertEODFundamentalsToYearlyFinancials(
           fundamentalData,
           priceData,
           yearlyCurrencyPairsForFundamental,
           yearlyCurrencyPairsForPrice
         );
 
-      // yearlyFinancials > yearlyFinancialsWithKeys
+      // yearlyFinancials > yearlyFinancialsWithKeys // FOR scopeToRows
       const yearlyFinancialsWithKeys =
         yearlyFinancials &&
         EODDataMaps.yearlyFinancialsWithKeys(yearlyFinancials);
 
-      // yearlyFinancialsWithKeys > yearlyFinancialsByYear
+      // yearlyFinancialsWithKeys > yearlyFinancialsByYear  // FOR AGGREGATIONS
       const yearlyFinancialsByYear =
         yearlyFinancialsWithKeys &&
         EODDataMaps.yearlyFinancialsFlatByYear(yearlyFinancialsWithKeys);
@@ -117,6 +117,12 @@ module.exports = {
       // TODO (maybe could  simplify)
       // EODFundamentals > yearlyFinancialsByYear
       // yearlyFinancialsByYear > yearlyFinancialsWithKeys
+      const dataByYear = EODDataMaps.convertEODFundamentalsToDataByYear(
+        fundamentalData,
+        priceData,
+        yearlyCurrencyPairsForFundamental,
+        yearlyCurrencyPairsForPrice
+      );
 
       const getUploadedImg = async (logoUrl) => {
         const logoMimeType = logoUrl.split(/\.(?=[^\.]+$)/)[1];
@@ -161,6 +167,7 @@ module.exports = {
             code: fundamentalData.General.Code,
             name: fundamentalData.General.Name,
             country: fundamentalData.General.CountryName,
+            url: fundamentalData.General.WebURL,
             exchange: fundamentalData.General.Exchange,
             EODExchange:
               fundamentalData.General.CountryISO === "US"
@@ -187,6 +194,7 @@ module.exports = {
             yearlyFinancialsByYear,
             retrieved_at: Date.now(),
             is_in_exchange_country,
+            dataByYear
             // has_biggest_last_year_market_cap
           }
         : {};

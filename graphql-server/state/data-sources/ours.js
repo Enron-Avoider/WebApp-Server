@@ -73,8 +73,8 @@ module.exports = {
             {
               $match: {
                 ...query,
-                "yearlyFinancials.years": {
-                  $in: [`${lastYear}`],
+                "yearlyFinancialsByYear.year": {
+                  $in: [`${lastYear-1}`],
                 },
                 is_in_exchange_country: true,
               },

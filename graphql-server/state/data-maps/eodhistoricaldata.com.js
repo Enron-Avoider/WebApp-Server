@@ -2,7 +2,7 @@ const pipe = require("../utils/pipe");
 
 const { rowKeys, rowKeysPaths } = require("./ours");
 
-const convertEODFundamentalsToEarlyFinancials = (
+const convertEODFundamentalsToYearlyFinancials = (
   fundamentalData,
   priceData,
   yearlyCurrencyPairsForFundamental,
@@ -25,9 +25,8 @@ const convertEODFundamentalsToEarlyFinancials = (
       {}
     );
 
-    const lastYearInStatement = Object.keys(yearFormat)[
-      Object.keys(yearFormat).length - 1
-    ];
+    const lastYearInStatement =
+      Object.keys(yearFormat)[Object.keys(yearFormat).length - 1];
 
     const rows =
       Object.entries(yearFormat).length &&
@@ -186,7 +185,11 @@ const convertEODFundamentalsToEarlyFinancials = (
                 y: yearRange,
               }),
               ({ f, y }) => convertStatementToTable(f, y),
-              (table) => convertCurrencyInTable(table, yearlyCurrencyPairsForFundamental),
+              (table) =>
+                convertCurrencyInTable(
+                  table,
+                  yearlyCurrencyPairsForFundamental
+                ),
               (table) => organizeTable(table, statementShortName)
             )(),
           }),
@@ -316,10 +319,212 @@ const yearlyFinancialsFlatByYear = (yearlyFinancialsWithKeys) => {
   return res;
 };
 
+const convertEODFundamentalsToDataByYear = (
+  fundamentalData,
+  priceData,
+  yearlyCurrencyPairsForFundamental,
+  yearlyCurrencyPairsForPrice
+) => {
+  // TODO: Get longest range out of all financials
+  const yearRange = Object.keys(fundamentalData.Financials.Balance_Sheet.yearly)
+    .length
+    ? Object.keys(fundamentalData.Financials.Balance_Sheet.yearly)
+        .map((y) => y.substring(0, 4))
+        .filter((value, index, self) => self.indexOf(value) === index)
+    : [];
+
+  const convertStatementToByYear = (statement, yearRange) => {
+    const yearFormat = Object.entries(statement).reduce(
+      (acc, [key, value]) => ({
+        ...acc,
+        [key.substring(0, 4)]: value,
+      }),
+      {}
+    );
+
+    const lastYearInStatement =
+      Object.keys(yearFormat)[Object.keys(yearFormat).length - 1];
+
+    const rows =
+      Object.entries(yearFormat).length &&
+      Object.entries(yearFormat[lastYearInStatement]).map(
+        ([key, value]) => key
+      );
+
+    const newFormat = rows
+      ? yearRange.reduce(
+          (acc, y) => ({
+            ...acc,
+            [y]: rows.reduce(
+              (acc, r) => ({
+                ...acc,
+                [r]: yearFormat[y] ? yearFormat[y][r] : null,
+              }),
+              {}
+            ),
+          }),
+          {}
+        )
+      : [];
+
+    //   rows.reduce(
+    //       (acc, r) => ({
+    //         ...acc,
+    //         [r]: yearRange.reduce(
+    //           (acc, y) => ({
+    //             ...acc,
+    //             [y]: yearFormat[y] ? yearFormat[y][r] : null,
+    //           }),
+    //           {}
+    //         ),
+    //       }),
+    //       {}
+    //     )
+    //   : [];
+
+    return newFormat;
+  };
+
+  const statementsByYear = yearRange.length
+    ? [
+        ["pl", "Income_Statement"],
+        ["bs", "Balance_Sheet"],
+        ["cf", "Cash_Flow"],
+      ].reduce(
+        (p, [statementShortName, statementInEOD]) => ({
+          ...p,
+          [statementShortName]: pipe(
+            () => ({
+              f: fundamentalData.Financials[statementInEOD].yearly,
+              y: yearRange,
+            }),
+            ({ f, y }) => convertStatementToByYear(f, y)
+          )(),
+        }),
+        {}
+      )
+    : [];
+
+  const convertCurrencyInTable = (table, yearlyCurrencyPairs) => {
+    return table.map((r) => ({
+      ...r,
+      ...Object.entries(r).reduce(
+        (acc, [key, value]) => ({
+          ...acc,
+          [key]:
+            isNaN(value) || value === null
+              ? value
+              : Number(value) * Number(yearlyCurrencyPairs.perYear[key]),
+        }),
+        {}
+      ),
+    }));
+  };
+
+  const pricesByYear = yearRange.reduce(
+    (acc, y) => ({
+      ...acc,
+      [y]: (() => {
+        const yearPrices = priceData.filter((p) => p.date.includes(y));
+
+        const lastYearPrice =
+          yearPrices.length &&
+          yearPrices.reduce(function (prev, current) {
+            return prev.date > current.date ? prev : current;
+          });
+
+        return yearPrices.length ? lastYearPrice.close : null;
+      })(),
+    }),
+    {}
+  );
+
+  const aggregatedShares = (() => {
+    if (Object.keys(fundamentalData.outstandingShares.annual).length) {
+      const yearSharesFormat = Object.entries(
+        fundamentalData.outstandingShares.annual
+      ).reduce(
+        (acc, [key, value]) => ({
+          ...acc,
+          [value.date]: value.shares,
+        }),
+        {}
+      );
+
+      return {
+        lastYearOnly: false,
+        ...yearRange.reduce(
+          (acc, y) => ({
+            ...acc,
+            [y]: yearSharesFormat[y],
+          }),
+          {}
+        ),
+      };
+    } else {
+      return {
+        lastYearOnly: true,
+        ...yearRange.reduce(
+          (acc, y) => ({
+            ...acc,
+            [y]: fundamentalData.SharesStats.SharesOutstanding,
+          }),
+          {}
+        ),
+      };
+    }
+  })();
+
+  const marketCap = yearRange.reduce(
+    (acc, y) => ({
+      ...acc,
+      [y]: (() => pricesByYear[y] * aggregatedShares[y])(),
+    }),
+    {}
+  );
+
+  const stockDataByYear = {
+    pricesByYear,
+    aggregatedShares,
+    marketCap,
+  };
+
+  const flatByYear = yearRange.map((year) => ({
+    year,
+    EOD: {
+      ...Object.keys(statementsByYear).reduce(
+        (acc, k) => ({
+          ...acc,
+          [k]: statementsByYear[k][year],
+        }),
+        {}
+      ),
+      ...Object.keys(stockDataByYear).reduce(
+        (acc, k) => ({
+          ...acc,
+          [k]: stockDataByYear[k][year],
+        }),
+        {}
+      ),
+    },
+  }));
+
+  return {
+    flatByYear,
+    statementsByYear,
+    sharesByYear: {
+      pricesByYear,
+      aggregatedShares,
+      marketCap,
+    },
+  };
+};
+
 module.exports = {
   rowKeys,
   rowKeysPaths,
-  convertEODFundamentalsToEarlyFinancials,
+  convertEODFundamentalsToYearlyFinancials,
   yearlyFinancialsWithKeys,
   yearlyFinancialsFlatByYear,
+  convertEODFundamentalsToDataByYear,
 };

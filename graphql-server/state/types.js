@@ -8,6 +8,7 @@ const typeDefs = gql`
     name: String
     adjusted_close: String
     country: String
+    url: String
     exchange: String
     EODExchange: String
     currency_symbol: String
@@ -24,6 +25,7 @@ const typeDefs = gql`
     yearlyFinancials: YearlyFinancials
     yearlyFinancialsWithKeys: JSON
     yearlyFinancialsByYear: JSON
+    dataByYear: JSON
     retrieved_at: String
     is_in_exchange_country: Boolean
   }

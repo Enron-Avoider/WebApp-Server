@@ -12,11 +12,6 @@ import {
     Typography,
     Link,
     IconButton,
-    Card,
-    CardActions,
-    CardContent,
-    Button,
-    ClickAwayListener,
     SvgIcon,
     Popper,
     MenuList,
@@ -32,7 +27,6 @@ import NewCalcRowButton from '../NewCalcRowButton';
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
 
 import "./style.sass";
-import { boolean } from "mathjs";
 
 const getRowPercentages = (row: any, years: any) =>
     [...years]
@@ -308,7 +302,8 @@ export default function Table(
                     title={title}
                     ticker={ticker || ''}
                     collectionName={collectionName}
-                />}
+                />
+            }
         </Box>
 
     );

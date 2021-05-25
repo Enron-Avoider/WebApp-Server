@@ -29,13 +29,13 @@ console.log({ env });
     });
     const client = new ApolloClient({
         uri: env.graphql,
-        cache,
+        ...env.environment !== 'development' && { cache },
         resolvers: {
             Mutation: {
                 ...todoResolvers.Mutation,
                 ...userKeysResolvers.Mutation
             }
-        }
+        },
     });
 
     // TODO: incapsulate in promises and handle Indiviualy.
