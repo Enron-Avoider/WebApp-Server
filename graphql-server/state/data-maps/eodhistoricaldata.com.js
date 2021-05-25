@@ -452,7 +452,6 @@ const convertEODFundamentalsToDataByYear = (
       );
 
       return {
-        lastYearOnly: false,
         ...yearRange.reduce(
           (acc, y) => ({
             ...acc,
@@ -463,14 +462,7 @@ const convertEODFundamentalsToDataByYear = (
       };
     } else {
       return {
-        lastYearOnly: true,
-        ...yearRange.reduce(
-          (acc, y) => ({
-            ...acc,
-            [y]: fundamentalData.SharesStats.SharesOutstanding,
-          }),
-          {}
-        ),
+        [yearRange[0]]: fundamentalData.SharesStats.SharesOutstanding,
       };
     }
   })();
@@ -487,22 +479,26 @@ const convertEODFundamentalsToDataByYear = (
     pricesByYear,
     aggregatedShares,
     marketCap,
+    employees: { [yearRange[0]]: fundamentalData.General.FullTimeEmployees },
+    providerMarketCap: {
+      [yearRange[0]]: fundamentalData.Highlights.MarketCapitalization,
+    },
   };
 
   const flatByYear = yearRange.map((year) => ({
     year,
     EOD: {
-      ...Object.keys(statementsByYear).reduce(
-        (acc, k) => ({
-          ...acc,
-          [k]: statementsByYear[k][year],
-        }),
-        {}
-      ),
       ...Object.keys(stockDataByYear).reduce(
         (acc, k) => ({
           ...acc,
           [k]: stockDataByYear[k][year],
+        }),
+        {}
+      ),
+      ...Object.keys(statementsByYear).reduce(
+        (acc, k) => ({
+          ...acc,
+          [k]: statementsByYear[k][year],
         }),
         {}
       ),
