@@ -10,7 +10,7 @@ const atlasCredentials = require("./credentials/atlas-credentials.json");
 const awsCredentials = require("./credentials/aws-credentials.json");
 
 const mongoClient = new MongoClient(
-  `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@aiaiaiaminhavida.oobyz.mongodb.net/Enron?retryWrites=true&w=majority`,
+  `mongodb+srv://${atlasCredentials.username}:${atlasCredentials.password}@cluster1.iq5zj.mongodb.net/Enron?retryWrites=true&w=majority`,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,

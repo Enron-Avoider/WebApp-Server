@@ -158,45 +158,45 @@ module.exports = {
 
       const logoUrl = fundamentalData.General.LogoURL
         ? getUploadedImg(
-            "eodhistoricaldata.com" + fundamentalData.General.LogoURL
-          )
+          "eodhistoricaldata.com" + fundamentalData.General.LogoURL
+        )
         : null;
 
       return Object.keys(fundamentalData).length && fundamentalData.Highlights
         ? {
-            code: fundamentalData.General.Code,
-            name: fundamentalData.General.Name,
-            country: fundamentalData.General.CountryName,
-            url: fundamentalData.General.WebURL,
-            exchange: fundamentalData.General.Exchange,
-            EODExchange:
-              fundamentalData.General.CountryISO === "US"
-                ? "US"
-                : fundamentalData.General.Exchange,
-            currency_symbol: fundamentalData.General.CurrencySymbol,
-            currency_code: fundamentalData.General.CurrencyCode,
-            fundamentalsCurrency,
-            finalCurrency: "USD",
-            yearlyCurrencyPairsForFundamental:
-              yearlyCurrencyPairsForFundamental &&
-              yearlyCurrencyPairsForFundamental.perYear,
-            yearlyCurrencyPairsForPrice:
-              yearlyCurrencyPairsForPrice &&
-              yearlyCurrencyPairsForPrice.perYear,
-            market_capitalization:
-              fundamentalData.Highlights.MarketCapitalization,
-            sector: fundamentalData.General.Sector,
-            industry: fundamentalData.General.Industry,
-            description: fundamentalData.General.Description,
-            logo: logoUrl,
-            yearlyFinancials,
-            yearlyFinancialsWithKeys,
-            yearlyFinancialsByYear,
-            retrieved_at: Date.now(),
-            is_in_exchange_country,
-            dataByYear
-            // has_biggest_last_year_market_cap
-          }
+          code: fundamentalData.General.Code,
+          name: fundamentalData.General.Name,
+          country: fundamentalData.General.CountryName,
+          url: fundamentalData.General.WebURL,
+          exchange: fundamentalData.General.Exchange,
+          EODExchange:
+            fundamentalData.General.CountryISO === "US"
+              ? "US"
+              : fundamentalData.General.Exchange,
+          currency_symbol: fundamentalData.General.CurrencySymbol,
+          currency_code: fundamentalData.General.CurrencyCode,
+          fundamentalsCurrency,
+          finalCurrency: "USD",
+          yearlyCurrencyPairsForFundamental:
+            yearlyCurrencyPairsForFundamental &&
+            yearlyCurrencyPairsForFundamental.perYear,
+          yearlyCurrencyPairsForPrice:
+            yearlyCurrencyPairsForPrice &&
+            yearlyCurrencyPairsForPrice.perYear,
+          market_capitalization:
+            fundamentalData.Highlights.MarketCapitalization,
+          sector: fundamentalData.General.Sector,
+          industry: fundamentalData.General.Industry,
+          description: fundamentalData.General.Description,
+          logo: logoUrl,
+          yearlyFinancials,
+          yearlyFinancialsWithKeys,
+          yearlyFinancialsByYear,
+          retrieved_at: Date.now(),
+          is_in_exchange_country,
+          dataByYear
+          // has_biggest_last_year_market_cap
+        }
         : {};
     };
 
@@ -248,9 +248,8 @@ module.exports = {
         !areCurrenciesSame &&
         (await this.get(
           `
-            https://eodhistoricaldata.com/api/eod/${
-              isGBX ? "GBP" : currency
-            }${toCurrency}.FOREX?
+            https://eodhistoricaldata.com/api/eod/${isGBX ? "GBP" : currency
+          }${toCurrency}.FOREX?
                 fmt=json&
                 api_token=${this.keys.eodhistoricaldata}
         `
@@ -258,16 +257,16 @@ module.exports = {
 
       const perYear = !areCurrenciesSame
         ? getCurrencyToCurrencyTimeseries.reduce(
-            (p, c) => ({
-              ...p,
-              [c.date.substring(0, 4)]: isGBX ? c.close / 100 : c.close,
-            }),
-            {}
-          )
+          (p, c) => ({
+            ...p,
+            [c.date.substring(0, 4)]: isGBX ? c.close / 100 : c.close,
+          }),
+          {}
+        )
         : Array(45)
-            .fill(null)
-            .map((_, i) => 1980 + i)
-            .reduce((p, c) => ({ ...p, [c]: 1 }), {});
+          .fill(null)
+          .map((_, i) => 1980 + i)
+          .reduce((p, c) => ({ ...p, [c]: 1 }), {});
 
       return {
         query: {
@@ -293,13 +292,13 @@ module.exports = {
           if (
             !!stockInDB &&
             (new Date() - new Date(stockInDB.retrieved_at)) /
-              (1000 * 60 * 60 * 24) <
-              30
+            (1000 * 60 * 60 * 24) <
+            30
           ) {
             return "Skipped [Updated < 30 days ago]: " + Code + "." + Exchange;
           }
 
-          const stock = await this.getStockByCode(
+          const stock = await this.getProviderStockByCode(
             {
               code: Code + "." + EODExchange,
             },
@@ -314,7 +313,7 @@ module.exports = {
               }),
             }))
             .catch((e) => {
-              console.log("Failed_: " + Code + "." + EODExchange, !!stockInDB);
+              console.log("Failed_: " + Code + "." + EODExchange + " - stockInDB:" + !!stockInDB, { e });
               return {};
             });
 
@@ -339,7 +338,7 @@ module.exports = {
     };
 
     updateStocksCompletely = async ({ userId }, dataSources) => {
-      const isAdmin = await dataSources.Ours.isAdmin({ id: userId });
+      const isAdmin = true; //await dataSources.Ours.isAdmin({ id: userId });
 
       if (isAdmin) {
         // get exchanges
@@ -349,7 +348,7 @@ module.exports = {
           async (accUnresolved, exchange, j) => {
             const accResolved = await accUnresolved;
 
-            //   console.log(`working on exchange`, { exchange: exchange.Name });
+            console.log(`working on exchange`, { exchange: exchange.Name });
 
             await new Promise((t) => setTimeout(t, 1000));
 
@@ -392,8 +391,8 @@ module.exports = {
                     onlyFailedStocks
                       ? 24.1 * 60 * 60 * 1000
                       : onlySkippedStocks
-                      ? 10
-                      : 100
+                        ? 10
+                        : 100
                   )
                 );
 

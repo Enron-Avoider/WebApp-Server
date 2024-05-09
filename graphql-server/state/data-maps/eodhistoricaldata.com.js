@@ -425,7 +425,7 @@ const convertEODFundamentalsToDataByYear = (
     (acc, y) => ({
       ...acc,
       [y]: (() => {
-        const yearPrices = priceData.filter((p) => p.date.includes(y));
+        const yearPrices = priceData && priceData.length ? priceData.filter((p) => p.date.includes(y)) : [];
 
         const lastYearPrice =
           yearPrices.length &&
