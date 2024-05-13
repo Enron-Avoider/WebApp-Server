@@ -8,7 +8,7 @@ import {
     Avatar,
     Link,
     SvgIcon
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { discordSVGPath, discordSVGViewBox } from "@assets/icon-paths/discord";
 import './style.sass';

@@ -1,10 +1,12 @@
 import React, { FunctionComponent } from 'react';
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 import { useLocation, useHistory, Link as Link_ } from "react-router-dom";
-import { DiscussionEmbed } from 'disqus-react';
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import CircularProgress from '@material-ui/core/CircularProgress';
+// import { DiscussionEmbed } from 'disqus-react';
+import {
+    ToggleButton,
+    ToggleButtonGroup
+} from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 import {
     Paper,
     Grid,
@@ -13,7 +15,7 @@ import {
     Typography,
     Avatar,
     Link,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import env from '@env';
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';
@@ -307,7 +309,7 @@ export const Stock: FunctionComponent<{
                             </Box>
                         </Paper>
 
-                        <Paper>
+                        {/* <Paper>
                             <Box display="flex" flexDirection="column" p={2} mt={2}>
                                 <Typography
                                     variant="h5"
@@ -326,7 +328,7 @@ export const Stock: FunctionComponent<{
                                     }
                                 />
                             </Box>
-                        </Paper>
+                        </Paper> */}
                     </>
                 ) : (
                     <Box p={5} m={5} height="100vh" display="flex" alignItems="center" justifyContent="center">

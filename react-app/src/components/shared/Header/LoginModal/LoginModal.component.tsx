@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState, useEffect } from "react";
 import { useParams, useRouteMatch, useLocation } from "react-router-dom";
-import { useQuery, useMutation, useLazyQuery } from "react-apollo";
+import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
 import deepFind from 'deep-find';
 import {
     Paper,
@@ -15,9 +15,9 @@ import {
     TextField,
     Fab,
     Chip,
-    Link
-} from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+    Link,
+    Autocomplete
+} from '@mui/material';
 
 import { GET_USER_BY_ID } from '@state/byModel/User/User.queries';
 import { GET_USER_KEYS, ADD_USER_KEY } from "@state/byModel/User/UserKey.localQueries";

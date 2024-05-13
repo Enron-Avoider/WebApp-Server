@@ -6,11 +6,11 @@ import {
     Typography,
     Avatar,
     Link,
-} from '@material-ui/core';
+} from '@mui/material';
 import { Link as Link_ } from "react-router-dom";
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 import numeral from 'numeral';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
 import { useTable, useBlockLayout } from 'react-table';
 import { FixedSizeList } from 'react-window';

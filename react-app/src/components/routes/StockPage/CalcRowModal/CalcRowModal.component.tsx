@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useParams, Link, useRouteMatch, useHistory, useLocation } from "react-router-dom";
-import { useQuery, useMutation } from "react-apollo";
+import { useQuery, useMutation } from "@apollo/client";
 import deepFind from 'deep-find';
 import {
     Paper,
@@ -14,10 +14,10 @@ import {
     Button,
     TextField,
     Fab,
-    Chip
-} from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { DiscussionEmbed } from 'disqus-react';
+    Chip,
+    Autocomplete
+} from '@mui/material';
+// import { DiscussionEmbed } from 'disqus-react';
 
 import env from '@env';
 import { GET_STOCK } from '@state/byModel/Stocks/stocks.queries';

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import { GET_LAST_YEAR_COUNTS } from '@state/byModel/Aggregate/aggregate.queries';

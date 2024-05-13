@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, Link, useHistory, useLocation } from "react-router-dom";
-import { Box, Fab } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
+import { Box, Fab } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 

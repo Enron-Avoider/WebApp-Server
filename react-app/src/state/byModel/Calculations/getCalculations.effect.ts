@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import { GET_RATIO_COLLECTIONS } from '@state/byModel/Calculations/calculations.queries';

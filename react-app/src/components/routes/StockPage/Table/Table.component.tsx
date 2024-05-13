@@ -17,8 +17,8 @@ import {
     MenuList,
     MenuItem,
     TextField,
-} from '@material-ui/core';
-import { ArrowDropDown, Equalizer, ZoomOutMap } from '@material-ui/icons';
+} from '@mui/material';
+import { ArrowDropDown, Equalizer, ZoomOutMap } from '@mui/icons-material';
 const math = require("mathjs");
 
 import PercentagePath from "@assets/icon-paths/percentage";

@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 import {
     Paper,
     Grid,
@@ -7,7 +7,7 @@ import {
     Typography,
     Avatar,
     Link,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import './style.sass';
 import { doCalculations } from '../calculations.map';

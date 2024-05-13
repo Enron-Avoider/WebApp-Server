@@ -1,8 +1,8 @@
 import React from 'react';
-import { useQuery } from "react-apollo";
-import { AppBar, Toolbar, Typography, IconButton } from '@material-ui/core';
+import { useQuery } from "@apollo/client";
+import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
 import { Link as Link_ } from "react-router-dom";
-import { Grid, Box, Link, Badge, Avatar, Button } from '@material-ui/core';
+import { Grid, Box, Link, Badge, Avatar, Button } from '@mui/material';
 
 import logoImg from '@assets/e-transparent.png';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';

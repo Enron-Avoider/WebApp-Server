@@ -22,7 +22,6 @@
           "camel2DashComponentName": false
         },
         "icons"
-      ],
-      "react-hot-loader/babel"
+      ]
     ]
   }

@@ -1,11 +1,11 @@
 import React, { FunctionComponent } from 'react';
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 import {
     Box,
     Chip,
-    TextField
-} from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+    TextField,
+    Autocomplete
+} from '@mui/material';
 import { useParams, useHistory } from "react-router-dom";
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import { GET_ROWS } from '@state/byModel/Rows/Rows.queries';

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
-import { useLazyQuery } from "react-apollo";
-import SearchIcon from '@material-ui/icons/Search';
-import { MenuItem, MenuList, Paper, InputBase, Typography, ClickAwayListener } from '@material-ui/core';
+import { useLazyQuery } from "@apollo/client";
+import SearchIcon from '@mui/icons-material/Search';
+import { MenuItem, MenuList, Paper, InputBase, Typography, ClickAwayListener } from '@mui/material';
 import numeral from 'numeral';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { SEARCH_QUERY } from '@state/byModel/Stocks/stocks.queries';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
@@ -14,7 +14,9 @@ import "./style.sass";
 
 export default function StockSearcher() {
 
-    const classes = useStyles();
+    const classes = useStyles().classes;
+
+    console.log({ classes });
 
     const [name, setName] = useState<string>('');
 

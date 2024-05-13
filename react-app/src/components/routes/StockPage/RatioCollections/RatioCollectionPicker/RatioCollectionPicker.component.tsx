@@ -2,9 +2,9 @@ import React, { useState, FunctionComponent, useContext } from "react";
 import {
     Box,
     Chip,
-    TextField
-} from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+    TextField,
+    Autocomplete
+} from '@mui/material';
 
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 

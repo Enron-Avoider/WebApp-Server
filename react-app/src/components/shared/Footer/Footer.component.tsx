@@ -1,7 +1,7 @@
 import React from 'react';
-import { Box, Link, Avatar, SvgIcon } from '@material-ui/core';
-import { Twitter } from '@material-ui/icons';
-// import { Grid, Box, Button, Menu, MenuItem, useMediaQuery, Badge } from '@material-ui/core';
+import { Box, Link, Avatar, SvgIcon } from '@mui/material';
+import { Twitter } from '@mui/icons-material';
+// import { Grid, Box, Button, Menu, MenuItem, useMediaQuery, Badge } from '@mui/material';
 
 import PercentagePath from "@assets/icon-paths/percentage";
 import { discordSVGPath, discordSVGViewBox } from "@assets/icon-paths/discord";

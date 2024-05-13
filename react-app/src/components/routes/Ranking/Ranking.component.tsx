@@ -7,10 +7,10 @@ import {
     Avatar,
     Link,
     Container
-} from '@material-ui/core';
+} from '@mui/material';
 import { useParams } from "react-router-dom";
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
-import { useQuery } from "react-apollo";
+import { useQuery } from "@apollo/client";
 
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
 import ComparisonsPicker from '@components/shared/ComparisonsPicker';

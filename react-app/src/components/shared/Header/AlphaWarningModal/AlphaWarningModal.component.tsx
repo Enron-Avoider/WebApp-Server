@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState, useEffect } from "react";
 import { useParams, useRouteMatch, useLocation } from "react-router-dom";
-import { useQuery, useMutation, useLazyQuery } from "react-apollo";
+import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
 import deepFind from 'deep-find';
 import {
     Paper,
@@ -17,7 +17,7 @@ import {
     Chip,
     Link,
     SvgIcon
-} from '@material-ui/core';
+} from '@mui/material';
 import { discordSVGPath, discordSVGViewBox } from "@assets/icon-paths/discord";
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 

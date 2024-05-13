@@ -6,9 +6,9 @@ import {
     Typography,
     Avatar,
     Link,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useDebouncedCallback } from 'use-debounce';
-import { useQuery, useMutation } from "react-apollo";
+import { useQuery, useMutation } from "@apollo/client";
 
 import './style.sass';
 import Table from '../../Table';

@@ -1,12 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ApolloProvider } from 'react-apollo';
-import ApolloClient from "apollo-boost";
-import { ThemeProvider } from '@material-ui/styles';
-import { createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import purple from '@material-ui/core/colors/purple';
-import { InMemoryCache } from "apollo-cache-inmemory";
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+import { ThemeProvider, responsiveFontSizes, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import purple from '@mui/material/colors/purple';
 import { persistCache } from 'apollo-cache-persist';
 import env from '@env';
 import localforage from "localforage";
@@ -21,15 +18,16 @@ import { userKeysResolvers } from '@state/byModel/User/UserKey.localResolvers';
 console.log({ env });
 
 (async () => {
-
     const cache = new InMemoryCache();
-    await persistCache({
-        cache,
-        storage: (localforage as any), //(window as any).localStorage,
-    });
+    if (env.environment !== 'development') {
+        await persistCache({
+            cache,
+            storage: (localforage as any), //(window as any).localStorage,
+        });
+    }
     const client = new ApolloClient({
         uri: env.graphql,
-        ...env.environment !== 'development' && { cache },
+        cache,
         resolvers: {
             Mutation: {
                 ...todoResolvers.Mutation,
@@ -55,9 +53,9 @@ console.log({ env });
         });
     }
 
-    const darkTheme = responsiveFontSizes(createMuiTheme({
+    const darkTheme = createTheme(({
         palette: {
-            type: 'dark',
+            mode: 'dark',
             primary: purple,
             secondary: purple,
             background: {

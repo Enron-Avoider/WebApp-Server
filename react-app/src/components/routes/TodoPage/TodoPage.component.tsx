@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation } from "react-apollo";
+import { useQuery, useMutation } from "@apollo/client";
 
 import { GET_TODOS, ADD_TODO } from "@state/byModel/Todos/todos.queries";
 import Counter from '@components/Shared/Counter/Counter';

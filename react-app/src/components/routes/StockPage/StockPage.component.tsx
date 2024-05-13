@@ -4,7 +4,7 @@ import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
 import {
     Grid,
     Box,
-} from '@material-ui/core';
+} from '@mui/material';
 
 import CalcRowModal from './CalcRowModal';
 import Stock from './Stock';

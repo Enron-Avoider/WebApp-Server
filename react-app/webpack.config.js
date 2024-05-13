@@ -9,7 +9,7 @@ console.log({ e: process.env.NODE_ENV, __dirname });
 
 const config = {
   mode: isProd ? "production" : "development",
-  entry: ['react-hot-loader/patch', "./src/index.tsx"],
+  entry: ["./src/index.tsx"],
   output: {
     path: `${__dirname}/dist`,
     publicPath: "/",
@@ -19,8 +19,7 @@ const config = {
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
     alias: {
-        'react-dom': '@hot-loader/react-dom',
-        ...resolveTsAliases(__dirname + "/tsconfig.json")
+      ...resolveTsAliases(__dirname + "/tsconfig.json")
     },
   },
   module: {
@@ -64,22 +63,32 @@ if (isProd) {
   };
 } else {
   config.devServer = {
-    publicPath: "/",
+    // publicPath: "/",
+    // port: 8080,
+    client: {
+      overlay: true,
+      progress: true,
+    },
+    static: {
+      publicPath: "/",
+    },
     port: 8080,
-    open: true,
-    hot: false,
-    compress: true,
-    stats: "errors-only",
-    overlay: true,
+    // open: true,
+    // // hot: false,
+    // compress: true,
+    // stats: "errors-only",
+    // overlay: true,
     historyApiFallback: {
       disableDotRule: true,
     },
-    watchOptions: {
-        aggregateTimeout: 500,
-        poll: 3000,
-        ignored: 'node_modules/**'
-    },
+    // watchOptions: {
+    //     aggregateTimeout: 500,
+    //     poll: 3000,
+    //     ignored: 'node_modules/**'
+    // },
   };
 }
+
+console.log({ config });
 
 module.exports = config;

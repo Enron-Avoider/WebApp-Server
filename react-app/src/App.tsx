@@ -1,4 +1,3 @@
-import { hot } from 'react-hot-loader/root';
 import React from 'react';
 import {
     BrowserRouter as Router,
@@ -7,7 +6,7 @@ import {
     Redirect
 } from 'react-router-dom';
 import loadable from '@loadable/component';
-import { Container, Box } from '@material-ui/core';
+import { Container, Box } from '@mui/material';
 
 import Header from '@components/shared/Header';
 import Footer from '@components/shared/Footer';
@@ -49,4 +48,4 @@ function App() {
         </>
     );
 }
-export default hot(App);
+export default App;
