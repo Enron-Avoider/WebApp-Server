@@ -277,9 +277,11 @@ module.exports = {
       };
     };
 
-    saveBatchOfStocksToDB = async ({ stockBatch }, dataSources) => {
+    saveBatchOfStocksToDB = async ({ stockBatch, EODExchange }, dataSources) => {
+
       const workingBatch = await Promise.all(
-        stockBatch.map(async ({ Code, Exchange, EODExchange }, i) => {
+        stockBatch.map(async (Code, i) => {
+
           const stockInDB = (
             await this.mongoDBStocksTable
               .find({
@@ -317,19 +319,17 @@ module.exports = {
               return {};
             });
 
-          // console.log(`${Code}.${Exchange} ${!!stockInDB} ${stock.is_in_exchange_country}`);
-
           if (!!stockInDB && stock.code) {
             const updated = await this.mongoDBStocksTable.updateOne(
               { _id: stockInDB._id },
               { $set: { ...stock } }
             );
-            return "Updated: " + Code + "." + Exchange + "." + EODExchange;
+            return "Updated: " + Code + "." + EODExchange;
           } else if (stock.code) {
             const inserted = await this.mongoDBStocksTable.insertOne(stock);
-            return "Created: " + Code + "." + Exchange + "." + EODExchange;
+            return "Created: " + Code + "." + EODExchange;
           } else {
-            return "Failed: " + Code + "." + Exchange + "." + EODExchange;
+            return "Failed: " + Code + "." + EODExchange;
           }
         })
       );
@@ -343,8 +343,12 @@ module.exports = {
       if (isAdmin) {
         // get exchanges
         const ExchangesFromEODAPI = await this.getAllExchanges();
+
+        // console.log({ ExchangesFromEODAPI });
+
         // get exchange Stock codes
-        const loopThroughExchangesOneByOne = await ExchangesFromEODAPI.reduce(
+
+        const loopThroughExchangesOneByOne = await ExchangesFromEODAPI.slice(0).reduce(
           async (accUnresolved, exchange, j) => {
             const accResolved = await accUnresolved;
 
@@ -358,8 +362,33 @@ module.exports = {
               })
             ).stocks;
 
-            // bundle stock codes
-            const exchangeStockBatches = chunkUp(exchangeStocks, 10);
+            const exchangeStocksTickers = exchangeStocks?.map(s => s.Code);
+
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+            const exchangeStocksInDBRecentlyUpdated = (
+              await this.mongoDBStocksTable
+                .find({
+                  code: { $in: exchangeStocksTickers },
+                  EODExchange: exchange.Code,
+                  retrieved_at: {
+                    $gte: Date.parse(oneMonthAgo),
+                  }
+                })
+                .project({
+                  code: 1
+                })
+                .toArray()
+            )?.map(s => s.code);
+
+            const exchangeStocksTickersSet = new Set(exchangeStocksTickers);
+            const exchangeStocksInDBRecentlyUpdatedSet = new Set(exchangeStocksInDBRecentlyUpdated);
+
+            // ⚠️ needs node v22
+            const stocksToUpdate = exchangeStocksTickersSet.difference(exchangeStocksInDBRecentlyUpdatedSet);
+
+            const exchangeStockBatches = chunkUp(Array.from(stocksToUpdate), 10);
 
             const savedExchangeStocks = await exchangeStockBatches.reduce(
               async (accUnresolved, stockBatch, i) => {
@@ -369,6 +398,7 @@ module.exports = {
                 const savedStocks = await this.saveBatchOfStocksToDB(
                   {
                     stockBatch,
+                    EODExchange: exchange.Code
                   },
                   dataSources
                 );
@@ -404,7 +434,7 @@ module.exports = {
                   exchangeProgress: `${(
                     (i / exchangeStockBatches.length) *
                     100
-                  ).toFixed(2)}%`,
+                  ).toFixed(2)}% of ${exchangeStocks.length}`,
                   savedStocks,
                 });
 
@@ -418,6 +448,7 @@ module.exports = {
               {
                 ...exchange,
                 stockCount: exchangeStocks.length,
+                stocksToUpdate: stocksToUpdate.length,
                 exchangeStockBatchesCount: exchangeStockBatches.length,
                 savedExchangeStocks,
               },
@@ -426,10 +457,13 @@ module.exports = {
           []
         );
 
+
         return loopThroughExchangesOneByOne;
+
       } else {
         return null;
       }
     };
+
   },
 };
