@@ -135,6 +135,8 @@ module.exports = {
             : false
         );
 
+        console.log({ existingUpload });
+
         return (
           existingUpload ||
           (await fetch(`http://${logoUrl}`)
@@ -148,9 +150,13 @@ module.exports = {
                 .promise();
             })
             .then((res) => {
+
+              console.log({ res });
               return res.Location.replace("https://", "");
             })
             .catch((err) => {
+
+              console.log({ err });
               return null;
             }))
         );

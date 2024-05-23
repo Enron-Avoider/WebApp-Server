@@ -14,23 +14,25 @@ export default function getComparisonOptions() {
     });
 
     const comparisonOptions: { value: string, title: string, type: string }[] = [
-        {
-            value: 'Stock_Related__industry',
-            title: 'Industry',
-            type: 'Stock Related'
-        }, {
-            value: 'Stock_Related__sector',
-            title: 'Sector',
-            type: 'Stock Related'
-        }, {
-            value: 'Stock_Related__country',
-            title: 'Country',
-            type: 'Stock Related'
-        }, {
-            value: 'Stock_Related__exchange',
-            title: 'Exchange',
-            type: 'Stock Related'
-        },
+        ...allSearchParams.ticker ? ([
+            {
+                value: 'Stock_Related__industry',
+                title: 'Industry',
+                type: 'Stock Related'
+            }, {
+                value: 'Stock_Related__sector',
+                title: 'Sector',
+                type: 'Stock Related'
+            }, {
+                value: 'Stock_Related__country',
+                title: 'Country',
+                type: 'Stock Related'
+            }, {
+                value: 'Stock_Related__exchange',
+                title: 'Exchange',
+                type: 'Stock Related'
+            }
+        ]) : [],
         // lazy: refactor
         ...(lastYearCounts?.getLastYearCounts?.counts.country) ?
             lastYearCounts?.getLastYearCounts?.counts?.country?.map((c: any) => ({

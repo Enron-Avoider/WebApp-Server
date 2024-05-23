@@ -57,10 +57,10 @@ module.exports = {
 
       return stockInDB
         ? {
-            ...stockInDB,
-            // weird fix for when the logo string is an object for some unknown reason
-            logo: typeof stockInDB.logo === "object" ? null : stockInDB.logo,
-          }
+          ...stockInDB,
+          // weird fix for when the logo string is an object for some unknown reason
+          logo: typeof stockInDB.logo === "object" ? null : stockInDB.logo,
+        }
         : null;
     };
 
@@ -74,7 +74,7 @@ module.exports = {
               $match: {
                 ...query,
                 "yearlyFinancialsByYear.year": {
-                  $in: [`${lastYear-1}`],
+                  $in: [`${lastYear - 1}`],
                 },
                 is_in_exchange_country: true,
               },
@@ -127,8 +127,8 @@ module.exports = {
         !!aggregationInDB &&
         (updateAlways ||
           (new Date() - new Date(aggregationInDB.retrieved_at)) /
-            (1000 * 60 * 60 * 24) >
-            14)
+          (1000 * 60 * 60 * 24) >
+          14)
       ) {
         const object = await getUncachedAggregationFn(
           getUncachedAggregationParameters
@@ -237,26 +237,26 @@ module.exports = {
                             },
                             ...(stockToRank
                               ? [
-                                  {
-                                    $addFields: {
-                                      rank: {
-                                        $indexOfArray: [
-                                          "$companies.company",
-                                          stockToRank,
-                                        ],
-                                      },
+                                {
+                                  $addFields: {
+                                    rank: {
+                                      $indexOfArray: [
+                                        "$companies.company",
+                                        stockToRank,
+                                      ],
                                     },
                                   },
-                                ]
+                                },
+                              ]
                               : []),
                             ...(!companiesForRow
                               ? [
-                                  {
-                                    $addFields: {
-                                      companies: { $size: "$companies" },
-                                    },
+                                {
+                                  $addFields: {
+                                    companies: { $size: "$companies" },
                                   },
-                                ]
+                                },
+                              ]
                               : []),
                             {
                               $sort: {
@@ -320,19 +320,19 @@ module.exports = {
 
       const financialRows = Object.keys(query).length
         ? await this.getAggregationThroughCacheIfPossible({
-            cacheQuery: {
-              type: "allFinancialRows",
-              query,
-              stockToRank,
-              companiesForRow,
-            },
-            getUncachedAggregationFn: getAllFinancialRows,
-            getUncachedAggregationParameters: {
-              query,
-              stockToRank,
-              companiesForRow,
-            },
-          })
+          cacheQuery: {
+            type: "allFinancialRows",
+            query,
+            stockToRank,
+            companiesForRow,
+          },
+          getUncachedAggregationFn: getAllFinancialRows,
+          getUncachedAggregationParameters: {
+            query,
+            stockToRank,
+            companiesForRow,
+          },
+        })
         : {};
 
       return {
@@ -465,26 +465,26 @@ module.exports = {
                         },
                         ...(stockToRank
                           ? [
-                              {
-                                $addFields: {
-                                  rank: {
-                                    $indexOfArray: [
-                                      "$companies.company",
-                                      stockToRank,
-                                    ],
-                                  },
+                            {
+                              $addFields: {
+                                rank: {
+                                  $indexOfArray: [
+                                    "$companies.company",
+                                    stockToRank,
+                                  ],
                                 },
                               },
-                            ]
+                            },
+                          ]
                           : []),
                         ...(!companiesForRow
                           ? [
-                              {
-                                $addFields: {
-                                  companies: { $size: "$companies" },
-                                },
+                            {
+                              $addFields: {
+                                companies: { $size: "$companies" },
                               },
-                            ]
+                            },
+                          ]
                           : []),
                         {
                           $sort: {
@@ -504,22 +504,22 @@ module.exports = {
 
       const calcRows = Object.keys(query).length
         ? await this.getAggregationThroughCacheIfPossible({
-            cacheQuery: {
-              type: "calcRows",
-              query,
-              stockToRank,
-              companiesForRow,
-              collectionId,
-              calcs: collection.calcs,
-            },
-            getUncachedAggregationFn: getCalcRows,
-            getUncachedAggregationParameters: {
-              query,
-              stockToRank,
-              companiesForRow,
-              calcs: collection.calcs,
-            },
-          })
+          cacheQuery: {
+            type: "calcRows",
+            query,
+            stockToRank,
+            companiesForRow,
+            collectionId,
+            calcs: collection.calcs,
+          },
+          getUncachedAggregationFn: getCalcRows,
+          getUncachedAggregationParameters: {
+            query,
+            stockToRank,
+            companiesForRow,
+            calcs: collection.calcs,
+          },
+        })
         : {};
 
       return {
@@ -564,8 +564,8 @@ module.exports = {
           if (
             !!stockInDB &&
             (new Date() - new Date(stockInDB.retrieved_at)) /
-              (1000 * 60 * 60 * 24) <
-              30
+            (1000 * 60 * 60 * 24) <
+            30
           ) {
             return "Skipped [Updated < 30 days ago]: " + Code + "." + Exchange;
           }
@@ -762,6 +762,12 @@ module.exports = {
     };
 
     saveRatioCollection = async ({ ratioCollection, userId }) => {
+
+      console.log({
+        ratioCollection,
+        userId
+      })
+
       const ratioCollectionInDB =
         ratioCollection.id &&
         (
@@ -850,6 +856,6 @@ module.exports = {
       };
     };
 
-    getRows = async ({}) => OursDataMaps.rowKeysPaths;
+    getRows = async ({ }) => OursDataMaps.rowKeysPaths;
   },
 };

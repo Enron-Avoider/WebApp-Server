@@ -1,3 +1,4 @@
+import { gql } from '@apollo/client';
 // import RandomID from "random-id";
 import { GET_TODOS } from "./todos.queries";
 
@@ -15,12 +16,21 @@ export const todoResolvers = {
         // },
         __typename: "todo"
       };
-      cache.writeData({
+      cache.writeQuery({
+        query: gql`
+        query {
+          todos {
+            __typename
+            name
+            completed
+          }
+        }
+        `,
         data: {
           todos: [...todos, new_todo]
         }
       });
-      console.log("TODOS: ", cache.readQuery({ query: GET_TODOS }));
+      // console.log("TODOS: ", cache.readQuery({ query: GET_TODOS }));
       return new_todo;
     }
   }

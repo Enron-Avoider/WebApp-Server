@@ -16,6 +16,7 @@ import RatioCollection from './RatioCollection';
 import { GET_RATIO_COLLECTIONS, GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import getCalculations from '@state/byModel/Calculations/getCalculations.effect';
+import NewCalcRowButton from '../NewCalcRowButton';
 
 export const RatioCollections: FunctionComponent<{
     ticker: string, stock: any
@@ -50,6 +51,14 @@ export const RatioCollections: FunctionComponent<{
                         ))}
                     </Grid>
                 </Box>
+
+                <pre>{JSON.stringify(pickedCollectionsWithCalculations, null, 2)}</pre>
+
+                <NewCalcRowButton
+                    title=""
+                    ticker="AMZ"
+                    collectionName="test1"
+                />
             </Box>
         </Paper>
     );

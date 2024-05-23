@@ -23,7 +23,6 @@ const math = require("mathjs");
 
 import PercentagePath from "@assets/icon-paths/percentage";
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
-import NewCalcRowButton from '../NewCalcRowButton';
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
 
 import "./style.sass";
@@ -64,7 +63,6 @@ export default function Table(
         years,
         data,
         title = '',
-        collectionName,
         isCollectionOwner,
         onTitleEdit,
     }: {
@@ -72,7 +70,6 @@ export default function Table(
         years: number[],
         data: {}[],
         title?: string,
-        collectionName?: string,
         isCollectionOwner?: boolean,
         onTitleEdit?: Function
     }
@@ -234,8 +231,7 @@ export default function Table(
                                                                                             search: getNewSearchParamsString({
                                                                                                 paramsToAdd: {
                                                                                                     ratio: cell.value,
-                                                                                                    ticker,
-                                                                                                    ratioCollection: collectionName
+                                                                                                    ticker
                                                                                                 }
                                                                                             })
                                                                                         }}
@@ -296,14 +292,6 @@ export default function Table(
                     </ScrollSyncPane>
                 </Box>
             </Paper>
-
-            {collectionName && isCollectionOwner &&
-                <NewCalcRowButton
-                    title={title}
-                    ticker={ticker || ''}
-                    collectionName={collectionName}
-                />
-            }
         </Box>
 
     );

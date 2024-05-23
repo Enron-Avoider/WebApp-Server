@@ -1,4 +1,4 @@
-import { gql } from "apollo-boost";
+import { gql } from "@apollo/client";
 
 export const GET_LAST_YEAR_COUNTS = gql`
     query($query: AggregationInputQuery ) { 

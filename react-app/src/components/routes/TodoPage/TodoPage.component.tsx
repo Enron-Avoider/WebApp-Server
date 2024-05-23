@@ -19,7 +19,7 @@ export default function TodoPage() {
 
 
             <h1>TODOS:</h1>
-            {data.todos.map((todo: any, i: number) => (
+            {data.todos?.map((todo: any, i: number) => (
                 <li key={i}> {todo.name} </li>
             ))}
             <input

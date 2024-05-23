@@ -16,8 +16,6 @@ export default function StockSearcher() {
 
     const classes = useStyles().classes;
 
-    console.log({ classes });
-
     const [name, setName] = useState<string>('');
 
     const [searchStocks, { loading, error, data }] = useLazyQuery(SEARCH_QUERY);

@@ -1,4 +1,4 @@
-import { gql } from "apollo-boost";
+import { gql } from "@apollo/client";
 
 export const GET_USER_BY_ID = gql`
     query($id: String!) {

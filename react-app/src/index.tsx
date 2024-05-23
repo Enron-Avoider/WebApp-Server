@@ -1,6 +1,6 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+import ReactDOM from 'react-dom/client';
+import { ApolloClient, ApolloProvider, InMemoryCache, gql } from '@apollo/client';
 import { ThemeProvider, responsiveFontSizes, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import purple from '@mui/material/colors/purple';
@@ -19,7 +19,8 @@ console.log({ env });
 
 (async () => {
     const cache = new InMemoryCache();
-    if (env.environment !== 'development') {
+
+    if (true || env.environment !== 'development') {
         await persistCache({
             cache,
             storage: (localforage as any), //(window as any).localStorage,
@@ -41,11 +42,29 @@ console.log({ env });
     // everything in `data`
 
     try {
-        client.readQuery({ query: GET_TODOS });
-        client.readQuery({ query: GET_USER_KEYS });
+        const getTodos = client.readQuery({ query: GET_TODOS });
+        const getKeys = client.readQuery({ query: GET_USER_KEYS });
+
+        console.log({
+            getTodos,
+            getKeys
+        })
+
+        if (!getKeys) {
+            client.writeQuery({
+                query: gql`
+                  query {
+                    todos
+                    userKeys
+                  }
+                `,
+                data: { todos: [], userKeys: [] }
+            });
+        }
     } catch (error) {
         console.log({ error });
-        client.writeData({
+        client.writeQuery({
+            query: gql``,
             data: {
                 todos: [],
                 userKeys: []
@@ -66,15 +85,16 @@ console.log({ env });
         },
     }), { factor: 15 });
 
-    ReactDOM.render(
 
+    const domNode = document.getElementById('app');
+    const root = ReactDOM.createRoot(domNode);
+    root.render(
         <ApolloProvider client={client}>
             <ThemeProvider theme={darkTheme}>
                 <CssBaseline />
                 <App />
             </ThemeProvider>
-        </ApolloProvider>,
-        document.getElementById('app')
+        </ApolloProvider>
     );
 
 })();
