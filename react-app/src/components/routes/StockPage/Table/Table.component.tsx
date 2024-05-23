@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useTable, useBlockLayout, useExpanded, Column } from "react-table";
 import { useSticky } from 'react-table-sticky';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ScrollSync, ScrollSyncPane } from 'react-scroll-sync';
 import { useParams, Link as Link_, useLocation, useHistory } from "react-router-dom";
 import numeral from 'numeral';
@@ -163,132 +161,130 @@ export default function Table(
             <Paper elevation={3}>
                 <Box bgcolor="grey.800">
                     <ScrollSyncPane>
-                        <DndProvider backend={HTML5Backend}>
-                            <div {...getTableProps()} className="table sticky">
-                                <div className="header">
-                                    {headerGroups.map((headerGroup: any) => (
-                                        <div {...headerGroup.getHeaderGroupProps()} className="tr">
-                                            {headerGroup.headers.map((column: any) => (
-                                                <div {...column.getHeaderProps()} className="th">
-                                                    {column.render('Header')}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ))}
-                                </div>
-                                <div {...getTableBodyProps()} className="body">
-                                    {rows.map((row: any) => {
-                                        prepareRow(row);
+                        <div {...getTableProps()} className="table sticky">
+                            <div className="header">
+                                {headerGroups.map((headerGroup: any) => (
+                                    <div {...headerGroup.getHeaderGroupProps()} className="tr">
+                                        {headerGroup.headers.map((column: any) => (
+                                            <div {...column.getHeaderProps()} className="th">
+                                                {column.render('Header')}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                            <div {...getTableBodyProps()} className="body">
+                                {rows.map((row: any) => {
+                                    prepareRow(row);
 
-                                        const changePercentage: any = getRowPercentages(row.original, years);
+                                    const changePercentage: any = getRowPercentages(row.original, years);
 
-                                        return (
-                                            <div {...row.getRowProps()} className={`
+                                    return (
+                                        <div {...row.getRowProps()} className={`
                                             tr
                                             ${row.original.type === 'total' ? 'total' : ''}
                                         `}>
-                                                {row.cells.map((cell: any, i: number) => (
-                                                    <div
-                                                        {...cell.getCellProps()}
-                                                        className={`
+                                            {row.cells.map((cell: any, i: number) => (
+                                                <div
+                                                    {...cell.getCellProps()}
+                                                    className={`
                                                         td
                                                         ${row?.subRows?.length ? 'relevant' : ''}
                                                     `}
-                                                    >
-                                                        <div className={`
+                                                >
+                                                    <div className={`
                                                         ${cell.column.id === 'expander' && `pl-${row.depth}`}
                                                     `}>
-                                                            <div className={`
+                                                        <div className={`
                                                             ${cell.column.id === 'expander' ?
-                                                                    `${row.original.type === 'calc' ? 'calc' : ''}` :
-                                                                    `
-                                                                    quartile ${changePercentage &&
-                                                                    getQuartile(Number(changePercentage[cell.column.id]), changePercentage.quartiles)
-                                                                    }
+                                                                `${row.original.type === 'calc' ? 'calc' : ''}` :
                                                                 `
+                                                                    quartile ${changePercentage &&
+                                                                getQuartile(Number(changePercentage[cell.column.id]), changePercentage.quartiles)
                                                                 }
+                                                                `
+                                                            }
                                                         `}>
-                                                                {showPercentage && changePercentage && cell.column.id !== 'expander' ?
-                                                                    `${changePercentage[cell.column.id]}%` :
-                                                                    cell.column.id !== 'expander' ?
-                                                                        <span title={numeral(cell.value).format('0,0[.]00')}>{cell.value === null ? '-' : numeral(cell.value).format('(0.00a)')}</span> :
-                                                                        (
-                                                                            <span
-                                                                                {...row.getToggleRowExpandedProps()}
-                                                                                title=""
-                                                                            >
-                                                                                {row?.subRows?.length ?
-                                                                                    <span className="arrow"><ArrowDropDown /></span> :
-                                                                                    ''
-                                                                                }
+                                                            {showPercentage && changePercentage && cell.column.id !== 'expander' ?
+                                                                `${changePercentage[cell.column.id]}%` :
+                                                                cell.column.id !== 'expander' ?
+                                                                    <span title={numeral(cell.value).format('0,0[.]00')}>{cell.value === null ? '-' : numeral(cell.value).format('(0.00a)')}</span> :
+                                                                    (
+                                                                        <span
+                                                                            {...row.getToggleRowExpandedProps()}
+                                                                            title=""
+                                                                        >
+                                                                            {row?.subRows?.length ?
+                                                                                <span className="arrow"><ArrowDropDown /></span> :
+                                                                                ''
+                                                                            }
 
-                                                                                {row.original.type === 'calc' ?
+                                                                            {row.original.type === 'calc' ?
+                                                                                <Link
+                                                                                    component={Link_}
+                                                                                    color="inherit"
+                                                                                    to={{
+                                                                                        pathname: location.pathname,
+                                                                                        search: getNewSearchParamsString({
+                                                                                            paramsToAdd: {
+                                                                                                ratio: cell.value,
+                                                                                                ticker
+                                                                                            }
+                                                                                        })
+                                                                                    }}
+                                                                                >
+                                                                                    {cell.value || ''}
+                                                                                </Link> :
+                                                                                cell.value
+                                                                            }
+
+                                                                            {row.original.key && (
+                                                                                <Box display="inline" position="relative" top={3} left={1}>
                                                                                     <Link
                                                                                         component={Link_}
                                                                                         color="inherit"
                                                                                         to={{
-                                                                                            pathname: location.pathname,
+                                                                                            pathname: `/ranking/${row.original.key}`,
                                                                                             search: getNewSearchParamsString({
-                                                                                                paramsToAdd: {
-                                                                                                    ratio: cell.value,
-                                                                                                    ticker
-                                                                                                }
+                                                                                                paramsToAdd: { ticker }
                                                                                             })
                                                                                         }}
+                                                                                        target="_blank"
                                                                                     >
-                                                                                        {cell.value || ''}
-                                                                                    </Link> :
-                                                                                    cell.value
-                                                                                }
+                                                                                        <ZoomOutMap fontSize="inherit" />
+                                                                                    </Link>
+                                                                                </Box>
+                                                                            )}
 
-                                                                                {row.original.key && (
-                                                                                    <Box display="inline" position="relative" top={3} left={1}>
-                                                                                        <Link
-                                                                                            component={Link_}
-                                                                                            color="inherit"
-                                                                                            to={{
-                                                                                                pathname: `/ranking/${row.original.key}`,
-                                                                                                search: getNewSearchParamsString({
-                                                                                                    paramsToAdd: { ticker }
-                                                                                                })
-                                                                                            }}
-                                                                                            target="_blank"
-                                                                                        >
-                                                                                            <ZoomOutMap fontSize="inherit" />
-                                                                                        </Link>
-                                                                                    </Box>
-                                                                                )}
-
-                                                                            </span >)
-                                                                }
-                                                            </div>
-                                                            {pickedComparisons?.map(c => row.original[c] && (
-                                                                <div key={c}>
-                                                                    <small className="comparisson">{
-                                                                        cell.column.id === 'expander' ?
-                                                                            getComparisonOption(c) :
-                                                                            (row.original[c][cell.column.id] ?
-                                                                                <span
-                                                                                    key={`${c}-${cell.column.id}-${row.cells[0].value}`}
-                                                                                    title="average ・ sum ・ rank / number of companies"
-                                                                                >
-                                                                                    <span className="number">{numeral(row.original[c][cell.column.id].avg?.$numberDecimal).format('(0a)')}</span>{'・'}
-                                                                                    <span className="number">{numeral(row.original[c][cell.column.id].sum?.$numberDecimal).format('(0a)')}</span>{'・'}
-                                                                                    <span className="number">{row.original[c][cell.column.id].rank}/{row.original[c][cell.column.id].count}</span>
-                                                                                </span> : '-'
-                                                                            )
-                                                                    }</small>
-                                                                </div>
-                                                            ))}
+                                                                        </span >)
+                                                            }
                                                         </div>
+                                                        {pickedComparisons?.map(c => row.original[c] && (
+                                                            <div key={c}>
+                                                                <small className="comparisson">{
+                                                                    cell.column.id === 'expander' ?
+                                                                        getComparisonOption(c) :
+                                                                        (row.original[c][cell.column.id] ?
+                                                                            <span
+                                                                                key={`${c}-${cell.column.id}-${row.cells[0].value}`}
+                                                                                title="average ・ sum ・ rank / number of companies"
+                                                                            >
+                                                                                <span className="number">{numeral(row.original[c][cell.column.id].avg?.$numberDecimal).format('(0a)')}</span>{'・'}
+                                                                                <span className="number">{numeral(row.original[c][cell.column.id].sum?.$numberDecimal).format('(0a)')}</span>{'・'}
+                                                                                <span className="number">{row.original[c][cell.column.id].rank}/{row.original[c][cell.column.id].count}</span>
+                                                                            </span> : '-'
+                                                                        )
+                                                                }</small>
+                                                            </div>
+                                                        ))}
                                                     </div>
-                                                ))}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    );
+                                })}
                             </div>
-                        </DndProvider>
+                        </div>
                     </ScrollSyncPane>
                 </Box>
             </Paper>

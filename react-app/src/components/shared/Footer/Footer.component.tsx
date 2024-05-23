@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Link, Avatar, SvgIcon } from '@mui/material';
-import { Twitter } from '@mui/icons-material';
+import { LinkedIn } from '@mui/icons-material';
 // import { Grid, Box, Button, Menu, MenuItem, useMediaQuery, Badge } from '@mui/material';
 
 import PercentagePath from "@assets/icon-paths/percentage";
@@ -21,16 +21,17 @@ export default function Footer() {
                     </Box>
                 </Box> */}
                 <Box display="flex">
-                    <b>By Who</b>:
+                    <b>Built by</b>:
                     <Box ml={1}>
-                        <Link href="https://twitter.com/esperancaJS" color="primary" target="_blank">
+                        <Link href="https://www.linkedin.com/in/esperancajs/" color="primary" target="_blank">
                             <Box display="flex" alignItems="center">
-                                <Twitter fontSize="inherit" />{' '}
-                                @esperancaJS
+                                <LinkedIn fontSize="inherit" />{' '}
+                                Pedro Esperança
                             </Box>
                         </Link>
                     </Box>
                 </Box>
+                {/* 
                 <Box display="flex">
                     <b>Feedback</b>:
                     <Box ml={1}>
@@ -43,11 +44,11 @@ export default function Footer() {
                             </Box>
                         </Link>
                     </Box>
-                </Box>
+                </Box> */}
                 <Box display="flex">
                     <b>Pricing</b>:
                     <Box ml={1}>
-                        Free for now
+                        Free
                     </Box>
                 </Box>
                 <Box display="flex">

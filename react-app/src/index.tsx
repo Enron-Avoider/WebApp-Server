@@ -20,7 +20,7 @@ console.log({ env });
 (async () => {
     const cache = new InMemoryCache();
 
-    if (true || env.environment !== 'development') {
+    if (env.environment !== 'development') {
         await persistCache({
             cache,
             storage: (localforage as any), //(window as any).localStorage,

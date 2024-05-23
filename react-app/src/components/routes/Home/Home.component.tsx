@@ -19,14 +19,14 @@ export const Home: FunctionComponent<{}> = ({ }) => {
             <Grid container justify="center">
                 <Grid item md={8} xs={10}>
 
-                    <Box p={2} mt={2}>
+                    {/* <Box p={2} mt={2}>
                         <Typography variant="h4">
                             Letter to users
                         </Typography>
-                    </Box>
+                    </Box> */}
 
                     <Paper>
-                        <Box p={2} mt={2}>
+                        <Box p={2} mt={5}>
 
                             <Typography variant="h5">
                                 Welcome!
@@ -34,7 +34,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
 
                             <p>
                                 Enron Avoider contains a set of tools built
-                                for learning value investing.
+                                for visualizing finantial data.
                             </p>
                             <p>
                                 The tools will expand based on value investing
@@ -48,7 +48,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                         </Box>
                     </Paper>
 
-                    <Paper>
+                    {/* <Paper>
                         <Box p={2} mt={2}>
 
                             <Typography variant="h5">
@@ -92,8 +92,7 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                             </Typography>
 
                             <p>
-                                Enron Avoider is currently free, and we have no intention of ever
-                                being profitable. <br />
+                                Enron Avoider is currently free, and will likely remain free . <br />
                                 Hopefully we won't have many users, so
                                 our server costs stay low, and we can remain free.
                             </p>
@@ -125,16 +124,16 @@ export const Home: FunctionComponent<{}> = ({ }) => {
                             </p>
 
                         </Box>
-                    </Paper>
+                    </Paper> */}
 
-                    <Box p={2} mt={2}>
+                    {/* <Box p={2} mt={2}>
                         <p>
                             March 31, 2021 <br />
                             <Link href="https://twitter.com/esperancaJS" color="primary" target="_blank">
                                 Pedro Esperança
                             </Link>
                         </p>
-                    </Box>
+                    </Box> */}
                 </Grid>
             </Grid>
         </Box>
