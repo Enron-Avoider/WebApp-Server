@@ -29,11 +29,8 @@ export const RatioCollectionPicker: FunctionComponent<{ ratioCollections: any }>
             .filter((o: any) => typeof o !== 'undefined')
     )(allSearchParams.ratioCollections?.split('-').map(c => c.split('.')[1])) : [];
 
-    // console.log({
-    //     pickedChosenCollections
-    // });
-
     const handleCollectionToggle = (e: any, { v }: any) => {
+        console.log({ v });
         updateParams({
             search: getNewSearchParamsString({
                 ...v.length && {

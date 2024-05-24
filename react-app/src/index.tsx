@@ -23,7 +23,7 @@ console.log({ env });
     if (env.environment !== 'development') {
         await persistCache({
             cache,
-            storage: (localforage as any), //(window as any).localStorage,
+            storage: (localforage as any), //(window as any).localStorage, 
         });
     }
     const client = new ApolloClient({

@@ -63,13 +63,15 @@ export default function Table(
         title = '',
         isCollectionOwner,
         onTitleEdit,
+        collectionName
     }: {
         ticker?: string,
         years: number[],
         data: {}[],
         title?: string,
         isCollectionOwner?: boolean,
-        onTitleEdit?: Function
+        onTitleEdit?: Function,
+        collectionName?: String
     }
 ) {
 
@@ -131,7 +133,7 @@ export default function Table(
 
             {title && (
                 <Box position="relative" mt={-1} display="flex" justifyContent="space-between" alignItems="center">
-                    {onTitleEdit ? (
+                    {/* {onTitleEdit && false ? (
                         <TextField
                             // label="Name"
                             // fullWidth
@@ -142,11 +144,11 @@ export default function Table(
                                 onTitleEdit(event?.target?.value);
                             }}
                         />
-                    ) : (
-                        <Typography variant="h5">
+                    ) : ( */}
+                        <Typography variant="h6">
                             {title}
                         </Typography>
-                    )}
+                    {/* )} */}
 
                     <Box>
                         <IconButton color={showPercentage ? 'secondary' : 'primary'} onClick={toggleShowPercentage}>
@@ -228,7 +230,8 @@ export default function Table(
                                                                                         search: getNewSearchParamsString({
                                                                                             paramsToAdd: {
                                                                                                 ratio: cell.value,
-                                                                                                ticker
+                                                                                                ticker,
+                                                                                                ratioCollection: collectionName
                                                                                             }
                                                                                         })
                                                                                     }}

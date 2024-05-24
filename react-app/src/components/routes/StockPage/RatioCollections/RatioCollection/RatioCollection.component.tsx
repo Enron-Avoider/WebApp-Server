@@ -12,6 +12,7 @@ import { useQuery, useMutation } from "@apollo/client";
 
 import './style.sass';
 import Table from '../../Table';
+import NewCalcRowButton from '../../NewCalcRowButton';
 import { SAVE_RATIO_COLLECTION } from '@state/byModel/Calculations/calculations.queries';
 import { GET_AGGREGATES_FOR_CALC_ROWS } from '@state/byModel/Aggregate/aggregate.queries';
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
@@ -90,10 +91,16 @@ export const RatioCollection: FunctionComponent<{
                                 collection.calculationResults
                             }
                             onTitleEdit={onTitleEdit}
-                            collectionName={`${collection.name}.${collection.id}`}
+                            collectionName={`${collection.name}`}
                             isCollectionOwner={collection.isOwnedByUser}
                         />
                     </Box>
+
+                    <NewCalcRowButton
+                        title=""
+                        ticker={ticker}
+                        collectionName={collection.name}
+                    />
                 </Paper>
             </Grid>
         );

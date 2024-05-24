@@ -135,8 +135,6 @@ module.exports = {
             : false
         );
 
-        console.log({ existingUpload });
-
         return (
           existingUpload ||
           (await fetch(`http://${logoUrl}`)

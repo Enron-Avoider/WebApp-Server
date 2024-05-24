@@ -74,14 +74,14 @@ module.exports = {
               $match: {
                 ...query,
                 "yearlyFinancialsByYear.year": {
-                  $in: [`${lastYear - 1}`],
+                  $in: [`${lastYear}`],
                 },
                 is_in_exchange_country: true,
               },
             },
             {
               $facet: {
-                ...["country", "exchange", "industry", "sector"].reduce(
+                ...["country", "industry", "sector", "exchange"].reduce(
                   (p, c) => ({
                     ...p,
                     [c]: [
@@ -103,62 +103,21 @@ module.exports = {
           ])
           .toArray();
 
+      const countsMaybeCached = await this.getAggregationThroughCacheIfPossible({
+        cacheQuery: {
+          type: "lastYearCounts",
+          query,
+        },
+        getUncachedAggregationFn: counts,
+        getUncachedAggregationParameters: {
+          query
+        }
+      });
+
       return {
         query,
-        counts: (await counts())[0],
+        counts: countsMaybeCached[0],
       };
-    };
-
-    getAggregationThroughCacheIfPossible = async ({
-      cacheQuery,
-      getUncachedAggregationFn,
-      getUncachedAggregationParameters,
-      updateAlways = false,
-    }) => {
-      const aggregationInDB = (
-        await this.mongoDBAggregationsCacheTable
-          .find({
-            cacheQuery,
-          })
-          .toArray()
-      )[0];
-
-      if (
-        !!aggregationInDB &&
-        (updateAlways ||
-          (new Date() - new Date(aggregationInDB.retrieved_at)) /
-          (1000 * 60 * 60 * 24) >
-          14)
-      ) {
-        const object = await getUncachedAggregationFn(
-          getUncachedAggregationParameters
-        );
-        const updated = await this.mongoDBAggregationsCacheTable.updateOne(
-          { _id: aggregationInDB._id },
-          {
-            $set: {
-              cacheQuery,
-              object,
-              retrieved_at: Date.now(),
-            },
-          }
-        );
-        return object;
-      } else if (!!aggregationInDB) {
-        // console.log("in db", { cacheQuery });
-        return aggregationInDB.object;
-      } else {
-        // console.log("not in db", { cacheQuery });
-        const object = await getUncachedAggregationFn(
-          getUncachedAggregationParameters
-        );
-        const inserted = await this.mongoDBAggregationsCacheTable.insertOne({
-          cacheQuery,
-          object,
-          retrieved_at: Date.now(),
-        });
-        return object;
-      }
     };
 
     getAggregateForFinancialRows = async ({
@@ -857,5 +816,57 @@ module.exports = {
     };
 
     getRows = async ({ }) => OursDataMaps.rowKeysPaths;
+
+    getAggregationThroughCacheIfPossible = async ({
+      cacheQuery,
+      getUncachedAggregationFn,
+      getUncachedAggregationParameters,
+      updateAlways = false,
+    }) => {
+      const aggregationInDB = (
+        await this.mongoDBAggregationsCacheTable
+          .find({
+            cacheQuery,
+          })
+          .toArray()
+      )[0];
+
+      if (
+        !!aggregationInDB &&
+        (updateAlways ||
+          (new Date() - new Date(aggregationInDB.retrieved_at)) /
+          (1000 * 60 * 60 * 24) > 14) // TODO: confirm this works, seems odd
+      ) {
+        const object = await getUncachedAggregationFn(
+          getUncachedAggregationParameters
+        );
+        const updated = await this.mongoDBAggregationsCacheTable.updateOne(
+          { _id: aggregationInDB._id },
+          {
+            $set: {
+              cacheQuery,
+              object,
+              retrieved_at: Date.now(),
+            },
+          }
+        );
+        return object;
+      } else if (!!aggregationInDB) {
+        console.log("in db", { cacheQuery });
+        return aggregationInDB.object;
+      } else {
+        console.log("not in db", { cacheQuery });
+        const object = await getUncachedAggregationFn(
+          getUncachedAggregationParameters
+        );
+        const inserted = await this.mongoDBAggregationsCacheTable.insertOne({
+          cacheQuery,
+          object,
+          retrieved_at: Date.now(),
+        });
+        return object;
+      }
+    };
+
   },
 };

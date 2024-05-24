@@ -7,7 +7,6 @@ import {
     Autocomplete
 } from '@mui/material';
 
-import { GET_LAST_YEAR_COUNTS } from '@state/byModel/Aggregate/aggregate.queries';
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
 
@@ -74,7 +73,7 @@ export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
                         <TextField
                             {...params}
                             variant="outlined"
-                            label={`Selected Aggregations`}
+                            label={`Compare with`}
                             placeholder=""
                         />
                     )}

@@ -51,9 +51,11 @@ export default function NewCalcRowModal() {
 
     const { ratioCollections } = getCalculations({ stock });
 
-    const [chosenCollectionName, chosenCollectionId] = searchParams.ratioCollection?.split('.') || [];
-    const chosenCollection = ratioCollections?.find((c: any) => c.id === chosenCollectionId);
+    const [chosenCollectionName] = searchParams.ratioCollection?.split('.') || [];
+    const chosenCollection = ratioCollections?.find((c: any) => c.name === chosenCollectionName);
     const existingCalc = chosenCollection?.calcs?.find((c: any) => c.title === searchParams.ratio);
+
+    console.log({ ratioCollections, chosenCollectionName, chosenCollection });
 
     const [saveRatioCollection] = useMutation(SAVE_RATIO_COLLECTION);
 
@@ -398,6 +400,8 @@ export default function NewCalcRowModal() {
                         )}
                     </DialogActions>
                 )}
+
+                <pre>{JSON.stringify(chosenCollection, null, 2)}</pre>
             </Box>
         </Dialog>
     );

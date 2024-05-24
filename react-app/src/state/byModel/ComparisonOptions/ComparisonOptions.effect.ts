@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useQuery } from "@apollo/client";
 
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
