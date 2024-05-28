@@ -173,10 +173,18 @@ module.exports = {
           country: fundamentalData.General.CountryName,
           url: fundamentalData.General.WebURL,
           exchange: fundamentalData.General.Exchange,
-          EODExchange:
-            fundamentalData.General.CountryISO === "US"
-              ? "US"
-              : fundamentalData.General.Exchange,
+          market_capitalization:
+          fundamentalData.Highlights.MarketCapitalization,
+          sector: fundamentalData.General.Sector,
+          industry: fundamentalData.General.Industry,
+          description: fundamentalData.General.Description,
+          logo: logoUrl,
+          retrieved_at: Date.now(),
+          is_in_exchange_country,
+          is_delisted: fundamentalData.General.IsDelisted,
+          PrimaryTicker: fundamentalData.General.PrimaryTicker,
+          Listings: fundamentalData.General.Listings,
+          EODExchange: fundamentalData.General.PrimaryTicker.split(".")[1],
           currency_symbol: fundamentalData.General.CurrencySymbol,
           currency_code: fundamentalData.General.CurrencyCode,
           fundamentalsCurrency,
@@ -187,17 +195,9 @@ module.exports = {
           yearlyCurrencyPairsForPrice:
             yearlyCurrencyPairsForPrice &&
             yearlyCurrencyPairsForPrice.perYear,
-          market_capitalization:
-            fundamentalData.Highlights.MarketCapitalization,
-          sector: fundamentalData.General.Sector,
-          industry: fundamentalData.General.Industry,
-          description: fundamentalData.General.Description,
-          logo: logoUrl,
           yearlyFinancials,
           yearlyFinancialsWithKeys,
           yearlyFinancialsByYear,
-          retrieved_at: Date.now(),
-          is_in_exchange_country,
           dataByYear
           // has_biggest_last_year_market_cap
         }
@@ -279,6 +279,59 @@ module.exports = {
         },
         perYear,
       };
+    };
+
+    saveSingleStockToDB = async ({ Code, EODExchange, DontSkip }, dataSources) => {
+      const stockInDB = (
+        await this.mongoDBStocksTable
+          .find({
+            code: Code,
+            EODExchange,
+          })
+          .toArray()
+      )[0];
+
+      if (
+        !DontSkip &&
+        !!stockInDB &&
+        (new Date() - new Date(stockInDB.retrieved_at)) /
+        (1000 * 60 * 60 * 24) <
+        30
+      ) {
+        return "Skipped [Updated < 30 days ago]: " + Code + "." + EODExchange;
+      }
+
+      const stock = await this.getProviderStockByCode(
+        {
+          code: Code + "." + EODExchange,
+        },
+        dataSources
+      )
+        .then((s) => ({
+          ...s,
+          ...(!s.is_in_exchange_country && {
+            yearlyFinancials: null,
+            yearlyFinancialsWithKeys: null,
+            yearlyFinancialsByYear: null,
+          }),
+        }))
+        .catch((e) => {
+          console.log("Failed_: " + Code + "." + EODExchange + " - stockInDB:" + !!stockInDB, { e });
+          return {};
+        });
+
+      if (!!stockInDB && stock.code) {
+        const updated = await this.mongoDBStocksTable.updateOne(
+          { _id: stockInDB._id },
+          { $set: { ...stock } }
+        );
+        return "Updated: " + Code + "." + EODExchange;
+      } else if (stock.code) {
+        const inserted = await this.mongoDBStocksTable.insertOne(stock);
+        return "Created: " + Code + "." + EODExchange;
+      } else {
+        return "Failed: " + Code + "." + EODExchange;
+      }
     };
 
     saveBatchOfStocksToDB = async ({ stockBatch, EODExchange }, dataSources) => {
@@ -389,6 +442,10 @@ module.exports = {
             const exchangeStocksTickersSet = new Set(exchangeStocksTickers);
             const exchangeStocksInDBRecentlyUpdatedSet = new Set(exchangeStocksInDBRecentlyUpdated);
 
+            console.log({
+              exchangeStocksTickers, exchangeStocksInDBRecentlyUpdated
+            });
+
             // ⚠️ needs node v22
             const stocksToUpdate = exchangeStocksTickersSet.difference(exchangeStocksInDBRecentlyUpdatedSet);
 
@@ -463,6 +520,31 @@ module.exports = {
 
 
         return loopThroughExchangesOneByOne;
+
+      } else {
+        return null;
+      }
+    };
+
+    updateSingleStock = async ({ userId, Code, Exchange, DontSkip }, dataSources) => {
+      console.log({
+        Code,
+        Exchange
+      })
+      const isAdmin = true; //await dataSources.Ours.isAdmin({ id: userId });
+
+      if (isAdmin) {
+
+        const saveSingleStockToDB = this.saveSingleStockToDB(
+          {
+            Code,
+            EODExchange: Exchange,
+            DontSkip
+          },
+          dataSources
+        );
+
+        return saveSingleStockToDB;
 
       } else {
         return null;

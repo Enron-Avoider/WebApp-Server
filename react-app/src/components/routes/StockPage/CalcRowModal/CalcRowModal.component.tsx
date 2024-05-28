@@ -78,6 +78,11 @@ export default function NewCalcRowModal() {
                     title: row.title,
                     type: table.tableName
                 },
+                {
+                    value: `${table.path}.${row.title}[y-1]`.replace('yearlyFinancials.', ''),
+                    title: row.title + '[y-1]',
+                    type: table.tableName
+                },
                 ...row?.subRows ?
                     row.subRows.reduce((p_: any, row_: any) => [
                         ...p_,
@@ -259,7 +264,7 @@ export default function NewCalcRowModal() {
                 </DialogTitle>
                 <DialogContent>
 
-                    <Box display="flex" justifyContent="space-around">
+                    <Box display="flex" justifyContent="space-around" py={2}>
 
                         <Box flex={1} mr={3}>
                             <TextField
@@ -295,8 +300,6 @@ export default function NewCalcRowModal() {
                         </Box>
 
                     </Box>
-
-                    <Box p={2}></Box>
 
                     <Autocomplete
                         multiple
@@ -401,7 +404,7 @@ export default function NewCalcRowModal() {
                     </DialogActions>
                 )}
 
-                <pre>{JSON.stringify(chosenCollection, null, 2)}</pre>
+                {/* <pre>{JSON.stringify(chosenCollection, null, 2)}</pre> */}
             </Box>
         </Dialog>
     );

@@ -58,6 +58,8 @@ export const RatioCollection: FunctionComponent<{
             setTitle(edit);
         }
 
+        console.log({ collection });
+
         const {
             loading: loading_aggregatesForCalcRows,
             error: error_aggregatesForCalcRows,
@@ -96,11 +98,13 @@ export const RatioCollection: FunctionComponent<{
                         />
                     </Box>
 
-                    <NewCalcRowButton
-                        title=""
-                        ticker={ticker}
-                        collectionName={collection.name}
-                    />
+                    {collection.isOwnedByUser ? (
+                        <NewCalcRowButton
+                            title=""
+                            ticker={ticker}
+                            collectionName={collection.name}
+                        />
+                    ) : null}
                 </Paper>
             </Grid>
         );

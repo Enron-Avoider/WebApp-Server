@@ -243,7 +243,7 @@ const rowKeys = {
           subRows: [
             {
               title: "Long Term Debt",
-              oldTitle: "longTermDebtTotal",
+              oldTitle: "longTermDebt",
             },
             {
               title: "Capital Lease Obligations",
@@ -264,8 +264,8 @@ const rowKeys = {
           ],
         },
         {
-          title: "Other Liabilities",
-          oldTitle: "otherLiab",
+          title: "Total Debt",
+          oldTitle: "shortLongTermDebtTotal",
         },
       ],
     },
@@ -346,6 +346,10 @@ const rowKeys = {
       title: "Not Used",
       subRows: [
         {
+          title: "Other Liabilities",
+          oldTitle: "otherLiab",
+        },
+        {
           title: "Common Stock Total Equity",
           oldTitle: "commonStockTotalEquity",
         },
@@ -354,16 +358,12 @@ const rowKeys = {
           oldTitle: "retainedEarningsTotalEquity",
         },
         {
-          title: "longTermDebt",
-          oldTitle: "longTermDebt",
+          title: "longTermDebtTotal",
+          oldTitle: "longTermDebtTotal",
         },
         {
           title: "shortLongTermDebt",
           oldTitle: "shortLongTermDebt",
-        },
-        {
-          title: "shortLongTermDebtTotal",
-          oldTitle: "shortLongTermDebtTotal",
         },
         {
           title: "liabilitiesAndStockholdersEquity",
@@ -516,9 +516,9 @@ const rowKeysPaths = [
             `${k}.${r.title}`,
             ...(r.subRows
               ? r.subRows.reduce(
-                  (p, r_) => [...p, `${k}.${r.title}.subRows.${r_.title}`],
-                  []
-                )
+                (p, r_) => [...p, `${k}.${r.title}.subRows.${r_.title}`],
+                []
+              )
               : []),
           ],
           []

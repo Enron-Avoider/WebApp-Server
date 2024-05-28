@@ -28,11 +28,20 @@ export const scopeToRows = (scope: { [key: string]: string }, stock: any,) => Ob
     .reduce((acc: any, [k, v]: any, i: number) => ({
         ...acc,
         [k]: Object.entries(
-            deepFind(stock, 'yearlyFinancialsWithKeys.' + v) || []
-        ).reduce((p_, [k_, v_]) => ({
-            ...p_,
-            ...k_ !== 'subRows' ? { [k_]: v_ } : {}
-        }), {}),
+            deepFind(stock, 'yearlyFinancialsWithKeys.' + v.replace('[y-1]', '')) || []
+        ).reduce((p_, [k_, v_]) => {
+
+            const hasYearLyOffset = v.includes('[y-1]');
+            const isKeyANumber = !isNaN(parseInt(k_));
+
+            return {
+                ...p_,
+                ...isKeyANumber ? { [hasYearLyOffset ? parseInt(k_) + 1 : k_]: v_ } : {},
+                ...k_ === 'title' ? {
+                    title: v_ + (hasYearLyOffset ? '[y-1]' : '')
+                } : {}
+            }
+        }, {}),
     }), {});
 
 export const doCalculations = (
@@ -42,6 +51,13 @@ export const doCalculations = (
         .map(([key, value]: any) => value)
         .map(forTable => {
             const scopeRows = scopeToRows(forTable.scope, stock);
+
+            console.log({
+                forTable,
+                scope: forTable.scope,
+                scopeRows
+            });
+
             const calc = years?.reduce((acc: any, year: any, i: number) => ({
                 ...acc,
                 [`${year}`]:
@@ -53,7 +69,7 @@ export const doCalculations = (
                                     .filter(([key, value]: any) => !!value && key !== '__typename')
                                     .reduce((acc: any, [key, value]: any, i: number) => ({
                                         ...acc,
-                                        [key]: scopeRows[key][year],
+                                        [key]: scopeRows[key][year] || 0,
                                     }), {})
                             )
                         }

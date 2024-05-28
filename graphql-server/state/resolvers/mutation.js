@@ -13,6 +13,11 @@ module.exports = {
         params,
         dataSources
       ),
+    updateSingleStock: async (_source, params, { dataSources }) =>
+      dataSources.EODDataAPI.updateSingleStock(
+        params,
+        dataSources
+      ),
     // removeEmptyAndDuplicates: async (_source, params, { dataSources }) =>
     //   dataSources.Ours.removeEmptyAndDuplicates(params),
   },

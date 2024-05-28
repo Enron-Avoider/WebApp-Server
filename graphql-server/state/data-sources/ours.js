@@ -315,13 +315,13 @@ module.exports = {
           .toArray()
       )[0];
 
-      //   console.log({
-      //     query,
-      //     //   calcs,
-      //     stockToRank,
-      //     collectionId,
-      //     companiesForRow,
-      //   });
+      console.log({
+        query,
+        calcs: collection.calcs,
+        stockToRank,
+        collectionId,
+        companiesForRow,
+      });
 
       const getCalcRows = async ({
         query,
@@ -333,7 +333,7 @@ module.exports = {
           .filter((c) => !companiesForRow || companiesForRow === c.title)
           .map((c) => {
             const paths = Object.values(c.scope).map(
-              (v) => `yearlyFinancialsByYear.${v}.v`
+              (v) => `yearlyFinancialsByYear.${v.replace('[y-1]', '')}.v`
             );
 
             const calc = mathToMongo(
@@ -353,133 +353,155 @@ module.exports = {
             };
           });
 
+        console.dir(calcs_, { depth: null });
+
+        const lastYear = new Date().getFullYear() - 1;
+        const aggregation = [
+          {
+            $match: {
+              ...query,
+              "yearlyFinancialsByYear.year": {
+                $in: [`${lastYear}`],
+              },
+              is_in_exchange_country: true,
+            },
+          },
+          {
+            $unwind: {
+              path: "$yearlyFinancialsByYear",
+            },
+          },
+          {
+            $addFields: {
+              ...calcs_.reduce(
+                (p, { fieldName, calc, paths }) => ({
+                  ...p,
+                  [`calc_${fieldName}`]: calc,
+                }),
+                {}
+              ),
+            },
+          },
+          {
+            $facet: {
+              ...calcs_.reduce(
+                (p, { fieldName, calc, paths }) => ({
+                  ...p,
+                  [`calc_${fieldName}`]: [
+                    {
+                      $project: {
+                        name: 1,
+                        code: 1,
+                        EODExchange: 1,
+                        "yearlyFinancialsByYear.year": 1,
+                        [`calc_${fieldName}`]: {
+                          $toDecimal: `$calc_${fieldName}`,
+                        },
+                        //   [path]: { $toDecimal: `$${path}` },
+                      },
+                    },
+                    {
+                      $sort: {
+                        [`calc_${fieldName}`]: -1,
+                      },
+                    },
+                    {
+                      $group: {
+                        _id: {
+                          year: "$yearlyFinancialsByYear.year",
+                        },
+                        [`count`]: {
+                          $sum: 1,
+                        },
+                        [`sum`]: {
+                          $sum: `$${`calc_${fieldName}`}`,
+                        },
+                        [`avg`]: {
+                          $avg: `$${`calc_${fieldName}`}`,
+                        },
+                        [`companies`]: {
+                          $push: {
+                            company: "$name",
+                            code: "$code",
+                            EODExchange: "$EODExchange",
+                            v: `$${`calc_${fieldName}`}`,
+                          },
+                        },
+                      },
+                    },
+                    ...(stockToRank
+                      ? [
+                        {
+                          $addFields: {
+                            rank: {
+                              $indexOfArray: [
+                                "$companies.company",
+                                stockToRank,
+                              ],
+                            },
+                          },
+                        },
+                      ]
+                      : []),
+                    ...(!companiesForRow
+                      ? [
+                        {
+                          $addFields: {
+                            companies: { $size: "$companies" },
+                          },
+                        },
+                      ]
+                      : []),
+                    {
+                      $sort: {
+                        "_id.year": -1,
+                      },
+                    },
+                  ],
+                }),
+                {}
+              ),
+            },
+          },
+        ];
+
+        console.dir(aggregation, { depth: null });
+
         return (
           await this.mongoDBStocksTable
-            .aggregate([
-              {
-                $match: query,
-              },
-              {
-                $unwind: {
-                  path: "$yearlyFinancialsByYear",
-                },
-              },
-              {
-                $addFields: {
-                  ...calcs_.reduce(
-                    (p, { fieldName, calc, paths }) => ({
-                      ...p,
-                      [`calc_${fieldName}`]: calc,
-                    }),
-                    {}
-                  ),
-                },
-              },
-              {
-                $facet: {
-                  ...calcs_.reduce(
-                    (p, { fieldName, calc, paths }) => ({
-                      ...p,
-                      [`calc_${fieldName}`]: [
-                        {
-                          $project: {
-                            name: 1,
-                            code: 1,
-                            EODExchange: 1,
-                            "yearlyFinancialsByYear.year": 1,
-                            [`calc_${fieldName}`]: {
-                              $toDecimal: `$calc_${fieldName}`,
-                            },
-                            //   [path]: { $toDecimal: `$${path}` },
-                          },
-                        },
-                        {
-                          $sort: {
-                            [`calc_${fieldName}`]: -1,
-                          },
-                        },
-                        {
-                          $group: {
-                            _id: {
-                              year: "$yearlyFinancialsByYear.year",
-                            },
-                            [`count`]: {
-                              $sum: 1,
-                            },
-                            [`sum`]: {
-                              $sum: `$${`calc_${fieldName}`}`,
-                            },
-                            [`avg`]: {
-                              $avg: `$${`calc_${fieldName}`}`,
-                            },
-                            [`companies`]: {
-                              $push: {
-                                company: "$name",
-                                code: "$code",
-                                EODExchange: "$EODExchange",
-                                v: `$${`calc_${fieldName}`}`,
-                              },
-                            },
-                          },
-                        },
-                        ...(stockToRank
-                          ? [
-                            {
-                              $addFields: {
-                                rank: {
-                                  $indexOfArray: [
-                                    "$companies.company",
-                                    stockToRank,
-                                  ],
-                                },
-                              },
-                            },
-                          ]
-                          : []),
-                        ...(!companiesForRow
-                          ? [
-                            {
-                              $addFields: {
-                                companies: { $size: "$companies" },
-                              },
-                            },
-                          ]
-                          : []),
-                        {
-                          $sort: {
-                            "_id.year": -1,
-                          },
-                        },
-                      ],
-                    }),
-                    {}
-                  ),
-                },
-              },
-            ])
+            .aggregate(aggregation)
             .toArray()
         )[0];
       };
 
-      const calcRows = Object.keys(query).length
-        ? await this.getAggregationThroughCacheIfPossible({
-          cacheQuery: {
-            type: "calcRows",
-            query,
-            stockToRank,
-            companiesForRow,
-            collectionId,
-            calcs: collection.calcs,
-          },
-          getUncachedAggregationFn: getCalcRows,
-          getUncachedAggregationParameters: {
-            query,
-            stockToRank,
-            companiesForRow,
-            calcs: collection.calcs,
-          },
-        })
-        : {};
+      // const calcRows = Object.keys(query).length
+      //   ? await this.getAggregationThroughCacheIfPossible({
+      //     cacheQuery: {
+      //       type: "calcRows",
+      //       query,
+      //       stockToRank,
+      //       companiesForRow,
+      //       collectionId,
+      //       calcs: collection.calcs,
+      //     },
+      //     getUncachedAggregationFn: getCalcRows,
+      //     getUncachedAggregationParameters: {
+      //       query,
+      //       stockToRank,
+      //       companiesForRow,
+      //       calcs: collection.calcs,
+      //     },
+      //   })
+      //   : {};
+
+      const calcRows = await getCalcRows({
+        query,
+        stockToRank,
+        companiesForRow,
+        calcs: collection.calcs,
+      });
+
+      console.log({ calcRows });
 
       return {
         query,

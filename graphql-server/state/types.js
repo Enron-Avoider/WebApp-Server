@@ -101,6 +101,7 @@ const typeDefs = gql`
     saveRatioCollection(ratioCollection: JSON, userId: String): RatioCollection
     saveUser(user: JSON, userId: String): User
     updateStocksCompletely(userId: String): JSON
+    updateSingleStock(userId: String, Code: String, Exchange: String, DontSkip: Boolean): JSON
     removeEmptyAndDuplicates(userId: String): JSON
     # resetCache(key: String!): JSON
   }

@@ -1,6 +1,6 @@
 const pipe = require("../utils/pipe");
 
-const { rowKeys, rowKeysPaths } = require("./ours");
+const { rowKeys, rowKeysPaths } = require("./eod-to-ours_keys");
 
 const convertEODFundamentalsToYearlyFinancials = (
   fundamentalData,
@@ -12,8 +12,8 @@ const convertEODFundamentalsToYearlyFinancials = (
   const yearRange = Object.keys(fundamentalData.Financials.Balance_Sheet.yearly)
     .length
     ? Object.keys(fundamentalData.Financials.Balance_Sheet.yearly)
-        .map((y) => y.substring(0, 4))
-        .filter((value, index, self) => self.indexOf(value) === index)
+      .map((y) => y.substring(0, 4))
+      .filter((value, index, self) => self.indexOf(value) === index)
     : [];
 
   const convertStatementToTable = (statement, yearRange) => {
@@ -36,15 +36,15 @@ const convertEODFundamentalsToYearlyFinancials = (
 
     const tableFormat = rows
       ? rows.map((r) => ({
-          title: r,
-          ...yearRange.reduce(
-            (acc, y) => ({
-              ...acc,
-              [y]: yearFormat[y] ? yearFormat[y][r] : null,
-            }),
-            {}
-          ),
-        }))
+        title: r,
+        ...yearRange.reduce(
+          (acc, y) => ({
+            ...acc,
+            [y]: yearFormat[y] ? yearFormat[y][r] : null,
+          }),
+          {}
+        ),
+      }))
       : [];
 
     return tableFormat;
@@ -67,33 +67,75 @@ const convertEODFundamentalsToYearlyFinancials = (
   };
 
   const organizeTable = (statement, statementKey) => {
-    return [
+
+    const allKeysInEODStatement = statement?.map((row) => row.title);
+
+    const remainingKeysInEODStatement = [...allKeysInEODStatement];
+    let remainingKeysObject = { keys: [...allKeysInEODStatement] };
+
+    const getStatementRow = ({ oldTitle, remainingKeysObject }) => {
+
+      remainingKeysObject.keys = [...remainingKeysObject.keys.filter(key => key !== oldTitle)];
+
+      // console.log({ remainingKeysInEODStatement, "remainingKeysInEODStatement.length": remainingKeysInEODStatement.length, })
+
+      return statement.find(
+        (statementRow) => statementRow.title === oldTitle
+      );
+    }
+
+    const keysInList = [
+      ...rowKeys[statementKey].map((row) => (row.oldTitle)),
+      ...rowKeys[statementKey].map((row) => (row.subRows?.map((row_) => row_.oldTitle))),
+      ...rowKeys[statementKey].map((row) => (row.subRows?.map((row_) => row_.subRows?.map((row__) => row__.oldTitle)))),
+      ...rowKeys[statementKey].map((row) => (row.subRows?.map((row_) => row_.subRows?.map((row__) => row__.subRows?.map((row___) => row___.oldTitle)))))
+    ].flat(Infinity).filter(item => item);
+
+
+    const keysInListSet = new Set(keysInList);
+    const allKeysInEODStatementSet = new Set(allKeysInEODStatement);
+
+    // ⚠️ needs node v22
+    const remainingKeys = allKeysInEODStatementSet.difference(keysInListSet);
+
+    console.log({
+      keysInList: keysInList,
+      remainingKeys,
+      "keysInList.length": keysInList.length,
+      "remainingKeys.length": remainingKeys.length,
+      "allKeysInEODStatement.length": allKeysInEODStatement.length,
+    });
+
+    // console.log({
+    //   statementKey,
+    //   allKeysInEODStatement,
+    //   "allKeysInEODStatement.length": allKeysInEODStatement.length,
+    //   // statement,
+    //   remainingKeysObject,
+    //   "remainingKeysInEODStatement.length": remainingKeysObject.keys.length,
+    //   keysInList,
+    //   "keysInList.length": keysInList.length,
+    // });
+
+    const organizedTable = [
       ...rowKeys[statementKey].map((row) => ({
-        ...statement.find(
-          (statementRow) => statementRow.title === row.oldTitle
-        ),
+        ...getStatementRow({ oldTitle: row.oldTitle, remainingKeysObject }),
         title: row.title,
         EODTitle: row.oldTitle,
         // ...(row.type && { type: row.type }),
         ...(row.subRows && {
           subRows: row.subRows.map((row_) => ({
-            ...statement.find(
-              (statementRow) => statementRow.title === row_.oldTitle
-            ),
+            ...getStatementRow({ oldTitle: row_.oldTitle, remainingKeysObject }),
             title: row_.title,
             EODTitle: row_.oldTitle,
             ...(row_.subRows && {
               subRows: row_.subRows.map((row__) => ({
-                ...statement.find(
-                  (statementRow) => statementRow.title === row__.oldTitle
-                ),
+                ...getStatementRow({ oldTitle: row__.oldTitle, remainingKeysObject }),
                 title: row__.title,
                 EODTitle: row__.oldTitle,
                 ...(row__.subRows && {
                   subRows: row__.subRows.map((row___) => ({
-                    ...statement.find(
-                      (statementRow) => statementRow.title === row___.oldTitle
-                    ),
+                    ...getStatementRow({ oldTitle: row___.oldTitle, remainingKeysObject }),
                     title: row___.title,
                     EODTitle: row___.oldTitle,
                   })),
@@ -103,7 +145,19 @@ const convertEODFundamentalsToYearlyFinancials = (
           })),
         }),
       })),
+      {
+        title: "Not Used - Generated",
+        subRows: [
+          ...Array.from(remainingKeys)?.map(k => ({
+            title: k,
+            oldTitle: k,
+          }))
+        ],
+      },
+
     ];
+
+    return organizedTable;
   };
 
   const pricesByYear = yearRange.reduce(
@@ -173,28 +227,28 @@ const convertEODFundamentalsToYearlyFinancials = (
     years: yearRange,
     ...(yearRange.length
       ? [
-          ["pl", "Income_Statement"],
-          ["bs", "Balance_Sheet"],
-          ["cf", "Cash_Flow"],
-        ].reduce(
-          (p, [statementShortName, statementInEOD]) => ({
-            ...p,
-            [statementShortName]: pipe(
-              () => ({
-                f: fundamentalData.Financials[statementInEOD].yearly,
-                y: yearRange,
-              }),
-              ({ f, y }) => convertStatementToTable(f, y),
-              (table) =>
-                convertCurrencyInTable(
-                  table,
-                  yearlyCurrencyPairsForFundamental
-                ),
-              (table) => organizeTable(table, statementShortName)
-            )(),
-          }),
-          {}
-        )
+        ["pl", "Income_Statement"],
+        ["bs", "Balance_Sheet"],
+        ["cf", "Cash_Flow"],
+      ].reduce(
+        (p, [statementShortName, statementInEOD]) => ({
+          ...p,
+          [statementShortName]: pipe(
+            () => ({
+              f: fundamentalData.Financials[statementInEOD].yearly,
+              y: yearRange,
+            }),
+            ({ f, y }) => convertStatementToTable(f, y),
+            (table) =>
+              convertCurrencyInTable(
+                table,
+                yearlyCurrencyPairsForFundamental
+              ),
+            (table) => organizeTable(table, statementShortName)
+          )(),
+        }),
+        {}
+      )
       : []),
     price: convertCurrencyInTable([pricesByYear], yearlyCurrencyPairsForPrice),
     aggregatedShares: [aggregatedShares],
@@ -210,45 +264,45 @@ const yearlyFinancialsWithKeys = (yearlyFinancials) =>
         k === "years"
           ? v
           : v.reduce(
-              (p, c) => ({
-                ...p,
-                [c.title]: {
-                  ...c,
-                  ...(c.subRows && {
-                    subRows: c.subRows.reduce(
-                      (p_, c_) => ({
-                        ...p_,
-                        [c_.title]: {
-                          ...c_,
-                          ...(c_.subRows && {
-                            subRows: c_.subRows.reduce(
-                              (p__, c__) => ({
-                                ...p__,
-                                [c__.title]: {
-                                  ...c__,
-                                  ...(c__.subRows && {
-                                    subRows: c__.subRows.reduce(
-                                      (p___, c___) => ({
-                                        ...p___,
-                                        [c___.title]: c___,
-                                      }),
-                                      {}
-                                    ),
-                                  }),
-                                },
-                              }),
-                              {}
-                            ),
-                          }),
-                        },
-                      }),
-                      {}
-                    ),
-                  }),
-                },
-              }),
-              {}
-            ),
+            (p, c) => ({
+              ...p,
+              [c.title]: {
+                ...c,
+                ...(c.subRows && {
+                  subRows: c.subRows.reduce(
+                    (p_, c_) => ({
+                      ...p_,
+                      [c_.title]: {
+                        ...c_,
+                        ...(c_.subRows && {
+                          subRows: c_.subRows.reduce(
+                            (p__, c__) => ({
+                              ...p__,
+                              [c__.title]: {
+                                ...c__,
+                                ...(c__.subRows && {
+                                  subRows: c__.subRows.reduce(
+                                    (p___, c___) => ({
+                                      ...p___,
+                                      [c___.title]: c___,
+                                    }),
+                                    {}
+                                  ),
+                                }),
+                              },
+                            }),
+                            {}
+                          ),
+                        }),
+                      },
+                    }),
+                    {}
+                  ),
+                }),
+              },
+            }),
+            {}
+          ),
     }),
     {}
   );
@@ -289,7 +343,7 @@ const yearlyFinancialsFlatByYear = (yearlyFinancialsWithKeys) => {
                                         v:
                                           yearlyFinancialsWithKeys[k][k_]
                                             .subRows[k__].subRows[k___].subRows[
-                                            k____
+                                          k____
                                           ][year] || 0,
                                       },
                                     }),
@@ -329,8 +383,8 @@ const convertEODFundamentalsToDataByYear = (
   const yearRange = Object.keys(fundamentalData.Financials.Balance_Sheet.yearly)
     .length
     ? Object.keys(fundamentalData.Financials.Balance_Sheet.yearly)
-        .map((y) => y.substring(0, 4))
-        .filter((value, index, self) => self.indexOf(value) === index)
+      .map((y) => y.substring(0, 4))
+      .filter((value, index, self) => self.indexOf(value) === index)
     : [];
 
   const convertStatementToByYear = (statement, yearRange) => {
@@ -353,18 +407,18 @@ const convertEODFundamentalsToDataByYear = (
 
     const newFormat = rows
       ? yearRange.reduce(
-          (acc, y) => ({
-            ...acc,
-            [y]: rows.reduce(
-              (acc, r) => ({
-                ...acc,
-                [r]: yearFormat[y] ? yearFormat[y][r] : null,
-              }),
-              {}
-            ),
-          }),
-          {}
-        )
+        (acc, y) => ({
+          ...acc,
+          [y]: rows.reduce(
+            (acc, r) => ({
+              ...acc,
+              [r]: yearFormat[y] ? yearFormat[y][r] : null,
+            }),
+            {}
+          ),
+        }),
+        {}
+      )
       : [];
 
     //   rows.reduce(
@@ -387,22 +441,22 @@ const convertEODFundamentalsToDataByYear = (
 
   const statementsByYear = yearRange.length
     ? [
-        ["pl", "Income_Statement"],
-        ["bs", "Balance_Sheet"],
-        ["cf", "Cash_Flow"],
-      ].reduce(
-        (p, [statementShortName, statementInEOD]) => ({
-          ...p,
-          [statementShortName]: pipe(
-            () => ({
-              f: fundamentalData.Financials[statementInEOD].yearly,
-              y: yearRange,
-            }),
-            ({ f, y }) => convertStatementToByYear(f, y)
-          )(),
-        }),
-        {}
-      )
+      ["pl", "Income_Statement"],
+      ["bs", "Balance_Sheet"],
+      ["cf", "Cash_Flow"],
+    ].reduce(
+      (p, [statementShortName, statementInEOD]) => ({
+        ...p,
+        [statementShortName]: pipe(
+          () => ({
+            f: fundamentalData.Financials[statementInEOD].yearly,
+            y: yearRange,
+          }),
+          ({ f, y }) => convertStatementToByYear(f, y)
+        )(),
+      }),
+      {}
+    )
     : [];
 
   const convertCurrencyInTable = (table, yearlyCurrencyPairs) => {
