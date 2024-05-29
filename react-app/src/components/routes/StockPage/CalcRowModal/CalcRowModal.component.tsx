@@ -55,7 +55,7 @@ export default function NewCalcRowModal() {
     const chosenCollection = ratioCollections?.find((c: any) => c.name === chosenCollectionName);
     const existingCalc = chosenCollection?.calcs?.find((c: any) => c.title === searchParams.ratio);
 
-    console.log({ ratioCollections, chosenCollectionName, chosenCollection });
+    // console.log({ ratioCollections, chosenCollectionName, chosenCollection, existingCalc });
 
     const [saveRatioCollection] = useMutation(SAVE_RATIO_COLLECTION);
 
@@ -91,6 +91,11 @@ export default function NewCalcRowModal() {
                             title: row.title + ' > ' + row_.title,
                             type: table.tableName
                         },
+                        {
+                            value: `${table.path}.${row.title}.subRows.${row_.title}[y-1]`.replace('yearlyFinancials.', ''),
+                            title: row.title + ' > ' + row_.title + '[y-1]',
+                            type: table.tableName
+                        },
                         ...row_?.subRows ?
                             row_.subRows.reduce((p__: any, row__: any) => [
                                 ...p__,
@@ -99,12 +104,22 @@ export default function NewCalcRowModal() {
                                     title: row.title + ' > ' + row_.title + ' > ' + row__.title,
                                     type: table.tableName
                                 },
+                                {
+                                    value: `${table.path}.${row.title}.subRows.${row_.title}.subRows.${row__.title}[y-1]`.replace('yearlyFinancials.', ''),
+                                    title: row.title + ' > ' + row_.title + ' > ' + row__.title + '[y-1]',
+                                    type: table.tableName
+                                },
                                 ...row__?.subRows ?
                                     row__.subRows.reduce((p___: any, row___: any) => [
                                         ...p___,
                                         {
                                             value: `${table.path}.${row.title}.subRows.${row_.title}.subRows.${row__.title}.subRows.${row___.title}`.replace('yearlyFinancials.', ''),
                                             title: row.title + ' > ' + row_.title + ' > ' + row__.title + ' > ' + row___.title,
+                                            type: table.tableName
+                                        },
+                                        {
+                                            value: `${table.path}.${row.title}.subRows.${row_.title}.subRows.${row__.title}.subRows.${row___.title}[y-1]`.replace('yearlyFinancials.', ''),
+                                            title: row.title + ' > ' + row_.title + ' > ' + row__.title + ' > ' + row___.title + '[y-1]',
                                             type: table.tableName
                                         }
                                     ], []) :
@@ -117,14 +132,34 @@ export default function NewCalcRowModal() {
         ];
     }, []).filter(i => i.title) : [];
 
-    const options = [
+
+    const otherCalcOptions = ratioCollections ? [
+        ...ratioCollections?.map(c => c.calcs?.map(calc => ({
+            title: calc.title,
+            type: `Calculations on ${c.name}`,
+            value: `_calc_${c.name}_${calc.title}`,
+            calc
+        }))).flat(Infinity)
+    ] : [];
+
+    const mathOptions = [
         { value: '/', title: '/', type: 'Math' },
         { value: '*', title: '*', type: 'Math' },
         { value: '+', title: '+', type: 'Math' },
         { value: '-', title: '-', type: 'Math' },
         { value: '(', title: '(', type: 'Math' },
         { value: ")", title: ')', type: 'Math' },
+        { value: "1", title: '1', type: 'Math' },
+        { value: "2", title: '2', type: 'Math' },
+        { value: 'M', title: 'max(0,', type: 'Math' },
+        // { value: 'max(0,', title: 'max(0,', type: 'Math' }, // this breaks multi calc logic, as it has many letters
         ...calcRowOptions
+    ];
+
+    const options = [
+        ...mathOptions,
+        ...calcRowOptions,
+        ...otherCalcOptions
     ];
 
     const history = useHistory();
@@ -148,8 +183,7 @@ export default function NewCalcRowModal() {
         setAutocompleteValue(v);
     }
 
-    // autocompleteValue to calc
-    // console.log({ autocompleteValue });
+    console.log({ autocompleteValue });
     const calc: CalculationType[] = [
         autocompleteValue?.reduce((acc: any, curr: any, i: number) => {
             // console.log(curr.type);
@@ -159,7 +193,8 @@ export default function NewCalcRowModal() {
             return ({
                 scope: {
                     ...acc.scope,
-                    ...(curr?.type !== 'Math' ? { [letterIndex]: curr?.value } : {})
+                    ...(curr?.type !== 'Math' ? { [letterIndex]: curr?.value } : {}),
+                    ...(curr?.type.includes('Calculations on') ? { [letterIndex]: curr?.calc } : {})
                 },
                 calc: `${acc?.calc}${(curr?.type === 'Math' ? curr?.value : letterIndex)}`
             })
@@ -168,6 +203,7 @@ export default function NewCalcRowModal() {
             calc: '',
         })
     ];
+    // console.log({ calc });
 
     const handleAdd = async () => {
         await saveRatioCollection({
@@ -240,13 +276,27 @@ export default function NewCalcRowModal() {
         if (existingCalc) {
             setTitleValue(existingCalc.title);
             setAboutValue(existingCalc.about);
+            console.log({ existingCalc });
             const autocompleteValue = existingCalc?.calc.split('').map((letter: string) => {
-                if (['a', 'b', 'c', 'd', 'e', 'f', 'g'].includes(letter)) {
+                if (existingCalc.scope[letter]?.scope !== undefined) {
+                    // type missing
+                    return {
+                        title: existingCalc.scope[letter].title,
+                        type: `Calculations on MISSING`,
+                        value: `_calc_MISSING_${existingCalc.scope[letter].title}`,
+                        calc: existingCalc.scope[letter]
+                    }
+                    
+                    
+                    // existingCalc.scope[letter];
+                }
+                else if (['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'].includes(letter)) {
                     return options.find((op) => op.value === existingCalc.scope[letter])
                 } else {
                     return options.find((op) => op.value === letter)
                 }
             });
+            console.log({ autocompleteValue });
             setAutocompleteValue(autocompleteValue);
         }
     }, [searchParams.ratio]);
@@ -348,7 +398,7 @@ export default function NewCalcRowModal() {
 
                     {stock && (
                         <Box m={-2} mt={2}>
-                            {/* <pre>{JSON.stringify(scopeRows, null, 2)}</pre> */}
+                            <pre>{JSON.stringify(scopeRows, null, 2)}</pre>
                             <Table
                                 years={stock?.yearlyFinancials?.years}
                                 data={[

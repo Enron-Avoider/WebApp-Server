@@ -318,13 +318,13 @@ module.exports = {
             .toArray()
         )[0];
 
-        console.log({
-          query,
-          calcs: collection.calcs,
-          stockToRank,
-          collectionId,
-          companiesForRow,
-        });
+        // console.log({
+        //   query,
+        //   calcs: collection.calcs,
+        //   stockToRank,
+        //   collectionId,
+        //   companiesForRow,
+        // });
 
         const getCalcRows = async ({
           query,
