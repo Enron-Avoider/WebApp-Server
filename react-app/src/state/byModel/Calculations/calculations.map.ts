@@ -24,7 +24,7 @@ export const calculations: CalculationType[] = [
 ];
 
 export const scopeToRows = (scope: { [key: string]: string }, stock: any,) => {
-    console.log({ scope });
+    // console.log({ scope });
 
     //const scopeWithCalcScope = scope
 
@@ -34,24 +34,51 @@ export const scopeToRows = (scope: { [key: string]: string }, stock: any,) => {
             ...acc,
             // for when using another calc
             ...v.scope ? {
-                ...Object.entries(v.scope)?.map(([k_, v_]) => ({
-                    [k + "_" + k_]: Object.entries(
-                        deepFind(stock, 'yearlyFinancialsWithKeys.' + v_.replace('[y-1]', '')) || []
-                    ).reduce((p_, [k__, v__]) => {
+                ...Object.entries(v.scope)?.map(([k_, v_]) => {
+                    if (v_.scope) { // 2nd level of another calc
+                        return ({
+                            ...Object.entries(v_.scope)?.map(([k__, v__]) => {
+                                return ({
+                                    [k + "_" + k_ + "_" + k__]: Object.entries(
+                                        deepFind(stock, 'yearlyFinancialsWithKeys.' + v__.replace('[y-1]', '')) || []
+                                    ).reduce((p__, [k___, v___]) => {
 
-                        const hasYearlyOffset = v_.includes('[y-1]');
-                        const isKeyANumber = !isNaN(parseInt(k__));
+                                        const hasYearlyOffset = v__.includes('[y-1]');
+                                        const isKeyANumber = !isNaN(parseInt(k___));
 
-                        return {
-                            ...p_,
-                            ...isKeyANumber ? { [hasYearlyOffset ? parseInt(k__) + 1 : k__]: v__ } : {},
-                            ...k__ === 'title' ? {
-                                title: v__ + (hasYearlyOffset ? '[y-1]' : '')
-                            } : {}
-                        }
-                    }, {})
+                                        return {
+                                            ...p__,
+                                            ...isKeyANumber ? { [hasYearlyOffset ? parseInt(k___) + 1 : k___]: v___ } : {},
+                                            ...k___ === 'title' ? {
+                                                title: v___ + (hasYearlyOffset ? '[y-1]' : '')
+                                            } : {}
+                                        }
+                                    }, {})
 
-                })).reduce((acc, curr) => ({ ...acc, ...curr }), {})
+                                })
+                            }).reduce((acc, curr) => ({ ...acc, ...curr }), {})
+                        })
+                    } else {
+                        return ({
+                            [k + "_" + k_]: Object.entries(
+                                deepFind(stock, 'yearlyFinancialsWithKeys.' + v_.replace('[y-1]', '')) || []
+                            ).reduce((p_, [k__, v__]) => {
+
+                                const hasYearlyOffset = v_.includes('[y-1]');
+                                const isKeyANumber = !isNaN(parseInt(k__));
+
+                                return {
+                                    ...p_,
+                                    ...isKeyANumber ? { [hasYearlyOffset ? parseInt(k__) + 1 : k__]: v__ } : {},
+                                    ...k__ === 'title' ? {
+                                        title: v__ + (hasYearlyOffset ? '[y-1]' : '')
+                                    } : {}
+                                }
+                            }, {})
+
+                        })
+                    }
+                }).reduce((acc, curr) => ({ ...acc, ...curr }), {})
             } : {},
             ...!v.scope ? {
                 [k]: Object.entries(
@@ -77,7 +104,7 @@ export const doCalculations = (
     calculations: CalculationType[], years: number[], stock: any, title?: string
 ) => {
 
-    // console.log({ calculations });
+    console.log({ calculations });
 
     return Object.entries(calculations)
         .map(([key, value]: any) => value)
@@ -90,37 +117,43 @@ export const doCalculations = (
             //     scopeRows
             // });
 
-            const isUpperCase = (string: string) => /^[A-Z]*$/.test(string)
+            const isUpperCase = (string: string) => /^[A-Z]*$/.test(string);
+            const isALetter = (letter_: string) => letter_.toLowerCase() != letter_.toUpperCase();
 
             const calcWithOtherCalcs = Array.from(forTable.calc as string)?.reduce((acc: Array<string>, letter: string) => {
+                // math functions
                 if (isUpperCase(letter)) {
                     if (letter === 'M') {
                         return [...acc, 'max(0,'];
                     }
                 }
+                //other calcs
                 else if (forTable.scope?.[letter]?.scope !== undefined) {
 
                     // console.log({
                     //     scope: forTable.scope?.[letter]?.scope,
-                    //     cond: forTable.scope?.[letter]?.scope !== undefined,
-                    //     a: forTable.scope[letter]?.scope
+                    //     cond: forTable.scope?.[letter]?.scope !== undefined
                     // });
 
                     return [...acc, "(", ...Array.from(forTable.scope?.[letter]?.calc)?.map((letter_) => {
-                        const isALetter = letter_.toLowerCase() != letter_.toUpperCase();
-                        return isALetter ? letter + "_" + letter_ : letter_
-                    }
-                    ), ")"];
-                }
-                else {
+                        if (forTable.scope?.[letter]?.scope[letter_]?.scope !== undefined) {
+                            return ["(", ...Array.from(forTable.scope?.[letter]?.scope[letter_]?.calc)?.map((letter__) => {
+                                return isALetter(letter__) ? letter + "_" +letter_ + "_" + letter__ : letter__
+                            }), ")"].join("");
+                        } else {
+                            return isALetter(letter_) ? letter + "_" + letter_ : letter_
+                        }
+                    }), ")"];
+
+                } else { //direct calcs
                     return [...acc, letter];
                 }
             }, []).join("");
 
-            // console.log({
-            //     calcWithOtherCalcs,
-            //     scope: forTable.scope
-            // });
+            console.log({
+                calcWithOtherCalcs,
+                scope: forTable.scope
+            });
 
             const calc = years?.reduce((acc: any, year: any, i: number) => ({
                 ...acc,

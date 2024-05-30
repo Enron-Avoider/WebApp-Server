@@ -398,7 +398,7 @@ export default function NewCalcRowModal() {
 
                     {stock && (
                         <Box m={-2} mt={2}>
-                            <pre>{JSON.stringify(scopeRows, null, 2)}</pre>
+                            {/* <pre>{JSON.stringify(scopeRows, null, 2)}</pre> */}
                             <Table
                                 years={stock?.yearlyFinancials?.years}
                                 data={[
