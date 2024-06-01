@@ -3,10 +3,19 @@
 const jsep = require("jsep");
 
 const mathToMongo = (mathExpr, args) => {
+
+  // console.log({
+  //   mathExpr, args
+  // });
+
   const exprString = mathExpr
     .split("")
     .map((l) => (RegExp(/[a-z]/).test(l) ? `_[${l.charCodeAt(0) - 97}]` : l))
     .reduce((p, c) => `${p}${c}`, "");
+
+  // console.log({
+  //   exprString
+  // });
 
   //treat first parameter as array or convert variable list of parameters to array and ignore first element (expression)
   const argsList =
@@ -76,6 +85,12 @@ const mathToMongo = (mathExpr, args) => {
         ) {
           return args[node.property.value];
         }
+
+      case "CallExpression":
+        if (node.callee.name === "M") {
+          return { $max: [0, transformJsepExpression(node.arguments[0], args)] };
+        }
+
     }
 
     return "error";

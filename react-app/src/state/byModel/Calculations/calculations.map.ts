@@ -104,7 +104,7 @@ export const doCalculations = (
     calculations: CalculationType[], years: number[], stock: any, title?: string
 ) => {
 
-    console.log({ calculations });
+    // console.log({ calculations });
 
     return Object.entries(calculations)
         .map(([key, value]: any) => value)
@@ -138,10 +138,16 @@ export const doCalculations = (
                     return [...acc, "(", ...Array.from(forTable.scope?.[letter]?.calc)?.map((letter_) => {
                         if (forTable.scope?.[letter]?.scope[letter_]?.scope !== undefined) {
                             return ["(", ...Array.from(forTable.scope?.[letter]?.scope[letter_]?.calc)?.map((letter__) => {
-                                return isALetter(letter__) ? letter + "_" +letter_ + "_" + letter__ : letter__
+                                return isALetter(letter__) ? letter + "_" + letter_ + "_" + letter__ : letter__
                             }), ")"].join("");
                         } else {
-                            return isALetter(letter_) ? letter + "_" + letter_ : letter_
+                            if (isUpperCase(letter_)) {
+                                if (letter_ === 'M') {
+                                    return 'max(0,';
+                                }
+                            } else {
+                                return isALetter(letter_) ? letter + "_" + letter_ : letter_
+                            }
                         }
                     }), ")"];
 
@@ -149,11 +155,6 @@ export const doCalculations = (
                     return [...acc, letter];
                 }
             }, []).join("");
-
-            console.log({
-                calcWithOtherCalcs,
-                scope: forTable.scope
-            });
 
             const calc = years?.reduce((acc: any, year: any, i: number) => ({
                 ...acc,
@@ -174,7 +175,14 @@ export const doCalculations = (
                         }
                     })()
 
-            }), { title: forTable.title || title, type: 'calc', onTable: forTable.onTable })
+            }), { title: forTable.title || title, type: 'calc', onTable: forTable.onTable });
+
+            console.log({
+                calcWithOtherCalcs,
+                scope: forTable.scope,
+                scopeRows,
+                calc
+            });
 
             return calc;
         });
