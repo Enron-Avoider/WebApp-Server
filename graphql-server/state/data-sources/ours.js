@@ -43,12 +43,6 @@ module.exports = {
     getStockByCode = async ({ code }) => {
       const [Ticker, EODExchange] = code.split(".");
 
-      //   console.log({
-      //     code,
-      //     Ticker,
-      //     EODExchange,
-      //   });
-
       const stockInDB = await this.mongoDBStocksTable.findOne({
         code: Ticker,
         ...(EODExchange && { EODExchange }),
@@ -318,14 +312,6 @@ module.exports = {
             .toArray()
         )[0];
 
-        // console.log({
-        //   query,
-        //   calcs: collection.calcs,
-        //   stockToRank,
-        //   collectionId,
-        //   companiesForRow,
-        // });
-
         const getCalcRows = async ({
           query,
           stockToRank,
@@ -358,50 +344,27 @@ module.exports = {
                   }
                 }, []
               );
-              // console.log({
-              //   calc: c.calc,
-              //   title: c.title,
-              //   scope: c.scope,
-              //   paths
-              // });
 
               const isUpperCase = (string) => /^[A-Z]*$/.test(string);
               const isLowerCase = (string) => /^[a-z]*$/.test(string);
-              const isALetter = (letter_) => letter_.toLowerCase() != letter_.toUpperCase();
               const alphabet = new Array(26).fill(1).map((_, i) => String.fromCharCode(97 + i));
 
               const calcWithOtherCalcs = Array.from(c.calc)?.reduce((acc, letter, i) => {
-                // math functions
-                if (isUpperCase(letter)) {
-                  if (letter === 'M') {
-                    return [...acc, 'M('];
-                  }
-                }
-                //other calcs
-                else if (c.scope?.[letter]?.scope !== undefined) {
-
-                  // console.log({
-                  //     scope: c.scope?.[letter]?.scope,
-                  //     cond: c.scope?.[letter]?.scope !== undefined
-                  // });
-
+                if (c.scope?.[letter]?.scope !== undefined) {
                   return [...acc, "(", ...Array.from(c.scope?.[letter]?.calc)?.map((letter_, ii) => {
                     if (c.scope?.[letter]?.scope[letter_]?.scope !== undefined) {
                       return ["(", ...Array.from(c.scope?.[letter]?.scope[letter_]?.calc)?.map((letter__, iii) => {
                         return isLowerCase(letter__) ? 'a' : isUpperCase(letter__) && letter__ === 'M' ? 'M(' : letter__
                       }), ")"].join("");
                     } else {
-                      return isLowerCase(letter_) ? 'a' :  isUpperCase(letter_) && letter_ === 'M' ? 'M(' : letter_
+                      return isLowerCase(letter_) ? 'a' : isUpperCase(letter_) && letter_ === 'M' ? 'M(' : letter_
                     }
                   }), ")"].join("");
-
                 } else { //direct calcs
-                  return [...acc, isLowerCase(letter) ? 'a' : letter];
+                  return [...acc, isLowerCase(letter) ? 'a' : isUpperCase(letter) && letter === 'M' ? 'M(' : letter];
                 }
               }, [])
                 .reduce((acc, l, i) => {
-                  // console.log({ l, l2: isLowerCase(l) ? alphabet[acc.count] : '', count: acc.count, isLowerCase: isLowerCase(l) })
-                  // return isLowerCase(l) ? alphabet[i] : l;
                   return {
                     calc: [...acc.calc, isLowerCase(l) ? alphabet[acc.count] : l],
                     count: acc.count + (isLowerCase(l) ? 1 : 0)
@@ -410,18 +373,11 @@ module.exports = {
                 ?.calc
                 ?.join("");
 
-              //.map((l, i) => isLowerCase(l) ? alphabet[i] : l)
-
-              console.log({ title: c.title, calcWithOtherCalcs, paths });
-
 
               const calc = mathToMongo(
-                // TODO change letters to match paths, by taking into account other calcs
                 calcWithOtherCalcs,
                 paths.map((p) => `$${p}`)
               );
-
-              console.log({ calc });
 
               return {
                 fieldName: c.title.replace(/\./g, "_"),
@@ -597,8 +553,6 @@ module.exports = {
           companiesForRow,
           calcs: collection.calcs,
         });
-
-        console.log({ calcRows });
 
         return {
           query,
