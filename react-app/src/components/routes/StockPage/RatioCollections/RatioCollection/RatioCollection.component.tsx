@@ -95,6 +95,7 @@ export const RatioCollection: FunctionComponent<{
                             onTitleEdit={onTitleEdit}
                             collectionName={`${collection.name}`}
                             isCollectionOwner={collection.isOwnedByUser}
+                            loading={loading_aggregatesForCalcRows}
                         />
                     </Box>
 

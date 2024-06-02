@@ -78,16 +78,15 @@ export const Stock: FunctionComponent<{
             {
                 !stock_loading && stock ? (
                     <>
-
                         <Box position="fixed" top={63} width="100%" left={0} zIndex={2}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     <Paper style={{ height: '100%' }}>
                                         <Container>
                                             <Box display="flex" flexDirection="row" p={2}>
-                                                <Box flex="1" maxWidth="100%">
-                                                    <Box display="flex" flexDirection="row" justifyContent="space-between">
-                                                        <Box display="flex" flexDirection="row">
+                                                <Box flex="1">
+                                                    <Box display="flex" flexDirection="row" justifyContent="space-between" flexWrap="wrap" mb="-15px">
+                                                        <Box display="flex" flexDirection="row" pb="15px">
                                                             <Box
                                                                 display="flex"
                                                                 alignItems="center"
@@ -96,8 +95,8 @@ export const Stock: FunctionComponent<{
                                                             >
                                                                 <Avatar className="avatar" variant="rounded" src={`//${stock.logo}`} />
                                                             </Box>
-                                                            <Box display="flex" flexDirection="column" >
-                                                                <Box display="flex" alignItems="center" mr={2}>
+                                                            <Box display="flex" flexDirection="column">
+                                                                <Box display="flex" alignItems="center" mr={2} mb={-2}>
                                                                     <Typography variant="h6">
                                                                         {stock.name}
                                                                     </Typography>
@@ -107,7 +106,7 @@ export const Stock: FunctionComponent<{
                                                                         </Typography>
                                                                     </Box>
                                                                 </Box>
-                                                                <Box display="flex" flex="auto" alignItems="flex-start" flexDirection="column">
+                                                                <Box display="flex" flex="auto" alignItems="flex-start" flexDirection="column" flexWrap="nowrap">
                                                                     <Typography
                                                                         display="block"
                                                                         noWrap={true}
@@ -164,18 +163,20 @@ export const Stock: FunctionComponent<{
                                                                 </Box>
                                                             </Box>
                                                         </Box>
-                                                        <Box display="flex" flexDirection="row">
-                                                            <Box
+                                                        
+                                                        <Box display="flex" flexDirection="row-reverse" pb="15px">
+                                                            <Box>
+                                                                <ComparisonsPicker />
+                                                            </Box>
+                                                            {/* <Box
                                                                 display="flex"
                                                                 alignItems="center"
                                                                 justifyContent="center"
-                                                                mr={3}
+                                                                mr={loading_aggregatesForFinancialRows ? 3 : 0}
                                                             >
                                                                 {loading_aggregatesForFinancialRows && <CircularProgress />}
-                                                            </Box>
-                                                            <ComparisonsPicker />
+                                                            </Box> */}
                                                         </Box>
-
                                                     </Box>
                                                 </Box>
                                             </Box>
@@ -186,6 +187,7 @@ export const Stock: FunctionComponent<{
                                                         years={stock.yearlyFinancials?.years}
                                                         data={[]}
                                                         ticker={ticker}
+                                                        loading={loading_aggregatesForFinancialRows}
                                                     />
                                                 </Box>
                                             ) : null}
@@ -228,6 +230,7 @@ export const Stock: FunctionComponent<{
                                             ]
                                         }
                                         ticker={ticker}
+                                        loading={loading_aggregatesForFinancialRows}
                                     />
                                 </Paper>
 
@@ -260,6 +263,7 @@ export const Stock: FunctionComponent<{
                                                                 years={stock.yearlyFinancials?.years}
                                                                 data={mergedStockAndAggregatesYearlyFinancials?.pl || stock.yearlyFinancials?.pl}
                                                                 ticker={ticker}
+                                                                loading={loading_aggregatesForFinancialRows}
                                                             />
                                                         </Paper>
                                                     </Grid>
@@ -272,6 +276,7 @@ export const Stock: FunctionComponent<{
                                                                 years={stock.yearlyFinancials?.years}
                                                                 data={mergedStockAndAggregatesYearlyFinancials?.bs || stock.yearlyFinancials?.bs}
                                                                 ticker={ticker}
+                                                                loading={loading_aggregatesForFinancialRows}
                                                             />
                                                         </Paper>
                                                     </Grid>
@@ -284,6 +289,7 @@ export const Stock: FunctionComponent<{
                                                                 years={stock.yearlyFinancials?.years}
                                                                 data={mergedStockAndAggregatesYearlyFinancials?.cf || stock.yearlyFinancials?.cf}
                                                                 ticker={ticker}
+                                                                loading={loading_aggregatesForFinancialRows}
                                                             />
                                                         </Paper>
                                                     </Grid>

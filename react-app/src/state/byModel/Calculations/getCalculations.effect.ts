@@ -38,6 +38,7 @@ export default function getCalculations({ stock }: { stock?: any }) {
     return {
         ratioCollections,
         pickedCollections,
-        pickedCollectionsWithCalculations
+        pickedCollectionsWithCalculations,
+        ratioCollections_loading
     };
 }

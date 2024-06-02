@@ -16,6 +16,7 @@ import {
     MenuItem,
     TextField,
 } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 import { ArrowDropDown, Equalizer, ZoomOutMap } from '@mui/icons-material';
 const math = require("mathjs");
 
@@ -63,7 +64,8 @@ export default function Table(
         title = '',
         isCollectionOwner,
         onTitleEdit,
-        collectionName
+        collectionName,
+        loading
     }: {
         ticker?: string,
         years: number[],
@@ -71,7 +73,8 @@ export default function Table(
         title?: string,
         isCollectionOwner?: boolean,
         onTitleEdit?: Function,
-        collectionName?: String
+        collectionName?: String,
+        loading?: boolean,
     }
 ) {
 
@@ -145,9 +148,20 @@ export default function Table(
                             }}
                         />
                     ) : ( */}
+                    <Box display="flex">
                         <Typography variant="h6">
                             {title}
+
                         </Typography>
+                        <Box
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            ml={3}
+                        >
+                            {loading && <CircularProgress />}
+                        </Box>
+                    </Box>
                     {/* )} */}
 
                     <Box>

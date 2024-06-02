@@ -14,7 +14,7 @@ import './style.sass';
 
 export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
     const { allSearchParams, getNewSearchParamsString, updateParams } = useSearchParams();
-    const { comparisonOptions } = getComparisonOptions();
+    const { comparisonOptions, comparisonOptionsLoading } = getComparisonOptions();
 
     const pickedComparisons = allSearchParams.comparisons ? (
         ids => ids?.map(
@@ -57,6 +57,7 @@ export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
                     options={comparisonOptions}
                     getOptionLabel={option => option ? option?.title : ''}
                     value={pickedComparisons}
+                    loading={comparisonOptionsLoading}
                     // inputValue={v}
                     // onInputChange={(_, newInputValue) => {
                     //     console.log({

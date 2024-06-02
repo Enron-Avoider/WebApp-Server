@@ -80,6 +80,7 @@ export default function getComparisonOptions() {
         comparisonOptions,
         getComparisonOption,
         pickedComparisons,
-        pickedComparisonsOptions
+        pickedComparisonsOptions,
+        comparisonOptionsLoading: lastYearCounts_loading
     };
 }

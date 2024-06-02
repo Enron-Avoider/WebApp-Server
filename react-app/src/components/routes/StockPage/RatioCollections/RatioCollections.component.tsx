@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from 'react';
-import { useQuery } from "@apollo/client";
 import {
     Paper,
     Grid,
@@ -8,20 +7,17 @@ import {
     Avatar,
     Link,
 } from '@mui/material';
-
+import CircularProgress from '@mui/material/CircularProgress';
 import './style.sass';
-import { doCalculations } from '../calculations.map';
 import RatioCollectionPicker from './RatioCollectionPicker';
 import RatioCollection from './RatioCollection';
-import { GET_RATIO_COLLECTIONS, GET_CALCULATIONS } from '@state/byModel/Calculations/calculations.queries';
-import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import getCalculations from '@state/byModel/Calculations/getCalculations.effect';
 
 export const RatioCollections: FunctionComponent<{
     ticker: string, stock: any
 }> = ({ ticker, stock }) => {
 
-    const { ratioCollections, pickedCollectionsWithCalculations } = getCalculations({ stock });
+    const { ratioCollections, pickedCollectionsWithCalculations, ratioCollections_loading } = getCalculations({ stock });
 
     return (
         <Paper>
@@ -35,6 +31,15 @@ export const RatioCollections: FunctionComponent<{
                         Ratio Collections
                     </Typography>
 
+                    <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        mr={3}
+                    >
+                        {ratioCollections_loading && <CircularProgress />}
+                    </Box>
+
                     <RatioCollectionPicker ratioCollections={ratioCollections} />
                 </Box>
 
@@ -42,7 +47,7 @@ export const RatioCollections: FunctionComponent<{
                     <Grid container spacing={3}>
                         {pickedCollectionsWithCalculations?.map((c, i) => (
                             <RatioCollection
-                                key={c.name+i}
+                                key={c.name + i}
                                 ticker={ticker}
                                 stock={stock}
                                 collection={c}
