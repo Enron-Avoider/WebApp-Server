@@ -161,7 +161,7 @@ module.exports = {
       };
 
       const logoUrl = fundamentalData.General.LogoURL
-        ? getUploadedImg(
+        ? await getUploadedImg(
           "eodhistoricaldata.com" + fundamentalData.General.LogoURL
         )
         : null;
@@ -550,6 +550,5 @@ module.exports = {
         return null;
       }
     };
-
   },
 };

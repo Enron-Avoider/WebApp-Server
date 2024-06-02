@@ -98,25 +98,6 @@ const convertEODFundamentalsToYearlyFinancials = (
     // ⚠️ needs node v22
     const remainingKeys = allKeysInEODStatementSet.difference(keysInListSet);
 
-    console.log({
-      keysInList: keysInList,
-      remainingKeys,
-      "keysInList.length": keysInList.length,
-      "remainingKeys.length": remainingKeys.length,
-      "allKeysInEODStatement.length": allKeysInEODStatement.length,
-    });
-
-    // console.log({
-    //   statementKey,
-    //   allKeysInEODStatement,
-    //   "allKeysInEODStatement.length": allKeysInEODStatement.length,
-    //   // statement,
-    //   remainingKeysObject,
-    //   "remainingKeysInEODStatement.length": remainingKeysObject.keys.length,
-    //   keysInList,
-    //   "keysInList.length": keysInList.length,
-    // });
-
     const organizedTable = [
       ...rowKeys[statementKey].map((row) => ({
         ...getStatementRow({ oldTitle: row.oldTitle, remainingKeysObject }),
