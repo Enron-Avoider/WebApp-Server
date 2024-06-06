@@ -288,7 +288,12 @@ export default function Table(
                                                                             >
                                                                                 <span className="number">{numeral(row.original[c][cell.column.id].avg?.$numberDecimal).format('(0a)')}</span>{'・'}
                                                                                 <span className="number">{numeral(row.original[c][cell.column.id].sum?.$numberDecimal).format('(0a)')}</span>{'・'}
-                                                                                <span className="number">{row.original[c][cell.column.id].rank}/{row.original[c][cell.column.id].count}</span>
+                                                                                <span className="number">
+                                                                                    TODO
+                                                                                    {
+                                                                                        //row.original[c][cell.column.id].rank}/{row.original[c][cell.column.id].count
+                                                                                    }
+                                                                                </span>
                                                                             </span> : '-'
                                                                         )
                                                                 }</small>

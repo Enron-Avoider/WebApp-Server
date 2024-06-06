@@ -6,6 +6,7 @@ import {
     TextField,
     Autocomplete
 } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import useSearchParams from '@state/byModel/Global/useSearchParams.effect';
 import getComparisonOptions from '@state/byModel/ComparisonOptions/ComparisonOptions.effect';
@@ -45,7 +46,17 @@ export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
     }
 
     return (
-        <>
+        <Box display="flex">
+            {comparisonOptionsLoading ? (
+                <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    mr={comparisonOptionsLoading ? 3 : 0}
+                >
+                    {comparisonOptionsLoading && <CircularProgress />}
+                </Box>
+            ) : null}
             <Box width={465}>
                 <Autocomplete
                     multiple
@@ -94,7 +105,7 @@ export const ComparisonsPicker: FunctionComponent<{}> = ({ }) => {
                     }
                 />
             </Box>
-        </>
+        </Box>
     );
 }
 
