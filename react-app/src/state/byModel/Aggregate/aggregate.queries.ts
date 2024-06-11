@@ -22,7 +22,7 @@ export const GET_AGGREGATES_FOR_FINANCIAL_ROWS = (aggregatesList: string[], stoc
         (p, v) => ({
             ...p,
             [v]:
-                (v => `getAggregateForFinancialRows(stockToRank:"${stock.name}", query: { ${v[0] === 'Stock_Related' ? v[1].replaceAll("_", " ") : v[0]
+                (v => `getAggregateForFinancialRows(query: { ${v[0] === 'Stock_Related' ? v[1].replaceAll("_", " ") : v[0]
                     }: "${v[0] === 'Stock_Related' ? stock[v[1]] : v[1]?.replaceAll("_", " ")
                     }" })`)
                     (v.split('__'))
@@ -65,7 +65,7 @@ export const GET_AGGREGATES_FOR_CALC_ROWS = ({
         (p, v) => ({
             ...p,
             [v]:
-                (v => `getAggregateForCalcRows(stockToRank:"${stock.name}", collectionId:"${collectionId}", query: { ${v[0] === 'Stock_Related' ? v[1].replaceAll("_", " ") : v[0]
+                (v => `getAggregateForCalcRows(collectionId:"${collectionId}", query: { ${v[0] === 'Stock_Related' ? v[1].replaceAll("_", " ") : v[0]
                     }: "${v[0] === 'Stock_Related' ? stock[v[1]] : v[1]?.replaceAll("_", " ")
                     }"})`)
                     (v.split('__'))

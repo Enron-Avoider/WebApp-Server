@@ -76,14 +76,12 @@ const typeDefs = gql`
     getLastYearCounts(query: AggregationInputQuery): JSON
     getAggregateForFinancialRows(
         query: AggregationInputQuery,
-        stockToRank: String,
         companiesForRow: String
     ): JSON
     getAggregateForCalcRows(
         query: AggregationInputQuery,
         collectionId: String,
         calcs: [JSON],
-        stockToRank: String,
         companiesForRow: String
     ): JSON
 
@@ -104,6 +102,8 @@ const typeDefs = gql`
     updateSingleStock(userId: String, Code: String, Exchange: String, DontSkip: Boolean): JSON
     removeEmptyAndDuplicates(userId: String): JSON
     # resetCache(key: String!): JSON
+    makeFinancialRowsCache: JSON
+    makeCalcRowsCache: JSON
   }
 `;
 module.exports = {

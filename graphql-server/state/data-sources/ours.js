@@ -119,17 +119,17 @@ module.exports = {
 
     getAggregateForFinancialRows = async ({
       query,
-      stockToRank,
-      companiesForRow,
+      companiesForRow, // a financial row, only one at a time due to resource intensity, but we could try adding more
     }) => {
 
-      console.log("getAggregateForFinancialRows", { query, stockToRank, companiesForRow });
+      console.log("getAggregateForFinancialRows", { query, companiesForRow });
 
       const getSomeFinancialRows = async ({
         rowKeysPathsBatch,
-        stockToRank,
         companiesForRow,
       }) => {
+
+        console.log("getSomeFinancialRows", { query, rowKeysPathsBatch, companiesForRow });
 
         const getSomeFinancialRowsAggregation = [
           {
@@ -164,6 +164,9 @@ module.exports = {
                         },
                       },
                       {
+                        $match: { [path]: { $lt: 10000000000000 } } // weeds out bad data
+                      },
+                      {
                         $sort: {
                           [path]: -1,
                         },
@@ -173,39 +176,157 @@ module.exports = {
                           _id: {
                             year: "$yearlyFinancialsByYear.year",
                           },
-                          [`count`]: {
+                          count: {
                             $sum: 1,
                           },
-                          [`sum`]: {
-                            $sum: `$${path}`,
+                          sum: {
+                            $sum: `$${path}`
                           },
-                          [`avg`]: {
-                            $avg: `$${path}`,
+                          avg: {
+                            $avg: `$${path}`
                           },
-                          [`companies`]: {
+                          max: {
+                            $max: `$${path}`
+                          },
+                          min: {
+                            $min: `$${path}`
+                          },
+                          median: {
+                            $median: {
+                              input: `$${path}`,
+                              method: "approximate"
+                            }
+                          },
+                          companies: {
                             $push: {
                               company: "$name",
                               code: "$code",
                               EODExchange: "$EODExchange",
-                              v: `$${path}`,
+                              v: { $divide: [`$${path}`, 10000000] }
                             },
                           },
                         },
                       },
-                      ...(stockToRank
-                        ? [
-                          {
-                            $addFields: {
-                              rank: {
-                                $indexOfArray: [
-                                  "$companies.company",
-                                  stockToRank,
-                                ],
+                      {
+                        $sort: {
+                          "_id.year": -1,
+                        },
+                      },
+                      {
+                        $addFields: {
+                          range: {
+                            $toInt: {
+                              $divide: [
+                                {
+                                  $subtract: [
+                                    {
+                                      $toInt: {
+                                        $divide: ["$max", 10000000]
+                                      }
+                                    },
+                                    {
+                                      $toInt: {
+                                        $divide: ["$min", 10000000]
+                                      }
+                                    }
+                                  ]
+                                },
+                                9
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      {
+                        $addFields: {
+                          ranges: {
+                            $cond: {
+                              if: {
+                                $gt: ["$range", 0]
                               },
-                            },
-                          },
-                        ]
-                        : []),
+                              then: {
+                                $range: [
+                                  {
+                                    $toInt: {
+                                      $divide: ["$min", 10000000]
+                                    }
+                                  },
+                                  {
+                                    $toInt: {
+                                      $divide: ["$max", 10000000]
+                                    }
+                                  },
+                                  "$range"
+                                ]
+                              },
+                              else: []
+                            }
+                          }
+                        }
+                      },
+                      {
+                        $addFields: {
+                          ranges: {
+                            $map: {
+                              input: "$ranges",
+                              as: "r",
+                              in: {
+                                min: "$$r",
+                                max: {
+                                  $add: ["$$r", "$range"]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        $addFields: {
+                          ranges: {
+                            $map: {
+                              input: "$ranges",
+                              as: "r",
+                              in: {
+                                range: ["$$r.min", "$$r.max"],
+                                companies: {
+                                  $size: {
+                                    $filter: {
+                                      input: "$companies",
+                                      as: "c",
+                                      cond: {
+                                        $and: [
+                                          {
+                                            $gt: ["$$c.v", "$$r.min"]
+                                          },
+                                          {
+                                            $lt: ["$$c.v", "$$r.max"]
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        $addFields: {
+                          companies: {
+                            $map: {
+                              input: "$companies",
+                              as: "c",
+                              in: {
+                                company: "$$c.company",
+                                code: "$$c.code",
+                                EODExchange: "$$c.EODExchange",
+                                v: { $multiply: ["$$c.v", 10000000] }
+                              }
+                            }
+                          }
+                        }
+                      },
                       ...(!companiesForRow
                         ? [
                           {
@@ -214,12 +335,7 @@ module.exports = {
                             },
                           },
                         ]
-                        : []),
-                      {
-                        $sort: {
-                          "_id.year": -1,
-                        },
-                      },
+                        : [])
                     ],
                   }),
                   {}
@@ -228,7 +344,7 @@ module.exports = {
           },
         ];
 
-        console.dir(getSomeFinancialRowsAggregation, { depth: null });
+        // console.dir(getSomeFinancialRowsAggregation, { depth: null });
 
         return (
           await this.mongoDBStocksTable
@@ -242,7 +358,6 @@ module.exports = {
 
       const getAllFinancialRows = async ({
         query,
-        stockToRank,
         companiesForRow,
       }) => {
         const rowKeysPathsBatches = chunkUp(
@@ -256,23 +371,20 @@ module.exports = {
           async (accUnresolved, batch, i) => {
             const accResolved = await accUnresolved;
 
-            console.log("working on", { batch });
-
             const batchResults = await this.getAggregationThroughCacheIfPossible(
               {
                 cacheQuery: {
                   type: "someFinancialRows",
                   query,
                   rowKeysPathsBatch: batch,
-                  stockToRank,
                   companiesForRow,
                 },
                 getUncachedAggregationFn: getSomeFinancialRows,
                 getUncachedAggregationParameters: {
                   rowKeysPathsBatch: batch,
-                  stockToRank,
                   companiesForRow,
                 },
+                updateAlways: true
               }
             );
 
@@ -290,15 +402,13 @@ module.exports = {
           cacheQuery: {
             type: "allFinancialRows",
             query,
-            stockToRank,
             companiesForRow,
           },
           getUncachedAggregationFn: getAllFinancialRows,
           getUncachedAggregationParameters: {
             query,
-            stockToRank,
             companiesForRow,
-          },
+          }
         })
         : {};
 
@@ -311,7 +421,6 @@ module.exports = {
     getAggregateForCalcRows = async ({
       query,
       //   calcs,
-      stockToRank,
       collectionId,
       companiesForRow,
     }) => {
@@ -328,7 +437,6 @@ module.exports = {
 
         const getCalcRows = async ({
           query,
-          stockToRank,
           companiesForRow,
           calcs,
         }) => {
@@ -398,7 +506,8 @@ module.exports = {
                 calc,
                 l: paths.length,
               };
-            });
+            })
+            .filter(c => c.calc !== 'error');
 
           // console.dir(calcs_, { depth: null });
 
@@ -441,7 +550,7 @@ module.exports = {
             {
               $addFields: {
                 ...calcs_.reduce(
-                  (p, { fieldName, calc, paths }) => ({
+                  (p, { fieldName, calc }) => ({
                     ...p,
                     [`calc_${fieldName}`]: calc,
                   }),
@@ -452,7 +561,7 @@ module.exports = {
             {
               $facet: {
                 ...calcs_.reduce(
-                  (p, { fieldName, calc, paths }) => ({
+                  (p, { fieldName, calc }) => ({
                     ...p,
                     [`calc_${fieldName}`]: [
                       {
@@ -468,6 +577,9 @@ module.exports = {
                         },
                       },
                       {
+                        $match: { [`calc_${fieldName}`]: { $lt: 10000000000000 } } // weeds out bad data
+                      },
+                      {
                         $sort: {
                           [`calc_${fieldName}`]: -1,
                         },
@@ -477,39 +589,323 @@ module.exports = {
                           _id: {
                             year: "$yearlyFinancialsByYear.year",
                           },
-                          [`count`]: {
+                          count: {
                             $sum: 1,
                           },
-                          [`sum`]: {
+                          sum: {
                             $sum: `$${`calc_${fieldName}`}`,
                           },
-                          [`avg`]: {
+                          avg: {
                             $avg: `$${`calc_${fieldName}`}`,
                           },
-                          [`companies`]: {
+                          max: {
+                            $max: `$${`calc_${fieldName}`}`,
+                          },
+                          min: {
+                            $min: `$${`calc_${fieldName}`}`,
+                          },
+                          median: {
+                            $median: {
+                              input: `$${`calc_${fieldName}`}`,
+                              method: "approximate"
+                            }
+                          },
+                          companies: {
                             $push: {
                               company: "$name",
                               code: "$code",
                               EODExchange: "$EODExchange",
-                              v: `$${`calc_${fieldName}`}`,
+                              v: `$${`calc_${fieldName}`}`
                             },
                           },
                         },
                       },
-                      ...(stockToRank
-                        ? [
-                          {
-                            $addFields: {
-                              rank: {
-                                $indexOfArray: [
-                                  "$companies.company",
-                                  stockToRank,
-                                ],
+                      {
+                        $sort: {
+                          "_id.year": -1,
+                        },
+                      },
+                      {
+                        $addFields: {
+                          range: {
+                            $subtract: ["$max", "$min"]
+                          }
+                        }
+                      },
+                      {
+                        $addFields: {
+                          rangeStep: {
+                            $divide: ["$range", 20]
+                          }
+                        }
+                      },
+                      {
+                        '$addFields': {
+                          rangeStep: {
+                            $cond: {
+                              if: {
+                                $and: [
+                                  {
+                                    $gt: ["$range", 10000000]
+                                  }
+                                ]
                               },
-                            },
+                              then: {
+                                '$cond': {
+                                  if: {
+                                    '$eq': [
+                                      {
+                                        '$toInt': 
+                                          { $divide: ['$rangeStep', 100000] }
+                                      },
+                                      0
+                                    ]
+                                  },
+                                  then: 1,
+                                  else: '$rangeStep'
+                                }
+                              },
+                              else: {
+                                '$cond': {
+                                  if: {
+                                    '$eq': [
+                                      {
+                                        $toInt: {
+                                          $multiply: [
+                                            "$rangeStep",
+                                            100
+                                          ]
+                                        }       
+                                      },
+                                      0
+                                    ]
+                                  },
+                                  then: 1,
+                                  else: '$rangeStep'
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        $addFields: {
+                          ranges: {
+                            $cond: {
+                              if: {
+                                $and: [
+                                  {
+                                    $gt: ["$range", 10000000]
+                                  }
+                                ]
+                              },
+                              then: {
+                                $range: [
+                                  {
+                                    $toInt: {
+                                      $divide: ["$min", 100000]
+                                    }
+                                  },
+                                  {
+                                    $toInt: {
+                                      $divide: ["$max", 100000]
+                                    }
+                                  },
+                                  {
+                                    $toInt: {
+                                      $divide: [
+                                        "$rangeStep",
+                                        100000
+                                      ]
+                                    }
+                                  }
+                                ]
+                              },
+                              else: {
+                                $range: [
+                                  {
+                                    $toInt: {
+                                      $multiply: ["$min", 100]
+                                    }
+                                  },
+                                  {
+                                    $toInt: {
+                                      $multiply: ["$max", 100]
+                                    }
+                                  },
+                                  {
+                                    $toInt: {
+                                      $multiply: [
+                                        "$rangeStep",
+                                        100
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            }
                           },
-                        ]
-                        : []),
+                          companies: {
+                            $cond: {
+                              if: {
+                                $gt: ["$range", 10000000]
+                              },
+                              then: {
+                                $map: {
+                                  input: "$companies",
+                                  as: "c",
+                                  in: {
+                                    company: "$$c.company",
+                                    code: "$$c.code",
+                                    EODExchange: "$$c.EODExchange",
+                                    v: { $divide: ["$$c.v", 100000] }
+                                  }
+                                }
+                              },
+                              else: {
+                                $map: {
+                                  input: "$companies",
+                                  as: "c",
+                                  in: {
+                                    company: "$$c.company",
+                                    code: "$$c.code",
+                                    EODExchange: "$$c.EODExchange",
+                                    v: { $multiply: ["$$c.v", 100] }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        $addFields: {
+                          ranges: {
+                            '$cond': {
+                              if: {
+                                '$gt': ['$range', 10000000]
+                              },
+                              then: {
+                                '$map': {
+                                  input: '$ranges',
+                                  as: 'r',
+                                  in: { min: '$$r', max: { '$add': ['$$r', { '$divide': ['$rangeStep', 100000] }] } }
+                                }
+                              },
+                              else: {
+                                '$map': {
+                                  input: '$ranges',
+                                  as: 'r',
+                                  in: { min: '$$r', max: { '$add': ['$$r', { '$multiply': ['$rangeStep', 100] }] } }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+
+                      {
+                        $addFields: {
+                          ranges: {
+                            '$cond': {
+                              if: {
+                                '$gt': ['$range', 10000000]
+                              },
+                              then: {
+                                $map: {
+                                  input: "$ranges",
+                                  as: "r",
+                                  in: {
+                                    range: [{ $multiply: ["$$r.min", 100000] }, { $multiply: ["$$r.max", 100000] }],
+                                    companies: {
+                                      $size: {
+                                        $filter: {
+                                          input: "$companies",
+                                          as: "c",
+                                          cond: {
+                                            $and: [
+                                              {
+                                                $gt: ["$$c.v", "$$r.min"]
+                                              },
+                                              {
+                                                $lt: ["$$c.v", "$$r.max"]
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              else: {
+                                $map: {
+                                  input: "$ranges",
+                                  as: "r",
+                                  in: {
+                                    range: [{ $divide: ["$$r.min", 100] }, { $divide: ["$$r.max", 100] }],
+                                    companies: {
+                                      $size: {
+                                        $filter: {
+                                          input: "$companies",
+                                          as: "c",
+                                          cond: {
+                                            $and: [
+                                              {
+                                                $gt: ["$$c.v", "$$r.min"]
+                                              },
+                                              {
+                                                $lt: ["$$c.v", "$$r.max"]
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        $addFields: {
+                          companies: {
+                            $cond: {
+                              if: {
+                                $gt: ["$range", 10000000]
+                              },
+                              then: {
+                                $map: {
+                                  input: "$companies",
+                                  as: "c",
+                                  in: {
+                                    company: "$$c.company",
+                                    code: "$$c.code",
+                                    EODExchange: "$$c.EODExchange",
+                                    v: { $multiply: ["$$c.v", 100000] }
+                                  }
+                                }
+                              },
+                              else: {
+                                $map: {
+                                  input: "$companies",
+                                  as: "c",
+                                  in: {
+                                    company: "$$c.company",
+                                    code: "$$c.code",
+                                    EODExchange: "$$c.EODExchange",
+                                    v: { $divide: ["$$c.v", 100] }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+
+
                       ...(!companiesForRow
                         ? [
                           {
@@ -518,12 +914,7 @@ module.exports = {
                             },
                           },
                         ]
-                        : []),
-                      {
-                        $sort: {
-                          "_id.year": -1,
-                        },
-                      },
+                        : [])
                     ],
                   }),
                   {}
@@ -541,38 +932,36 @@ module.exports = {
           )[0];
         };
 
-        // const calcRows = Object.keys(query).length
-        //   ? await this.getAggregationThroughCacheIfPossible({
-        //     cacheQuery: {
-        //       type: "calcRows",
-        //       query,
-        //       stockToRank,
-        //       companiesForRow,
-        //       collectionId,
-        //       calcs: collection.calcs,
-        //     },
-        //     getUncachedAggregationFn: getCalcRows,
-        //     getUncachedAggregationParameters: {
-        //       query,
-        //       stockToRank,
-        //       companiesForRow,
-        //       calcs: collection.calcs,
-        //     },
-        //   })
-        //   : {};
+        const calcRows = Object.keys(query).length
+          ? await this.getAggregationThroughCacheIfPossible({
+            cacheQuery: {
+              type: "calcRows",
+              query,
+              companiesForRow,
+              collectionId,
+              calcs: collection.calcs,
+            },
+            getUncachedAggregationFn: getCalcRows,
+            getUncachedAggregationParameters: {
+              query,
+              companiesForRow,
+              calcs: collection.calcs,
+            },
+            updateAlways: true
+          })
+          : {};
 
-        const calcRows = await getCalcRows({
-          query,
-          stockToRank,
-          companiesForRow,
-          calcs: collection.calcs,
-        });
+        // const calcRows = await getCalcRows({
+        //   query,
+        //   companiesForRow,
+        //   calcs: collection.calcs,
+        // });
 
         return {
           query,
           collectionId,
           // calcs: collection.calcs,
-          calcRows,
+          calcRows
         };
       } else {
         return {
@@ -815,7 +1204,7 @@ module.exports = {
         !!aggregationInDB &&
         (updateAlways ||
           (new Date() - new Date(aggregationInDB.retrieved_at)) /
-          (1000 * 60 * 60 * 24) > 14) // TODO: confirm this works, seems odd
+          (100 * 60 * 60 * 24) > 14) // TODO: confirm this works, seems odd
       ) {
         const object = await getUncachedAggregationFn(
           getUncachedAggregationParameters
@@ -846,6 +1235,90 @@ module.exports = {
         });
         return object;
       }
+    };
+
+    // TODO
+    // 1-8 weeks
+    makeFinancialRowsCache = async ({ }) => {
+      // Yeah, not happening, unless worth waiting for like 3-5 weeks
+
+      const { counts } = await this.getLastYearCounts({ query: {} });
+      const paths = await this.getRows({});
+
+      const categories = Object.entries(counts);
+      console.log({ categories });
+
+      const workingBatch = await Promise.all(
+        categories.map(async ([k, v], i) => {
+
+          const v_ = await v.map(async ({ _id, count }, i) => {
+            const p = await paths.map(async (path, i) => {
+              console.log({ k, _id, path });
+              return path;
+            });
+            return p;
+          });
+
+          // console.log({ v_ });
+
+
+          return { v_, k, v };
+        }));
+
+
+
+      // const hum = this.getAggregateForFinancialRows({
+      //   query: {
+      //     sector: "Communication Services",
+      //     companiesForRow: "pl.Total Revenue"
+      //   },
+      //   companiesForRow,
+      // });
+
+      return { workingBatch, counts, paths };
+    };
+
+    // TODO
+    // 1 day ?
+    makeCalcRowsCache = async ({ }) => {
+      const { counts } = await this.getLastYearCounts({ query: {} });
+      // const paths = await this.getRows({});
+
+      const ratioCollections = await this.getRatioCollections({});
+      const categories = Object.entries(counts);
+      console.log({ categories });
+
+      const workingBatch = await Promise.all(
+        categories.map(async ([k, v], i) => {
+
+          const v_ = await v.map(async ({ _id, count }, i) => {
+            const p = await ratioCollections.map(async (ratioCollection, i) => {
+              console.log({ sector: k, _id, companiesForRow: ratioCollection.name, ratioCollectionId: ratioCollection.id, });
+
+              const hum = await this.getAggregateForCalcRows({
+                query: {
+                  [k]: _id,
+                },
+                collectionId: ratioCollection.id,
+                companiesForRow: ratioCollection.name
+              });
+
+              console.log({ hum });
+
+              return hum;
+            });
+            return p;
+          });
+
+
+
+          // console.log({ v_ });
+
+
+          return { v_, k, v };
+        }));
+
+      return { ratioCollections, workingBatch, counts };
     };
 
   },

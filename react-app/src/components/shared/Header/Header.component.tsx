@@ -133,6 +133,25 @@ export default function Header() {
                             >
                                 Rank
                             </Link>
+                            <Link
+                                className="hide-on-mobile"
+                                style={{
+                                    ...window.location.pathname.includes('/ranking/') && { fontWeight: 'bold' },
+                                    marginLeft: '15px'
+                                }}
+                                component={Link_}
+                                color="inherit"
+                                variant="subtitle1"
+                                to={
+                                    {
+                                        pathname: `/ranking/pl.Total Revenue`,
+                                        search: (getNewSearchParamsString({ paramsToAdd: { ticker: allSearchParams.ticker || 'AMZN' } }) as string)
+                                    }
+                                }
+                                target="_blank"
+                            >
+                                Screener
+                            </Link>
                             {/* <Link
                                 className="hide-on-mobile"
                                 style={{

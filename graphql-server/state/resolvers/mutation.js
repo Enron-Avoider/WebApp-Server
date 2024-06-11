@@ -18,6 +18,18 @@ module.exports = {
         params,
         dataSources
       ),
+
+    makeFinancialRowsCache: async (_source, params, { dataSources }) =>
+      dataSources.Ours.makeFinancialRowsCache(
+        params,
+        dataSources
+      ),
+
+    makeCalcRowsCache: async (_source, params, { dataSources }) =>
+      dataSources.Ours.makeCalcRowsCache(
+        params,
+        dataSources
+      ),
     // removeEmptyAndDuplicates: async (_source, params, { dataSources }) =>
     //   dataSources.Ours.removeEmptyAndDuplicates(params),
   },
