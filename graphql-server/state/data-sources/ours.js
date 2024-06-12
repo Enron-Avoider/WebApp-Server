@@ -507,7 +507,8 @@ module.exports = {
                 l: paths.length,
               };
             })
-            .filter(c => c.calc !== 'error');
+            .filter(c => c.calc !== 'error')
+            //.splice(0,1);
 
           // console.dir(calcs_, { depth: null });
 
@@ -923,7 +924,7 @@ module.exports = {
             },
           ];
 
-          // console.dir(aggregation, { depth: null });
+          console.dir(aggregation, { depth: null });
 
           return (
             await this.mongoDBStocksTable

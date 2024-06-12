@@ -224,7 +224,10 @@ export default function Table(
                                                             {showPercentage && changePercentage && cell.column.id !== 'expander' ?
                                                                 `${changePercentage[cell.column.id]}%` :
                                                                 cell.column.id !== 'expander' ?
-                                                                    <span title={numeral(cell.value).format('0,0[.]00')}>{cell.value === null ? '-' : numeral(cell.value).format('(0.00a)')}</span> :
+                                                                    <span title={numeral(cell.value).format('0,0[.]00')}>
+                                                                        {cell.value === null ? 
+                                                                            '-' : cell.value < 10 ? numeral(cell.value).format('0%') : numeral(cell.value).format('(0.00a)')
+                                                                        }</span> :
                                                                     (
                                                                         <span
                                                                             {...row.getToggleRowExpandedProps()}
@@ -281,20 +284,39 @@ export default function Table(
                                                                 <small className="comparisson">{
                                                                     cell.column.id === 'expander' ?
                                                                         getComparisonOption(c) :
-                                                                        (row.original[c][cell.column.id] ?
-                                                                            <span
-                                                                                key={`${c}-${cell.column.id}-${row.cells[0].value}`}
-                                                                                title="average ・ sum ・ rank / number of companies"
-                                                                            >
-                                                                                <span className="number">{numeral(row.original[c][cell.column.id].avg?.$numberDecimal).format('(0a)')}</span>{'・'}
-                                                                                <span className="number">{numeral(row.original[c][cell.column.id].sum?.$numberDecimal).format('(0a)')}</span>{'・'}
-                                                                                <span className="number">
-                                                                                    TODO
-                                                                                    {
-                                                                                        //row.original[c][cell.column.id].rank}/{row.original[c][cell.column.id].count
-                                                                                    }
-                                                                                </span>
-                                                                            </span> : '-'
+                                                                        (row.original[c][cell.column.id] ? (
+                                                                            <>
+                                                                                {
+                                                                                    row.original[c][cell.column.id].avg?.$numberDecimal > 10 ? (
+                                                                                        <span
+                                                                                            key={`${c}-${cell.column.id}-${row.cells[0].value}`}
+                                                                                            title="average ・ sum ・ rank / number of companies"
+                                                                                        >
+                                                                                            <span className="number">{numeral(row.original[c][cell.column.id].avg?.$numberDecimal).format('(0a)')}</span>{'・'}
+                                                                                            <span className="number">{numeral(row.original[c][cell.column.id].sum?.$numberDecimal).format('(0a)')}</span>{'・'}
+                                                                                            <span className="number">
+                                                                                                TODO/
+                                                                                                {row.original[c][cell.column.id].count}
+                                                                                            </span>
+                                                                                        </span>
+                                                                                    ) : (
+                                                                                        <span
+                                                                                            key={`${c}-${cell.column.id}-${row.cells[0].value}`}
+                                                                                            title="average ・ rank / number of companies"
+                                                                                        >
+                                                                                            <span className="number">{numeral(row.original[c][cell.column.id].avg?.$numberDecimal).format('0%')}</span>{'・'}
+                                                                                            {/* <span className="number">{numeral(row.original[c][cell.column.id].sum?.$numberDecimal).format('(0a)')}</span>{'・'} */}
+                                                                                            <span className="number">
+                                                                                                TODO/
+                                                                                                {row.original[c][cell.column.id].count}
+                                                                                            </span>
+                                                                                        </span>
+                                                                                    )
+                                                                                }
+                                                                            </>
+
+                                                                        )
+                                                                            : '-'
                                                                         )
                                                                 }</small>
                                                             </div>
