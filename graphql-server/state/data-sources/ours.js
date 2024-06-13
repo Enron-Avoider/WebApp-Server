@@ -508,7 +508,7 @@ module.exports = {
               };
             })
             .filter(c => c.calc !== 'error')
-            //.splice(0,1);
+          //.splice(0,1);
 
           // console.dir(calcs_, { depth: null });
 
@@ -656,7 +656,7 @@ module.exports = {
                                   if: {
                                     '$eq': [
                                       {
-                                        '$toInt': 
+                                        '$toInt':
                                           { $divide: ['$rangeStep', 100000] }
                                       },
                                       0
@@ -676,7 +676,7 @@ module.exports = {
                                             "$rangeStep",
                                             100
                                           ]
-                                        }       
+                                        }
                                       },
                                       0
                                     ]
@@ -1186,6 +1186,58 @@ module.exports = {
     };
 
     getRows = async ({ }) => OursDataMaps.rowKeysPaths;
+
+    getRowsWithCounts = async ({ }) => {
+
+      const lastYear = new Date().getFullYear() - 1;
+
+      // console.log("getLastYearCounts for >", lastYear)
+
+      const agg = [
+        {
+          $match: {
+            // ...query,
+            "yearlyFinancialsByYear.year": {
+              $in: [`${lastYear}`],
+            },
+            is_in_exchange_country: true,
+          },
+        },
+        {
+          $facet: {
+            ...OursDataMaps.rowKeysPaths.reduce(
+              (p, c) => ({
+                ...p,
+                [c.replaceAll(".","_")]: [
+                  {
+                    $match: {
+                      [`yearlyFinancialsWithKeys.${c}`]: { $exists: true }
+                    },
+                  },
+                  {
+                    $count: "count"
+                  },
+                  { $sort: { count: -1 } },
+                ],
+              }),
+              {}
+            ),
+          },
+        },
+      ]
+
+      console.dir(agg, { depth: null });
+      const counts = async () =>
+        await this.mongoDBStocksTable
+          .aggregate(agg)
+          .toArray();
+
+      const counts_ = await counts();
+
+      console.log(counts_);
+
+      return counts_;
+    }
 
     getAggregationThroughCacheIfPossible = async ({
       cacheQuery,

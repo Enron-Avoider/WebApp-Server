@@ -18,6 +18,8 @@ module.exports = {
       dataSources.Ours.getUserById(params),
     getRows: async (_source, params, { dataSources }) =>
       dataSources.Ours.getRows(params),
+    getRowsWithCounts: async (_source, params, { dataSources }) =>
+      dataSources.Ours.getRowsWithCounts(params),
 
     // Internal
     getCurrencyToCurrencyTimeseries: async (_source, params, { dataSources }) =>

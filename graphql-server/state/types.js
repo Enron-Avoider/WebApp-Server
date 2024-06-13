@@ -91,6 +91,7 @@ const typeDefs = gql`
     getExchangeStocks(code: String): JSON
     getRatioCollections(userId: String!): [RatioCollection]
     getRows: JSON
+    getRowsWithCounts: JSON
 
     getUserById(id: String): User
   }
